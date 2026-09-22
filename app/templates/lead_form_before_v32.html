@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }} | WSBCO Insurance CRM{% endblock %}
+
+{% macro value(field, default='') -%}
+  {%- if lead is mapping -%}
+    {{ lead.get(field, default) or default }}
+  {%- elif lead -%}
+    {{ lead|attr(field) or default }}
+  {%- else -%}
+    {{ default }}
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro checked(field) -%}
+  {%- if lead is mapping and lead.get(field) -%}checked
+  {%- elif lead and not lead is mapping and lead|attr(field) -%}checked
+  {%- endif -%}
+{%- endmacro %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Contact Record</p>
+    <h1>{{ page_title }}</h1>
+    <p>Enter the prospect's contact, Medicare, product-interest, and follow-up details.</p>
+  </div>
+</section>
+
+{% if error %}
+<div class="notice error">{{ error }}</div>
+{% endif %}
+
+<form class="contact-form" method="post">
+  <section class="form-section">
+    <div class="section-title">
+      <span>1</span>
+      <div><h2>Personal Information</h2><p>Basic contact and eligibility information.</p></div>
+    </div>
+
+    <div class="form-grid">
+      <label>First Name *
+        <input name="first_name" required value="{{ value('first_name') }}">
+      </label>
+      <label>Last Name *
+        <input name="last_name" required value="{{ value('last_name') }}">
+      </label>
+      <label>Spouse
+        <input name="spouse" value="{{ value('spouse') }}">
+      </label>
+      <label>Date of Birth
+        <input type="date" name="date_of_birth" value="{{ value('date_of_birth') }}">
+      </label>
+      <label>Medicare Effective Date
+        <input type="date" name="medicare_effective_date" value="{{ value('medicare_effective_date') }}">
+      </label>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="section-title">
+      <span>2</span>
+      <div><h2>Medicare and Coverage</h2><p>Sensitive identifiers are masked on the contact screen.</p></div>
+    </div>
+
+    <div class="form-grid">
+      <label>Medicare MBI
+        <input name="medicare_mbi" autocomplete="off" value="{{ value('medicare_mbi') }}">
+      </label>
+      <label>Medicaid Number
+        <input name="medicaid_number" autocomplete="off" value="{{ value('medicaid_number') }}">
+      </label>
+      <label>Plan ID
+        <input name="plan_id" placeholder="H1234-001" value="{{ value('plan_id') }}">
+      </label>
+      <label class="wide">Current Coverage
+        <input name="current_coverage" value="{{ value('current_coverage') }}">
+      </label>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="section-title">
+      <span>3</span>
+      <div><h2>Contact Information</h2><p>Phone, email, and mailing address.</p></div>
+    </div>
+
+    <div class="form-grid">
+      <label>Phone
+        <input type="tel" name="phone" value="{{ value('phone') }}">
+      </label>
+      <label>Mobile
+        <input type="tel" name="mobile" value="{{ value('mobile') }}">
+      </label>
+      <label>Email
+        <input type="email" name="email" value="{{ value('email') }}">
+      </label>
+      <label class="wide">Address
+        <input name="address" value="{{ value('address') }}">
+      </label>
+      <label>City
+        <input name="city" value="{{ value('city') }}">
+      </label>
+      <label>State
+        <input name="state" maxlength="2" value="{{ value('state', 'OR') }}">
+      </label>
+      <label>ZIP
+        <input name="zip_code" value="{{ value('zip_code') }}">
+      </label>
+      <label>County
+        <input name="county" value="{{ value('county') }}">
+      </label>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="section-title">
+      <span>4</span>
+      <div><h2>Product Interest</h2><p>Select all products the prospect wants to discuss.</p></div>
+    </div>
+
+    <div class="checkbox-grid">
+      <label><input type="checkbox" name="interested_supplement" {{ checked('interested_supplement') }}> Medicare Supplement</label>
+      <label><input type="checkbox" name="interested_advantage" {{ checked('interested_advantage') }}> Medicare Advantage</label>
+      <label><input type="checkbox" name="interested_pdp" {{ checked('interested_pdp') }}> Prescription Drug Plan</label>
+      <label><input type="checkbox" name="interested_dental" {{ checked('interested_dental') }}> Dental Insurance</label>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div class="section-title">
+      <span>5</span>
+      <div><h2>Sales and Follow-up</h2><p>Lead status, ownership, notes, and next action.</p></div>
+    </div>
+
+    <div class="form-grid">
+      <label>Status
+        <select name="status">
+          {% set current_status = value('status', 'New')|trim %}
+          {% for option in ["New", "Attempt Again", "Callback", "Appointment Set", "Interested", "Sold", "Not Interested", "Do Not Call", "Wrong Number"] %}
+          <option value="{{ option }}" {% if current_status == option %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label>Priority
+        {% set current_priority = value('priority', 'Normal')|trim %}
+        <select name="priority">
+          {% for option in ["Low", "Normal", "High", "Urgent"] %}
+          <option value="{{ option }}" {% if current_priority == option %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label>Lead Source
+        <input name="lead_source" value="{{ value('lead_source') }}">
+      </label>
+      <label>Agent
+        <input name="agent" value="{{ value('agent') }}">
+      </label>
+      <label>Last Contact
+        <input type="datetime-local" name="last_contact" value="{{ value('last_contact') }}">
+      </label>
+      <label>Next Follow-up
+        <input type="date" name="next_follow_up" value="{{ value('next_follow_up') }}">
+      </label>
+      <label>Follow-up Type
+        <input name="follow_up_type" placeholder="Phone, email, appointment..." value="{{ value('follow_up_type') }}">
+      </label>
+      <label>Call Attempts
+        <input type="number" min="0" name="call_attempts" value="{{ value('call_attempts', 0) }}">
+      </label>
+      <label class="wide">Notes
+        <textarea name="notes" rows="8">{{ value('notes') }}</textarea>
+      </label>
+    </div>
+  </section>
+
+  <div class="form-actions">
+    <a class="button ghost" href="{% if lead and lead.id %}/leads/{{ lead.id }}{% else %}/leads{% endif %}">Cancel</a>
+    <button class="button primary" type="submit">Save Contact</button>
+  </div>
+</form>
+{% endblock %}

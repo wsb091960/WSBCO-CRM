@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Power Dialer | WSBCO Insurance CRM{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Phase 1.2</p>
+    <h1>Twilio Power Dialer</h1>
+    <p>Call your phone first, then connect to the selected Medicare prospect.</p>
+  </div>
+</section>
+
+{% if not configured %}
+<div class="notice error">
+  Twilio is not configured. Copy <strong>.env.example</strong> to
+  <strong>.env</strong>, enter your credentials and phone numbers, and restart Uvicorn.
+</div>
+{% endif %}
+
+<section class="dialer-grid">
+  <article class="panel next-lead-card">
+    <div class="panel-heading">
+      <div>
+        <h2>Next Eligible Lead</h2>
+        <p>Ordered by follow-up date, priority, and contact ID.</p>
+      </div>
+    </div>
+
+    {% if next_lead %}
+      <h3>{{ next_lead.first_name }} {{ next_lead.last_name }}</h3>
+      <p class="lead-phone">{{ next_lead.phone or next_lead.mobile }}</p>
+      <div class="lead-meta">
+        <span>{{ next_lead.status }}</span>
+        <span>{{ next_lead.priority }} priority</span>
+        <span>{{ next_lead.call_attempts }} attempts</span>
+      </div>
+      <div class="notes-preview">{{ next_lead.notes or "No contact notes." }}</div>
+
+      <div class="button-row">
+        <a class="button secondary" href="/leads/{{ next_lead.id }}">Open Contact</a>
+        <form method="post" action="/dialer/call-next">
+          <button class="button primary" type="submit" {% if not configured %}disabled{% endif %}>
+            Call Next Lead
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <h3>No eligible leads</h3>
+        <p>New, Attempt Again, Callback, and Interested contacts appear here.</p>
+      </div>
+    {% endif %}
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading">
+      <div>
+        <h2>How It Works</h2>
+        <p>Agent-first calling prevents the prospect from hearing dead air.</p>
+      </div>
+    </div>
+    <ol class="workflow-list">
+      <li>Click <strong>Call Next Lead</strong>.</li>
+      <li>Twilio calls your agent phone.</li>
+      <li>Answer and hear the connection message.</li>
+      <li>Twilio dials the contact.</li>
+      <li>Save the disposition and follow-up.</li>
+    </ol>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-heading">
+    <div>
+      <h2>Recent Call History</h2>
+      <p>The latest 20 Twilio call attempts.</p>
+    </div>
+  </div>
+
+  {% if history %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Started</th>
+          <th>Contact</th>
+          <th>Number</th>
+          <th>Status</th>
+          <th>Duration</th>
+          <th>Disposition</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for call in history %}
+        <tr>
+          <td>{{ call.started_at }}</td>
+          <td><a href="/leads/{{ call.lead_id }}">{{ lead_names.get(call.lead_id, "Contact") }}</a></td>
+          <td>{{ call.lead_phone }}</td>
+          <td><span class="badge">{{ call.status }}</span></td>
+          <td>{{ call.duration_seconds }} sec</td>
+          <td>{{ call.disposition or "—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h3>No call history yet</h3>
+    <p>Your Twilio call attempts will appear here.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

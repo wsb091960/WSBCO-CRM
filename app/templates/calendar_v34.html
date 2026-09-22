@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Follow-Up Center | WSBCO{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/calendar_v34.css?v=34">
+<div class="fu">
+<header class="fu-head"><div><small>SALES WORKFLOW</small><h1>Follow-Up Center</h1><p>Today's calls, overdue prospects, and upcoming Medicare follow-ups.</p></div><a class="primary" href="/dialer"><i class="bi bi-telephone"></i> Power Dialer</a></header>
+<div class="stats">
+ <a href="/calendar?view=today" class="{{'active' if view=='today'}}"><span>TODAY</span><b>{{counts.today}}</b><small>Due today</small></a>
+ <a href="/calendar?view=overdue" class="{{'active' if view=='overdue'}}"><span>OVERDUE</span><b>{{counts.overdue}}</b><small>Needs attention</small></a>
+ <a href="/calendar?view=upcoming" class="{{'active' if view=='upcoming'}}"><span>UPCOMING</span><b>{{counts.upcoming}}</b><small>Scheduled ahead</small></a>
+ <a href="/calendar?view=all" class="{{'active' if view=='all'}}"><span>ALL OPEN</span><b>{{counts.all}}</b><small>Follow-ups</small></a>
+</div>
+<section class="queue">
+<div class="queue-head"><div><h2>{{view|capitalize}} Follow-Ups</h2><p>{{items|length}} contact{% if items|length != 1 %}s{% endif %} in this queue</p></div>
+<nav><a href="/calendar?view=today" class="{{'active' if view=='today'}}">Today</a><a href="/calendar?view=overdue" class="{{'active' if view=='overdue'}}">Overdue</a><a href="/calendar?view=upcoming" class="{{'active' if view=='upcoming'}}">Upcoming</a><a href="/calendar?view=all" class="{{'active' if view=='all'}}">All</a></nav></div>
+{% if items %}
+<div class="table-wrap"><table><thead><tr><th>CONTACT</th><th>FOLLOW-UP</th><th>TYPE</th><th>STATUS</th><th>PRIORITY</th><th>MEDICARE</th><th>ACTIONS</th></tr></thead><tbody>
+{% for x in items %}<tr>
+<td><div class="contact"><div class="avatar">{{(x.first_name or '?')[0]}}{{(x.last_name or '')[0]}}</div><div><b>{{x.first_name}} {{x.last_name}}</b><small>{{x.mobile or x.phone or 'No phone'}}</small></div></div></td>
+<td><b class="date {{x.bucket}}">{{x.follow_date.strftime('%b %d, %Y')}}</b><small>{% if x.days_delta < 0 %}{{-x.days_delta}} day{% if -x.days_delta != 1 %}s{% endif %} overdue{% elif x.days_delta == 0 %}Due today{% else %}In {{x.days_delta}} day{% if x.days_delta != 1 %}s{% endif %}{% endif %}</small></td>
+<td>{{x.follow_up_type or 'Follow-up'}}</td><td><span class="status">{{x.status or 'New'}}</span></td><td><b>{{x.priority or 'Normal'}}</b></td>
+<td>{{x.medicare_effective_date or '—'}}</td>
+<td><div class="actions"><form method="post" action="/leads/{{x.id}}/call"><button title="Call"><i class="bi bi-telephone-fill"></i></button></form><a href="/leads/{{x.id}}" title="Open"><i class="bi bi-arrow-up-right"></i></a><a href="/leads/{{x.id}}/edit" title="Edit"><i class="bi bi-pencil"></i></a></div></td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="empty"><i class="bi bi-calendar2-check"></i><h3>Queue is clear</h3><p>No {{view}} follow-ups are scheduled.</p><a href="/leads">View Contacts</a></div>{% endif %}
+</section></div>
+{% endblock %}

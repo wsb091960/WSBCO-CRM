@@ -1,0 +1,1 @@
+document.querySelectorAll('.counter').forEach(e=>{let t=+e.textContent,n=0;e.textContent=0;let i=setInterval(()=>{n++;e.textContent=n;if(n>=t)clearInterval(i)},30)});

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}{{ lead.first_name }} {{ lead.last_name }} | WSBCO CRM{% endblock %}
+
+{% block content %}
+{% if saved %}
+<div class="notice success">Contact saved successfully.</div>
+{% endif %}
+{% if calling %}
+<div class="notice success">
+  Twilio is calling your agent phone. Answer it to connect with this contact.
+</div>
+{% endif %}
+{% if call_error %}
+<div class="notice error">{{ call_error }}</div>
+{% endif %}
+
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Contact #{{ lead.id }}</p>
+    <h1>{{ lead.first_name }} {{ lead.last_name }}</h1>
+    <p>{{ lead.status }} · {{ lead.priority }} priority · {{ lead.call_attempts }} call attempts</p>
+  </div>
+  <div class="button-row">
+    <a class="button secondary" href="/leads/{{ lead.id }}/edit">Edit Contact</a>
+    <form method="post" action="/leads/{{ lead.id }}/call">
+      <button class="button primary" type="submit"
+        {% if lead.status == "Do Not Call" or not (lead.phone or lead.mobile) %}disabled{% endif %}>
+        Call Lead
+      </button>
+    </form>
+  </div>
+</section>
+
+<section class="detail-grid">
+  <article class="panel">
+    <div class="panel-heading"><h2>Contact Information</h2></div>
+    <dl class="detail-list">
+      <div><dt>Phone</dt><dd>{{ lead.phone or "—" }}</dd></div>
+      <div><dt>Mobile</dt><dd>{{ lead.mobile or "—" }}</dd></div>
+      <div><dt>Email</dt><dd>{{ lead.email or "—" }}</dd></div>
+      <div><dt>Address</dt><dd>{{ lead.address or "—" }}</dd></div>
+      <div><dt>Location</dt><dd>{{ lead.city }}{% if lead.state %}, {{ lead.state }}{% endif %} {{ lead.zip_code }}</dd></div>
+      <div><dt>County</dt><dd>{{ lead.county or "—" }}</dd></div>
+    </dl>
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><h2>Medicare Information</h2></div>
+    <dl class="detail-list">
+      <div><dt>Date of Birth</dt><dd>{{ lead.date_of_birth or "—" }}</dd></div>
+      <div><dt>Medicare Effective</dt><dd>{{ lead.medicare_effective_date or "—" }}</dd></div>
+      <div><dt>Medicare MBI</dt><dd class="sensitive">{{ "••••••••" + lead.medicare_mbi[-3:] if lead.medicare_mbi else "—" }}</dd></div>
+      <div><dt>Medicaid Number</dt><dd class="sensitive">{{ "••••••" + lead.medicaid_number[-4:] if lead.medicaid_number else "—" }}</dd></div>
+      <div><dt>Plan ID</dt><dd>{{ lead.plan_id or "—" }}</dd></div>
+      <div><dt>Current Coverage</dt><dd>{{ lead.current_coverage or "—" }}</dd></div>
+    </dl>
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><h2>Sales Profile</h2></div>
+    <dl class="detail-list">
+      <div><dt>Spouse</dt><dd>{{ lead.spouse or "—" }}</dd></div>
+      <div><dt>Lead Source</dt><dd>{{ lead.lead_source or "—" }}</dd></div>
+      <div><dt>Agent</dt><dd>{{ lead.agent or "—" }}</dd></div>
+      <div><dt>Last Contact</dt><dd>{{ lead.last_contact or "—" }}</dd></div>
+      <div><dt>Next Follow-up</dt><dd>{{ lead.next_follow_up or "—" }}</dd></div>
+      <div><dt>Follow-up Type</dt><dd>{{ lead.follow_up_type or "—" }}</dd></div>
+    </dl>
+
+    <div class="interest-list">
+      <span class="{% if lead.interested_supplement %}active{% endif %}">Supplement</span>
+      <span class="{% if lead.interested_advantage %}active{% endif %}">Advantage</span>
+      <span class="{% if lead.interested_pdp %}active{% endif %}">PDP</span>
+      <span class="{% if lead.interested_dental %}active{% endif %}">Dental</span>
+    </div>
+  </article>
+
+  <article class="panel">
+    <div class="panel-heading"><h2>Contact Notes</h2></div>
+    <div class="notes-box">{{ lead.notes or "No notes have been entered." }}</div>
+  </article>
+</section>
+
+{% if call_id %}
+<section class="panel disposition-panel">
+  <div class="panel-heading">
+    <div>
+      <h2>Call Disposition</h2>
+      <p>Record the outcome after the call.</p>
+    </div>
+  </div>
+  <form method="post" action="/calls/{{ call_id }}/disposition" class="form-grid">
+    <label>Disposition
+      <select name="disposition" required>
+        <option value="">Select outcome</option>
+        {% for option in ["No Answer", "Voicemail", "Callback", "Appointment Set", "Interested", "Not Interested", "Do Not Call", "Wrong Number", "Sold"] %}
+        <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Next Follow-up
+      <input type="date" name="next_follow_up">
+    </label>
+    <label class="wide">Call Notes
+      <textarea name="notes" rows="5"></textarea>
+    </label>
+    <div class="wide form-actions">
+      <button class="button primary" type="submit">Save Call Result</button>
+    </div>
+  </form>
+</section>
+{% endif %}
+
+<section class="danger-zone">
+  <form method="post" action="/leads/{{ lead.id }}/delete" onsubmit="return confirm('Delete this contact? This cannot be undone.');">
+    <button class="link-danger" type="submit">Delete Contact</button>
+  </form>
+</section>
+{% endblock %}

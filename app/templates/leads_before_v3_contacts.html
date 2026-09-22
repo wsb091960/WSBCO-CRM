@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Contacts | WSBCO Insurance CRM{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Contact Management</p>
+    <h1>Contacts and Leads</h1>
+    <p>Search, review, and update your Medicare prospects.</p>
+  </div>
+  <a class="button primary" href="/leads/new">+ Add Contact</a>
+</section>
+
+<section class="panel">
+  <form class="filter-bar" method="get" action="/leads">
+    <input
+      type="search"
+      name="q"
+      value="{{ q }}"
+      placeholder="Search name, phone, email, city, or ZIP"
+    >
+    <select name="status">
+      <option value="">All statuses</option>
+      {% for option in ["New", "Attempt Again", "Callback", "Appointment Set", "Interested", "Sold", "Not Interested", "Do Not Call"] %}
+      <option value="{{ option }}" {% if status == option %}selected{% endif %}>{{ option }}</option>
+      {% endfor %}
+    </select>
+    <button class="button secondary" type="submit">Search</button>
+    <a class="button ghost" href="/leads">Clear</a>
+  </form>
+
+  {% if leads %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Contact</th>
+          <th>Phone</th>
+          <th>Coverage / Interest</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Next Follow-up</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+        <tr>
+          <td>
+            <strong>{{ lead.first_name }} {{ lead.last_name }}</strong>
+            <small>{{ lead.email or "No email" }}</small>
+          </td>
+          <td>
+            {{ lead.phone or "—" }}
+            <small>{{ lead.mobile }}</small>
+          </td>
+          <td>
+            {{ lead.current_coverage or "Not entered" }}
+            <small>
+              {% if lead.interested_supplement %}Supplement {% endif %}
+              {% if lead.interested_advantage %}Advantage {% endif %}
+              {% if lead.interested_pdp %}PDP {% endif %}
+              {% if lead.interested_dental %}Dental{% endif %}
+            </small>
+          </td>
+          <td><span class="badge">{{ lead.status }}</span></td>
+          <td>{{ lead.priority }}</td>
+          <td>{{ lead.next_follow_up or "—" }}</td>
+          <td><a href="/leads/{{ lead.id }}">Open</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h3>No matching contacts</h3>
+    <p>Try a different search or add a new contact.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

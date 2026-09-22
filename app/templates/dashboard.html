@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | WSBCO Insurance CRM{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">Phase 1.1</p>
+    <h1>Insurance CRM Dashboard</h1>
+    <p>Manage Medicare prospects, contact information, notes, and follow-ups.</p>
+  </div>
+  <a class="button primary" href="/leads/new">+ Add Contact</a>
+</section>
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <span>Total Contacts</span>
+    <strong>{{ total }}</strong>
+  </article>
+  <article class="stat-card">
+    <span>New Leads</span>
+    <strong>{{ new_count }}</strong>
+  </article>
+  <article class="stat-card">
+    <span>Follow-ups</span>
+    <strong>{{ follow_up_count }}</strong>
+  </article>
+  <article class="stat-card">
+    <span>High Priority</span>
+    <strong>{{ high_priority_count }}</strong>
+  </article>
+</section>
+
+<section class="panel">
+  <div class="panel-heading">
+    <div>
+      <h2>Recently Updated</h2>
+      <p>Your most recently added or edited contacts.</p>
+    </div>
+    <a href="/leads">View all contacts</a>
+  </div>
+
+  {% if recent %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Contact</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Priority</th>
+          <th>Next Follow-up</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in recent %}
+        <tr>
+          <td>
+            <strong>{{ lead.first_name }} {{ lead.last_name }}</strong>
+            <small>{{ lead.city }}{% if lead.state %}, {{ lead.state }}{% endif %}</small>
+          </td>
+          <td>{{ lead.phone or lead.mobile or "—" }}</td>
+          <td><span class="badge">{{ lead.status }}</span></td>
+          <td>{{ lead.priority }}</td>
+          <td>{{ lead.next_follow_up or "—" }}</td>
+          <td><a href="/leads/{{ lead.id }}">Open</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <h3>No contacts yet</h3>
+    <p>Add your first Medicare prospect to begin building the CRM.</p>
+    <a class="button primary" href="/leads/new">Add First Contact</a>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

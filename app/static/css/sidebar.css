@@ -1,0 +1,150 @@
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 24px;
+  background: var(--navy);
+  color: #fff;
+
+  overflow-y: auto;
+}
+
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  margin: 0 0 28px;
+}
+
+.brand-logo {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 14px;
+  background: var(--teal);
+
+  color: #fff;
+  font-size: 24px;
+}
+
+.brand h4 {
+  margin: 0;
+  color: #fff;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.brand p {
+  margin: 6px 0 0;
+  color: #fff;
+  font-size: 17px;
+}
+
+/* Navigation */
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar nav a {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  min-height: 48px;
+  padding: 11px 13px;
+
+  border-radius: 11px;
+
+  color: #e7eef5;
+  font-size: 16px;
+  font-weight: 500;
+
+  text-decoration: none;
+
+  transition:
+    background 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
+}
+
+.sidebar nav a i {
+  width: 20px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.sidebar nav a:hover {
+  background: rgba(255, 255, 255, 0.09);
+  color: #fff;
+  transform: translateX(2px);
+}
+
+/* Agent profile stays at bottom */
+.agent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-top: auto;
+  padding-top: 20px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.agent > i {
+  font-size: 28px;
+}
+
+.agent strong,
+.agent small {
+  display: block;
+}
+
+.agent strong {
+  color: #fff;
+  font-size: 14px;
+}
+
+.agent small {
+  margin-top: 2px;
+  color: #aac0d2;
+  font-size: 11px;
+}
+
+/* Narrow screens */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    padding: 20px 14px;
+  }
+
+  .brand h4 {
+    font-size: 22px;
+  }
+
+  .brand p {
+    font-size: 14px;
+  }
+
+  .sidebar nav a {
+    font-size: 14px;
+  }
+}

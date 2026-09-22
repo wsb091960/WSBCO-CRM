@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}Contacts | WSBCO Medicare Sales{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/contacts.css?v=3.0">
+
+<section class="contacts-page">
+  <header class="contacts-hero">
+    <div>
+      <p class="eyebrow">Contact Management</p>
+      <h1>Contacts & Leads</h1>
+      <p>Search, review, call, and follow up with your Medicare prospects.</p>
+    </div>
+    <div class="hero-actions">
+      <a href="/dialer" class="btn btn-outline-primary"><i class="bi bi-telephone-outbound"></i> Power Dialer</a>
+      <a href="/leads/new" class="btn btn-primary"><i class="bi bi-person-plus"></i> New Contact</a>
+    </div>
+  </header>
+
+  <section class="toolbar-card">
+    <form class="contacts-toolbar" method="get" action="/leads">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input type="search" name="q" value="{{ q }}" placeholder="Search name, phone, email, city, or ZIP">
+      </div>
+      <div class="filter-box">
+        <i class="bi bi-funnel"></i>
+        <select name="status">
+          <option value="">All statuses</option>
+          {% for option in ["New","In Progress","Attempt Again","Callback","Appointment Set","Interested","Sold","Not Interested","Do Not Call","Wrong Number"] %}
+          <option value="{{ option }}" {% if status == option %}selected{% endif %}>{{ option }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit">Search</button>
+      {% if q or status %}<a class="btn btn-light" href="/leads">Clear</a>{% endif %}
+    </form>
+  </section>
+
+  <div class="contacts-summary">
+    <span><strong>{{ leads|length }}</strong> {% if leads|length == 1 %}contact{% else %}contacts{% endif %}</span>
+    <span><i class="bi bi-info-circle"></i> Call, open, or edit directly from the list.</span>
+  </div>
+
+  {% if leads %}
+  <section class="table-card">
+    <div class="desktop-contacts">
+      <div class="contacts-head">
+        <div>Contact</div><div>Medicare</div><div>Interest</div><div>Status</div><div>Priority</div><div>Next Follow-up</div><div>Actions</div>
+      </div>
+
+      {% for lead in leads %}
+      {% set initials = (lead.first_name[:1] if lead.first_name else "") ~ (lead.last_name[:1] if lead.last_name else "") %}
+      {% set status_key = (lead.status or "New")|lower|replace(" ","-") %}
+      {% set priority_key = (lead.priority or "Normal")|lower|replace(" ","-") %}
+      <article class="contact-row">
+        <div class="person-cell">
+          <div class="avatar">{{ initials|upper or "?" }}</div>
+          <div>
+            <a class="person-name" href="/leads/{{ lead.id }}">{{ lead.first_name }} {{ lead.last_name }}</a>
+            <div class="secondary">
+              {% if lead.phone %}<i class="bi bi-telephone"></i> {{ lead.phone }}
+              {% elif lead.mobile %}<i class="bi bi-phone"></i> {{ lead.mobile }}
+              {% else %}No phone{% endif %}
+            </div>
+            {% if lead.email %}<div class="tertiary">{{ lead.email }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="stack-cell">
+          <strong>{{ lead.medicare_effective_date or "—" }}</strong>
+          <span>{{ lead.current_coverage or "Coverage not entered" }}</span>
+        </div>
+
+        <div class="product-pills">
+          {% if lead.interested_supplement %}<span class="pill supplement">Supplement</span>{% endif %}
+          {% if lead.interested_advantage %}<span class="pill advantage">Advantage</span>{% endif %}
+          {% if lead.interested_pdp %}<span class="pill pdp">PDP</span>{% endif %}
+          {% if lead.interested_dental %}<span class="pill dental">Dental</span>{% endif %}
+          {% if not (lead.interested_supplement or lead.interested_advantage or lead.interested_pdp or lead.interested_dental) %}
+          <span class="muted">No interest selected</span>{% endif %}
+        </div>
+
+        <div><span class="status status-{{ status_key }}"><span></span>{{ lead.status or "New" }}</span></div>
+        <div><span class="priority priority-{{ priority_key }}">{{ lead.priority or "Normal" }}</span></div>
+
+        <div class="stack-cell">
+          <strong>{{ lead.next_follow_up or "—" }}</strong>
+          {% if lead.follow_up_type %}<span>{{ lead.follow_up_type }}</span>{% endif %}
+        </div>
+
+        <div class="actions">
+          {% if lead.status != "Do Not Call" and (lead.phone or lead.mobile) %}
+          <form method="post" action="/leads/{{ lead.id }}/call">
+            <button class="icon-btn call" type="submit" title="Call"><i class="bi bi-telephone-fill"></i></button>
+          </form>
+          {% else %}
+          <button class="icon-btn disabled" type="button" disabled><i class="bi bi-telephone-x"></i></button>
+          {% endif %}
+          <a class="icon-btn" href="/leads/{{ lead.id }}" title="Open"><i class="bi bi-arrow-up-right"></i></a>
+          <a class="icon-btn edit" href="/leads/{{ lead.id }}/edit" title="Edit"><i class="bi bi-pencil"></i></a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+    <div class="mobile-contacts">
+      {% for lead in leads %}
+      {% set initials = (lead.first_name[:1] if lead.first_name else "") ~ (lead.last_name[:1] if lead.last_name else "") %}
+      {% set status_key = (lead.status or "New")|lower|replace(" ","-") %}
+      <article class="mobile-card">
+        <div class="mobile-top">
+          <div class="avatar">{{ initials|upper or "?" }}</div>
+          <div class="mobile-name"><a href="/leads/{{ lead.id }}">{{ lead.first_name }} {{ lead.last_name }}</a><span>{{ lead.phone or lead.mobile or "No phone" }}</span></div>
+          <span class="status status-{{ status_key }}"><span></span>{{ lead.status or "New" }}</span>
+        </div>
+        <div class="mobile-grid">
+          <div><small>Medicare Effective</small><strong>{{ lead.medicare_effective_date or "—" }}</strong></div>
+          <div><small>Priority</small><strong>{{ lead.priority or "Normal" }}</strong></div>
+          <div><small>Next Follow-up</small><strong>{{ lead.next_follow_up or "—" }}</strong></div>
+          <div><small>Coverage</small><strong>{{ lead.current_coverage or "—" }}</strong></div>
+        </div>
+        <div class="mobile-actions">
+          {% if lead.status != "Do Not Call" and (lead.phone or lead.mobile) %}
+          <form method="post" action="/leads/{{ lead.id }}/call"><button class="btn btn-primary" type="submit"><i class="bi bi-telephone-fill"></i> Call</button></form>
+          {% endif %}
+          <a class="btn btn-outline-primary" href="/leads/{{ lead.id }}">Open</a>
+          <a class="btn btn-light" href="/leads/{{ lead.id }}/edit">Edit</a>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% else %}
+  <section class="empty-state">
+    <div class="empty-icon"><i class="bi bi-people"></i></div>
+    <h2>No contacts found</h2>
+    <p>{% if q or status %}No contacts match your current search or filter.{% else %}Add your first Medicare prospect to begin.{% endif %}</p>
+    {% if q or status %}<a class="btn btn-outline-primary" href="/leads">Clear Filters</a>
+    {% else %}<a class="btn btn-primary" href="/leads/new">Add First Contact</a>{% endif %}
+  </section>
+  {% endif %}
+</section>
+{% endblock %}
