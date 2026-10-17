@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Import Data | WSBCO CRM{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/imports_v35.css?v=3.5">
+<section class="imports-page">
+  <header class="import-heading">
+    <div><p class="import-eyebrow">Contact management</p><h1>Import Data</h1><p>Bring your contacts into WSBCO from a spreadsheet.</p></div>
+    <a class="btn btn-outline-primary" href="/leads">Back to Contacts</a>
+  </header>
+  <ol class="import-steps" aria-label="Import progress">
+    {% for label in ['Choose source', 'Match columns', 'Review', 'Results'] %}
+    <li {% if (step == 'source' and loop.index == 1) or (step == 'mapping' and loop.index == 2) or (step == 'preview' and loop.index == 3) or (step == 'done' and loop.index == 4) %}aria-current="step"{% endif %}><span>{{ loop.index }}</span>{{ label }}</li>
+    {% endfor %}
+  </ol>
+  {% if error %}<div role="alert" class="alert alert-danger">{{ error }}</div>{% endif %}
+  {% if step == 'source' %}
+  <div class="import-source-grid">
+    <section class="import-card">
+      <h2><i class="bi bi-file-earmark-spreadsheet"></i> CSV or Excel</h2>
+      <p>Choose a file from your computer, Chromebook, or tablet.</p>
+      <form method="post" action="/imports/source" enctype="multipart/form-data">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="source_type" value="file">
+        <label for="contact-file">Contact file</label><input id="contact-file" class="form-control" type="file" name="file" accept=".csv,.xlsx,.xls" required>
+        <label for="excel-tab">Excel tab name <small>(optional)</small></label><input id="excel-tab" class="form-control" name="worksheet" maxlength="100" placeholder="Uses the first tab if blank">
+        <p class="import-help">Headings on row 1 · Up to 10 MB and 10,000 data rows · .csv, .xlsx, .xls</p>
+        <button class="btn btn-primary" type="submit">Continue to column matching</button>
+      </form>
+    </section>
+    <section class="import-card">
+      <h2><i class="bi bi-google"></i> Google Sheets</h2>
+      <p>Paste a link to a sheet shared with your configured Google connection.</p>
+      <form method="post" action="/imports/source">
+        <input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="source_type" value="sheets">
+        <label for="sheet-link">Google Sheets link</label><input id="sheet-link" class="form-control" type="url" name="sheet_url" required placeholder="https://docs.google.com/spreadsheets/d/…">
+        <label for="google-tab">Tab name <small>(optional)</small></label><input id="google-tab" class="form-control" name="worksheet" maxlength="100" placeholder="Uses the tab selected in your link">
+        <p class="import-help">Reads a copy of the selected tab. Your Google Sheet stays unchanged.</p>
+        <button class="btn btn-primary" type="submit">Read sheet and match columns</button>
+      </form>
+    </section>
+  </div>
+  <section class="import-card import-note"><h2>Start with your existing spreadsheet</h2><p>Column names can differ from the CRM. Match them on the next screen, then review every row before saving. First and last names are required. Dates can use YYYY-MM-DD or MM/DD/YYYY.</p><a href="/imports/template.csv">Download a blank CSV template</a></section>
+  {% elif step == 'mapping' %}
+  <section class="import-card">
+    <h2>Match your columns</h2><p><strong>{{ batch.source }}</strong> · {{ table.rows|length }} rows found. Check the suggested matches, and leave unwanted columns set to Skip.</p>
+    <form method="post" action="/imports/{{ batch.id }}/preview">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="import-table-wrap"><table class="table import-mapping"><thead><tr><th>Source column</th><th>First value</th><th>CRM field</th></tr></thead><tbody>
+      {% for header in table.headers %}{% set i = loop.index0 %}
+      <tr><th scope="row"><label for="column-{{ i }}">{{ header }}</label></th><td class="import-sample">{{ table.rows[0]['values'][i] or '—' }}</td><td><select class="form-select" id="column-{{ i }}" name="column_{{ i }}"><option value="">Skip this column</option>{% for field in fields %}<option value="{{ field }}" {% if mapping[i] == field %}selected{% endif %}>{{ labels[field] }}</option>{% endfor %}</select></td></tr>
+      {% endfor %}</tbody></table></div>
+      <fieldset class="import-policy"><legend>When a contact already exists</legend>
+        <label><input type="radio" name="mode" value="skip" {% if mode != 'update' %}checked{% endif %}> Skip matching contacts <small>Recommended for adding a new list.</small></label>
+        <label><input type="radio" name="mode" value="update" {% if mode == 'update' %}checked{% endif %}> Update matching contacts <small>Only matched fields with nonblank values change. Existing Do Not Call status is protected.</small></label>
+      </fieldset>
+      <p class="import-help">Matches use Medicare MBI, email, phone, or full name plus birth date. Conflicting identities are flagged. Repeated contacts in the source are skipped after the first valid row.</p>
+      <button class="btn btn-primary" type="submit">Preview import</button>
+    </form>
+  </section>
+  {% elif step == 'preview' %}
+  <section class="import-card">
+    <h2>Review before saving</h2><p><strong>{{ batch.source }}</strong> · Nothing has been saved yet.</p>
+    <div class="import-counts">{% for action, label in [('create','New contacts'),('update','Updates'),('skip','Skipped'),('error','Needs correction')] %}<div><strong>{{ result.counts[action] }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
+    <p>Rows marked Needs correction will be left out. Fix them in your source file and import them again. <a href="/imports/{{ batch.id }}/results.csv">Download all row results</a></p>
+    <div class="import-table-wrap"><table class="table"><thead><tr><th>Row</th><th>Name</th><th>Result</th><th>Details / fields to save</th></tr></thead><tbody>
+    {% for row in result.rows[:200] %}<tr><td>{{ row.row }}</td><td>{{ row.name or '—' }}</td><td><span class="import-badge import-{{ row.action }}">{{ {'create':'New','update':'Update','skip':'Skip','error':'Needs correction'}[row.action] }}</span></td><td>{{ row.message }}{% if row.action in ['create','update'] %}<details><summary>View matched values{% if row.action == 'update' %} and current values{% endif %}</summary><dl class="import-values">{% for field,value in row.data.items() %}<dt>{{ labels[field] }}</dt><dd>{% if row.action == 'update' %}<span class="import-before">{{ row.before[field] if row.before[field] is not none else 'Blank' }} → </span>{% endif %}{{ value }}</dd>{% endfor %}</dl></details>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>
+    {% if result.rows|length > 200 %}<p class="import-help">Showing the first 200 of {{ result.rows|length }} rows. The download contains every result; counts include all rows.</p>{% endif %}
+    <div class="import-actions"><a class="btn btn-outline-primary" href="/imports/{{ batch.id }}">Change column matching</a>
+      {% if result.counts['create'] + result.counts['update'] > 0 %}<form method="post" action="/imports/{{ batch.id }}/commit"><input type="hidden" name="csrf" value="{{ csrf }}"><label class="import-confirm"><input type="checkbox" name="confirm" value="yes" required> I reviewed the preview and want to save these contacts.</label><button class="btn btn-primary" type="submit">Import {{ result.counts['create'] + result.counts['update'] }} contacts</button></form>{% endif %}
+    </div>
+  </section>
+  {% elif step == 'done' %}
+  <section class="import-card">
+    <h2><i class="bi bi-check-circle"></i> Import complete</h2><p>{{ batch.source }}</p>
+    <div class="import-counts">{% for action,label in [('create','Added'),('update','Updated'),('skip','Skipped'),('error','Left out — fix source')] %}<div><strong>{{ summary.counts[action] }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
+    <div class="import-actions"><a class="btn btn-primary" href="/leads">View Contacts</a><a class="btn btn-outline-primary" href="/imports/{{ batch.id }}/results.csv">Download results</a><a class="btn btn-outline-primary" href="/imports">Import another source</a></div>
+  </section>
+  {% endif %}
+  {% if batch %}<form class="import-cancel" method="post" action="/imports/{{ batch.id }}/cancel"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="btn btn-link" type="submit">{% if step == 'done' %}Clear these import results{% else %}Cancel and discard this import{% endif %}</button><span>Preview and results expire one hour after upload.</span></form>{% endif %}
+</section>
+{% endblock %}
