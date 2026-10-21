@@ -1,0 +1,445 @@
+county,carrier,plan_name,contract_plan_id,segment_id,plan_type,premium,drug_deductible,moop,tier_without_deductible,sanctioned,parent_org,contract_org,plan_segment_id,category
+Baker,Humana,Humana Value Choice (PPO),H5216_428,5,PPO,0,700,6750,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_5,General MAPD
+Baker,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Baker,Humana,HumanaChoice H5525-054 (PPO),H5525_054,0,PPO,70,700,7150,Yes,No,Humana Inc.,"HUMANA BENEFIT PLAN OF ILLINOIS, INC.",H5525_054_0,General MAPD
+Benton,Devoted Health,DEVOTED CORE 026 OR (HMO),H2923_026,1,HMO,0,461,7100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_026_1,General MAPD
+Benton,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,1,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_1,General MAPD
+Benton,Devoted Health,DEVOTED GIVEBACK EXTRAS 024 OR (HMO),H2923_024,0,HMO,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_024_0,General MAPD
+Benton,Devoted Health,DEVOTED PREMIUM 027 OR (HMO),H2923_027,1,HMO,48,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_027_1,General MAPD
+Benton,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Benton,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Benton,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Benton,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Classic (PPO),H3817_008,2,PPO,168,590,6700,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_008_2,General MAPD
+Benton,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Enhanced (PPO),H3817_009,2,PPO,233,305,5900,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_009_2,General MAPD
+Benton,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Primary (PPO),H3817_011,2,PPO,62,700,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_011_2,General MAPD
+Benton,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Benton,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Benton,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Benton,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Clackamas,ATRIO Health Plans,ATRIO Choice Rx (PPO),H7006_018,0,PPO,0,400,5900,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_018_0,General MAPD
+Clackamas,Aetna Medicare,Aetna Medicare Elite (HMO),H2056_003,0,HMO,0,700,7150,Yes,No,CVS Health Corporation,AETNA BETTER HEALTH OF MICHIGAN INC.,H2056_003_0,General MAPD
+Clackamas,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Clackamas,Devoted Health,DEVOTED CORE 001 OR (HMO),H2923_001,0,HMO,0,461,6700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_001_0,General MAPD
+Clackamas,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,3,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_3,General MAPD
+Clackamas,Devoted Health,DEVOTED GIVEBACK EXTRAS 025 OR (HMO),H2923_025,0,HMO,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_025_0,General MAPD
+Clackamas,Devoted Health,DEVOTED PREMIUM 005 OR (HMO),H2923_005,0,HMO,43,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_005_0,General MAPD
+Clackamas,Humana,Humana Essentials Plus Giveback (HMO),H1036_323,0,HMO,0,700,9050,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_323_0,General MAPD
+Clackamas,Humana,Humana Total Complete (HMO),H1036_153,0,HMO,0,700,5150,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_153_0,General MAPD
+Clackamas,Humana,Humana Value Choice (PPO),H5216_428,2,PPO,0,700,6950,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_2,General MAPD
+Clackamas,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Clackamas,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Clackamas,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Clackamas,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Clackamas,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Classic (PPO),H3817_008,1,PPO,130,590,6700,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_008_1,General MAPD
+Clackamas,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Enhanced (PPO),H3817_009,1,PPO,244,305,5900,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_009_1,General MAPD
+Clackamas,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Primary (PPO),H3817_011,1,PPO,88,700,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_011_1,General MAPD
+Clackamas,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Clackamas,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Clackamas,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Clackamas,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Clackamas,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Clackamas,Wellcare,Wellcare Low Premium Open (PPO),H5439_015,0,PPO,29,700,9250,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_015_0,General MAPD
+Clackamas,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Clackamas,Wellcare,Wellcare Premium Ultra Open (PPO),H5439_011,0,PPO,206,700,6500,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_011_0,General MAPD
+Clatsop,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Clatsop,Devoted Health,DEVOTED CORE 026 OR (HMO),H2923_026,2,HMO,0,461,7100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_026_2,General MAPD
+Clatsop,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,2,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_2,General MAPD
+Clatsop,Devoted Health,DEVOTED GIVEBACK EXTRAS 029 OR (HMO),H2923_029,0,HMO,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_029_0,General MAPD
+Clatsop,Devoted Health,DEVOTED PREMIUM 027 OR (HMO),H2923_027,2,HMO,48,650,6100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_027_2,General MAPD
+Columbia,Aetna Medicare,Aetna Medicare Elite (HMO),H2056_003,0,HMO,0,700,7150,Yes,No,CVS Health Corporation,AETNA BETTER HEALTH OF MICHIGAN INC.,H2056_003_0,General MAPD
+Columbia,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Columbia,Devoted Health,DEVOTED CORE 001 OR (HMO),H2923_001,0,HMO,0,461,6700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_001_0,General MAPD
+Columbia,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,3,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_3,General MAPD
+Columbia,Devoted Health,DEVOTED GIVEBACK EXTRAS 025 OR (HMO),H2923_025,0,HMO,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_025_0,General MAPD
+Columbia,Devoted Health,DEVOTED PREMIUM 005 OR (HMO),H2923_005,0,HMO,43,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_005_0,General MAPD
+Columbia,Humana,Humana Essentials Plus Giveback (HMO),H1036_323,0,HMO,0,700,9050,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_323_0,General MAPD
+Columbia,Humana,Humana Total Complete (HMO),H1036_153,0,HMO,0,700,5150,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_153_0,General MAPD
+Columbia,Humana,Humana Value Choice (PPO),H5216_428,2,PPO,0,700,6950,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_2,General MAPD
+Columbia,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Columbia,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Columbia,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Columbia,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Columbia,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Classic (PPO),H3817_008,1,PPO,130,590,6700,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_008_1,General MAPD
+Columbia,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Enhanced (PPO),H3817_009,1,PPO,244,305,5900,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_009_1,General MAPD
+Columbia,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Primary (PPO),H3817_011,1,PPO,88,700,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_011_1,General MAPD
+Columbia,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Columbia,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Columbia,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Columbia,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Columbia,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Coos,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Crook,Devoted Health,DEVOTED CORE 011 OR (HMO),H2923_011,0,HMO,0,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_011_0,General MAPD
+Crook,Devoted Health,DEVOTED GIVEBACK 012 OR (HMO),H2923_012,0,HMO,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_012_0,General MAPD
+Crook,Devoted Health,DEVOTED GIVEBACK EXTRAS 022 OR (HMO),H2923_022,0,HMO,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_022_0,General MAPD
+Crook,PacificSource Medicare,PacificSource Medicare Cascade Classic Rx (HMO-POS),H3864_046,0,HMO-POS,98,700,9850,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_046_0,General MAPD
+Crook,PacificSource Medicare,PacificSource Medicare Cascade Premier Rx (HMO-POS),H3864_006,0,HMO-POS,198,700,7150,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_006_0,General MAPD
+Deschutes,PacificSource Medicare,PacificSource Medicare Cascade Classic Rx (HMO-POS),H3864_046,0,HMO-POS,98,700,9850,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_046_0,General MAPD
+Deschutes,PacificSource Medicare,PacificSource Medicare Cascade Premier Rx (HMO-POS),H3864_006,0,HMO-POS,198,700,7150,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_006_0,General MAPD
+Douglas,ATRIO Health Plans,ATRIO Choice Rx (PPO),H6743_007,0,PPO,0,500,7150,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H6743_007_0,General MAPD
+Douglas,ATRIO Health Plans,ATRIO Prime Rx (PPO),H6743_028,0,PPO,90,650,4450,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H6743_028_0,General MAPD
+Douglas,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Gilliam,Devoted Health,DEVOTED CORE 011 OR (HMO),H2923_011,0,HMO,0,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_011_0,General MAPD
+Gilliam,Devoted Health,DEVOTED GIVEBACK 012 OR (HMO),H2923_012,0,HMO,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_012_0,General MAPD
+Gilliam,Devoted Health,DEVOTED GIVEBACK EXTRAS 022 OR (HMO),H2923_022,0,HMO,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_022_0,General MAPD
+Gilliam,Humana,Humana Value Choice (PPO),H5216_428,5,PPO,0,700,6750,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_5,General MAPD
+Gilliam,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Gilliam,Humana,HumanaChoice H5525-054 (PPO),H5525_054,0,PPO,70,700,7150,Yes,No,Humana Inc.,"HUMANA BENEFIT PLAN OF ILLINOIS, INC.",H5525_054_0,General MAPD
+Hood River,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Hood River,Devoted Health,DEVOTED CORE 001 OR (HMO),H2923_001,0,HMO,0,461,6700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_001_0,General MAPD
+Hood River,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,3,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_3,General MAPD
+Hood River,Devoted Health,DEVOTED GIVEBACK EXTRAS 025 OR (HMO),H2923_025,0,HMO,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_025_0,General MAPD
+Hood River,Devoted Health,DEVOTED PREMIUM 005 OR (HMO),H2923_005,0,HMO,43,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_005_0,General MAPD
+Hood River,Humana,Humana Value Choice (PPO),H5216_428,2,PPO,0,700,6950,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_2,General MAPD
+Hood River,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Hood River,PacificSource Medicare,PacificSource Medicare Cascade Classic Rx (HMO-POS),H3864_046,0,HMO-POS,98,700,9850,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_046_0,General MAPD
+Hood River,PacificSource Medicare,PacificSource Medicare Cascade Premier Rx (HMO-POS),H3864_006,0,HMO-POS,198,700,7150,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_006_0,General MAPD
+Hood River,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Hood River,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Jackson,ATRIO Health Plans,ATRIO Choice Rx (PPO),H6743_025,0,PPO,0,500,7150,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H6743_025_0,General MAPD
+Jackson,ATRIO Health Plans,ATRIO Prime Rx (PPO),H6743_026,0,PPO,43,350,4450,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H6743_026_0,General MAPD
+Jackson,Aetna Medicare,Aetna Medicare Elite (HMO),H2056_005,0,HMO,0,400,7150,Yes,No,CVS Health Corporation,AETNA BETTER HEALTH OF MICHIGAN INC.,H2056_005_0,General MAPD
+Jefferson,PacificSource Medicare,PacificSource Medicare Cascade Classic Rx (HMO-POS),H3864_046,0,HMO-POS,98,700,9850,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_046_0,General MAPD
+Jefferson,PacificSource Medicare,PacificSource Medicare Cascade Premier Rx (HMO-POS),H3864_006,0,HMO-POS,198,700,7150,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_006_0,General MAPD
+Josephine,ATRIO Health Plans,ATRIO Choice Rx (PPO),H6743_025,0,PPO,0,500,7150,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H6743_025_0,General MAPD
+Josephine,ATRIO Health Plans,ATRIO Prime Rx (PPO),H6743_026,0,PPO,43,350,4450,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H6743_026_0,General MAPD
+Josephine,Aetna Medicare,Aetna Medicare Elite (HMO),H2056_005,0,HMO,0,400,7150,Yes,No,CVS Health Corporation,AETNA BETTER HEALTH OF MICHIGAN INC.,H2056_005_0,General MAPD
+Klamath,ATRIO Health Plans,ATRIO Choice Rx (PPO),H6743_001,0,PPO,26,350,7150,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H6743_001_0,General MAPD
+Klamath,ATRIO Health Plans,ATRIO Prime Rx (PPO),H6743_030,0,PPO,139,0,4450,Not Applicable,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H6743_030_0,General MAPD
+Klamath,PacificSource Medicare,PacificSource Medicare Cascade Classic Rx (HMO-POS),H3864_046,0,HMO-POS,98,700,9850,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_046_0,General MAPD
+Klamath,PacificSource Medicare,PacificSource Medicare Cascade Premier Rx (HMO-POS),H3864_006,0,HMO-POS,198,700,7150,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_006_0,General MAPD
+Lane,ATRIO Health Plans,ATRIO Choice Rx (PPO),H7006_018,0,PPO,0,400,5900,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_018_0,General MAPD
+Lane,Devoted Health,DEVOTED CORE 026 OR (HMO),H2923_026,1,HMO,0,461,7100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_026_1,General MAPD
+Lane,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,1,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_1,General MAPD
+Lane,Devoted Health,DEVOTED GIVEBACK EXTRAS 024 OR (HMO),H2923_024,0,HMO,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_024_0,General MAPD
+Lane,Devoted Health,DEVOTED PREMIUM 027 OR (HMO),H2923_027,1,HMO,48,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_027_1,General MAPD
+Lane,Kaiser Permanente,Kaiser Permanente Senior Advantage Value Lane (HMO-POS),H9003_008,0,HMO-POS,0,0,4450,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_008_0,General MAPD
+Lane,PacificSource Medicare,PacificSource Medicare Valley Select Rx (HMO-POS),H3864_036,0,HMO-POS,49,600,7150,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_036_0,General MAPD
+Lane,Regence BlueCross BlueShield of Oregon,Regence BlueAdvantage HMO (HMO),H6237_009,0,HMO,0,310,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H6237_009_0,General MAPD
+Lane,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Classic (PPO),H3817_008,1,PPO,130,590,6700,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_008_1,General MAPD
+Lane,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Enhanced (PPO),H3817_009,1,PPO,244,305,5900,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_009_1,General MAPD
+Lane,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Primary (PPO),H3817_011,1,PPO,88,700,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_011_1,General MAPD
+Lane,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Lane,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Lane,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Lane,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Lane,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Lane,Wellcare,Wellcare Low Premium Open (PPO),H5439_015,0,PPO,29,700,9250,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_015_0,General MAPD
+Lane,Wellcare,Wellcare Low Premium Value Open (PPO),H5439_023,0,PPO,22,700,7900,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_023_0,General MAPD
+Lane,Wellcare,Wellcare PeaceHealth Simple (HMO-POS),H6815_040,0,HMO-POS,0,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_040_0,General MAPD
+Lane,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Lane,Wellcare,Wellcare Premium Ultra Open (PPO),H5439_011,0,PPO,206,700,6500,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_011_0,General MAPD
+Lincoln,Devoted Health,DEVOTED CORE 026 OR (HMO),H2923_026,2,HMO,0,461,7100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_026_2,General MAPD
+Lincoln,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,2,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_2,General MAPD
+Lincoln,Devoted Health,DEVOTED GIVEBACK EXTRAS 029 OR (HMO),H2923_029,0,HMO,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_029_0,General MAPD
+Lincoln,Devoted Health,DEVOTED PREMIUM 027 OR (HMO),H2923_027,2,HMO,48,650,6100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_027_2,General MAPD
+Linn,Devoted Health,DEVOTED CORE 026 OR (HMO),H2923_026,2,HMO,0,461,7100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_026_2,General MAPD
+Linn,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,2,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_2,General MAPD
+Linn,Devoted Health,DEVOTED GIVEBACK EXTRAS 029 OR (HMO),H2923_029,0,HMO,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_029_0,General MAPD
+Linn,Devoted Health,DEVOTED PREMIUM 027 OR (HMO),H2923_027,2,HMO,48,650,6100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_027_2,General MAPD
+Linn,Humana,Humana Value Choice (PPO),H5216_428,5,PPO,0,700,6750,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_5,General MAPD
+Linn,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Linn,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Linn,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Linn,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Linn,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Linn,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Linn,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Linn,Wellcare,Wellcare Low Premium Open (PPO),H5439_015,0,PPO,29,700,9250,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_015_0,General MAPD
+Linn,Wellcare,Wellcare Low Premium Value Open (PPO),H5439_023,0,PPO,22,700,7900,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_023_0,General MAPD
+Linn,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Linn,Wellcare,Wellcare Premium Ultra Open (PPO),H5439_011,0,PPO,206,700,6500,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_011_0,General MAPD
+Malheur,Humana,Humana Value Choice (PPO),H5216_132,0,PPO,0,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_132_0,General MAPD
+Malheur,Humana,Humana Value Choice (PPO),H5216_428,5,PPO,0,700,6750,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_5,General MAPD
+Malheur,Humana,Humana Value Choice (PPO),H7617_031,0,PPO,0,700,7150,Yes,No,Humana Inc.,EMPHESYS INSURANCE COMPANY,H7617_031_0,General MAPD
+Malheur,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Marion,ATRIO Health Plans,ATRIO Choice Rx (PPO),H7006_007,0,PPO,0,500,7900,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_007_0,General MAPD
+Marion,Devoted Health,DEVOTED CORE 026 OR (HMO),H2923_026,1,HMO,0,461,7100,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_026_1,General MAPD
+Marion,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,1,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_1,General MAPD
+Marion,Devoted Health,DEVOTED GIVEBACK EXTRAS 024 OR (HMO),H2923_024,0,HMO,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_024_0,General MAPD
+Marion,Devoted Health,DEVOTED PREMIUM 027 OR (HMO),H2923_027,1,HMO,48,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_027_1,General MAPD
+Marion,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Marion,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Marion,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Marion,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Classic (PPO),H3817_008,1,PPO,130,590,6700,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_008_1,General MAPD
+Marion,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Enhanced (PPO),H3817_009,1,PPO,244,305,5900,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_009_1,General MAPD
+Marion,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Primary (PPO),H3817_011,1,PPO,88,700,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_011_1,General MAPD
+Marion,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Marion,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Marion,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Marion,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Marion,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Marion,Wellcare,Wellcare Low Premium Open (PPO),H5439_015,0,PPO,29,700,9250,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_015_0,General MAPD
+Marion,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Marion,Wellcare,Wellcare Premium Ultra Open (PPO),H5439_011,0,PPO,206,700,6500,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_011_0,General MAPD
+Morrow,Humana,Humana Value Choice (PPO),H5216_428,5,PPO,0,700,6750,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_5,General MAPD
+Morrow,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Morrow,Humana,HumanaChoice H5525-054 (PPO),H5525_054,0,PPO,70,700,7150,Yes,No,Humana Inc.,"HUMANA BENEFIT PLAN OF ILLINOIS, INC.",H5525_054_0,General MAPD
+Multnomah,ATRIO Health Plans,ATRIO Choice Rx (PPO),H7006_018,0,PPO,0,400,5900,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_018_0,General MAPD
+Multnomah,Aetna Medicare,Aetna Medicare Elite (HMO),H2056_003,0,HMO,0,700,7150,Yes,No,CVS Health Corporation,AETNA BETTER HEALTH OF MICHIGAN INC.,H2056_003_0,General MAPD
+Multnomah,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Multnomah,Devoted Health,DEVOTED CORE 001 OR (HMO),H2923_001,0,HMO,0,461,6700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_001_0,General MAPD
+Multnomah,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,3,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_3,General MAPD
+Multnomah,Devoted Health,DEVOTED GIVEBACK EXTRAS 025 OR (HMO),H2923_025,0,HMO,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_025_0,General MAPD
+Multnomah,Devoted Health,DEVOTED PREMIUM 005 OR (HMO),H2923_005,0,HMO,43,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_005_0,General MAPD
+Multnomah,Humana,Humana Essentials Plus Giveback (HMO),H1036_323,0,HMO,0,700,9050,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_323_0,General MAPD
+Multnomah,Humana,Humana Total Complete (HMO),H1036_153,0,HMO,0,700,5150,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_153_0,General MAPD
+Multnomah,Humana,Humana Value Choice (PPO),H5216_428,2,PPO,0,700,6950,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_2,General MAPD
+Multnomah,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Multnomah,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Multnomah,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Multnomah,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Multnomah,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Classic (PPO),H3817_008,1,PPO,130,590,6700,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_008_1,General MAPD
+Multnomah,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Enhanced (PPO),H3817_009,1,PPO,244,305,5900,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_009_1,General MAPD
+Multnomah,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Primary (PPO),H3817_011,1,PPO,88,700,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_011_1,General MAPD
+Multnomah,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Multnomah,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Multnomah,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Multnomah,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Multnomah,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Multnomah,Wellcare,Wellcare Low Premium Open (PPO),H5439_015,0,PPO,29,700,9250,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_015_0,General MAPD
+Multnomah,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Multnomah,Wellcare,Wellcare Premium Ultra Open (PPO),H5439_011,0,PPO,206,700,6500,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_011_0,General MAPD
+Polk,ATRIO Health Plans,ATRIO Choice Rx (PPO),H7006_007,0,PPO,0,500,7900,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_007_0,General MAPD
+Polk,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Polk,Devoted Health,DEVOTED CORE 001 OR (HMO),H2923_001,0,HMO,0,461,6700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_001_0,General MAPD
+Polk,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,3,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_3,General MAPD
+Polk,Devoted Health,DEVOTED GIVEBACK EXTRAS 025 OR (HMO),H2923_025,0,HMO,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_025_0,General MAPD
+Polk,Devoted Health,DEVOTED PREMIUM 005 OR (HMO),H2923_005,0,HMO,43,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_005_0,General MAPD
+Polk,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Polk,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Polk,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Polk,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Polk,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Polk,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Polk,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Polk,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Polk,Wellcare,Wellcare Low Premium Open (PPO),H5439_015,0,PPO,29,700,9250,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_015_0,General MAPD
+Polk,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Polk,Wellcare,Wellcare Premium Ultra Open (PPO),H5439_011,0,PPO,206,700,6500,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_011_0,General MAPD
+Sherman,Devoted Health,DEVOTED CORE 011 OR (HMO),H2923_011,0,HMO,0,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_011_0,General MAPD
+Sherman,Devoted Health,DEVOTED GIVEBACK 012 OR (HMO),H2923_012,0,HMO,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_012_0,General MAPD
+Sherman,Devoted Health,DEVOTED GIVEBACK EXTRAS 022 OR (HMO),H2923_022,0,HMO,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_022_0,General MAPD
+Sherman,Humana,Humana Value Choice (PPO),H5216_428,5,PPO,0,700,6750,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_5,General MAPD
+Sherman,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Sherman,Humana,HumanaChoice H5525-054 (PPO),H5525_054,0,PPO,70,700,7150,Yes,No,Humana Inc.,"HUMANA BENEFIT PLAN OF ILLINOIS, INC.",H5525_054_0,General MAPD
+Sherman,PacificSource Medicare,PacificSource Medicare Cascade Classic Rx (HMO-POS),H3864_046,0,HMO-POS,98,700,9850,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_046_0,General MAPD
+Sherman,PacificSource Medicare,PacificSource Medicare Cascade Premier Rx (HMO-POS),H3864_006,0,HMO-POS,198,700,7150,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_006_0,General MAPD
+Tillamook,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Tillamook,Devoted Health,DEVOTED CORE 001 OR (HMO),H2923_001,0,HMO,0,461,6700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_001_0,General MAPD
+Tillamook,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,3,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_3,General MAPD
+Tillamook,Devoted Health,DEVOTED GIVEBACK EXTRAS 025 OR (HMO),H2923_025,0,HMO,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_025_0,General MAPD
+Tillamook,Devoted Health,DEVOTED PREMIUM 005 OR (HMO),H2923_005,0,HMO,43,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_005_0,General MAPD
+Wallowa,Humana,Humana Value Choice (PPO),H5216_428,5,PPO,0,700,6750,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_5,General MAPD
+Wallowa,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Wallowa,Humana,HumanaChoice H5525-054 (PPO),H5525_054,0,PPO,70,700,7150,Yes,No,Humana Inc.,"HUMANA BENEFIT PLAN OF ILLINOIS, INC.",H5525_054_0,General MAPD
+Wasco,Devoted Health,DEVOTED CORE 011 OR (HMO),H2923_011,0,HMO,0,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_011_0,General MAPD
+Wasco,Devoted Health,DEVOTED GIVEBACK 012 OR (HMO),H2923_012,0,HMO,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_012_0,General MAPD
+Wasco,Devoted Health,DEVOTED GIVEBACK EXTRAS 022 OR (HMO),H2923_022,0,HMO,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_022_0,General MAPD
+Wasco,Humana,HumanaChoice H5525-054 (PPO),H5525_054,0,PPO,70,700,7150,Yes,No,Humana Inc.,"HUMANA BENEFIT PLAN OF ILLINOIS, INC.",H5525_054_0,General MAPD
+Wasco,PacificSource Medicare,PacificSource Medicare Cascade Classic Rx (HMO-POS),H3864_046,0,HMO-POS,98,700,9850,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_046_0,General MAPD
+Wasco,PacificSource Medicare,PacificSource Medicare Cascade Premier Rx (HMO-POS),H3864_006,0,HMO-POS,198,700,7150,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_006_0,General MAPD
+Washington,ATRIO Health Plans,ATRIO Choice Rx (PPO),H7006_018,0,PPO,0,400,5900,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_018_0,General MAPD
+Washington,Aetna Medicare,Aetna Medicare Elite (HMO),H2056_003,0,HMO,0,700,7150,Yes,No,CVS Health Corporation,AETNA BETTER HEALTH OF MICHIGAN INC.,H2056_003_0,General MAPD
+Washington,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Washington,Devoted Health,DEVOTED CORE 001 OR (HMO),H2923_001,0,HMO,0,461,6700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_001_0,General MAPD
+Washington,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,3,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_3,General MAPD
+Washington,Devoted Health,DEVOTED GIVEBACK EXTRAS 025 OR (HMO),H2923_025,0,HMO,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_025_0,General MAPD
+Washington,Devoted Health,DEVOTED PREMIUM 005 OR (HMO),H2923_005,0,HMO,43,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_005_0,General MAPD
+Washington,Humana,Humana Essentials Plus Giveback (HMO),H1036_323,0,HMO,0,700,9050,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_323_0,General MAPD
+Washington,Humana,Humana Total Complete (HMO),H1036_153,0,HMO,0,700,5150,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_153_0,General MAPD
+Washington,Humana,Humana Value Choice (PPO),H5216_428,2,PPO,0,700,6950,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_428_2,General MAPD
+Washington,Humana,HumanaChoice H5216-048 (PPO),H5216_048,0,PPO,97,700,7000,Yes,No,Humana Inc.,HUMANA INSURANCE COMPANY,H5216_048_0,General MAPD
+Washington,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Washington,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Washington,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Washington,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Classic (PPO),H3817_008,1,PPO,130,590,6700,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_008_1,General MAPD
+Washington,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Enhanced (PPO),H3817_009,1,PPO,244,305,5900,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_009_1,General MAPD
+Washington,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Primary (PPO),H3817_011,1,PPO,88,700,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_011_1,General MAPD
+Washington,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Washington,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Washington,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Washington,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Washington,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Washington,Wellcare,Wellcare Low Premium Open (PPO),H5439_015,0,PPO,29,700,9250,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_015_0,General MAPD
+Washington,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Washington,Wellcare,Wellcare Premium Ultra Open (PPO),H5439_011,0,PPO,206,700,6500,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_011_0,General MAPD
+Wheeler,Devoted Health,DEVOTED CORE 011 OR (HMO),H2923_011,0,HMO,0,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_011_0,General MAPD
+Wheeler,Devoted Health,DEVOTED GIVEBACK 012 OR (HMO),H2923_012,0,HMO,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_012_0,General MAPD
+Wheeler,Devoted Health,DEVOTED GIVEBACK EXTRAS 022 OR (HMO),H2923_022,0,HMO,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_022_0,General MAPD
+Yamhill,ATRIO Health Plans,ATRIO Choice Rx (PPO),H7006_018,0,PPO,0,400,5900,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_018_0,General MAPD
+Yamhill,Aetna Medicare,Aetna Medicare Elite (HMO),H2056_003,0,HMO,0,700,7150,Yes,No,CVS Health Corporation,AETNA BETTER HEALTH OF MICHIGAN INC.,H2056_003_0,General MAPD
+Yamhill,Devoted Health,DEVOTED CHOICE PREMIUM 002 OR (PPO),H7199_002,0,PPO,28.5,650,6000,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH  PLAN OF OREGON,H7199_002_0,General MAPD
+Yamhill,Devoted Health,DEVOTED CORE 001 OR (HMO),H2923_001,0,HMO,0,461,6700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_001_0,General MAPD
+Yamhill,Devoted Health,DEVOTED GIVEBACK 028 OR (HMO),H2923_028,3,HMO,0,461,8900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_028_3,General MAPD
+Yamhill,Devoted Health,DEVOTED GIVEBACK EXTRAS 025 OR (HMO),H2923_025,0,HMO,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_025_0,General MAPD
+Yamhill,Devoted Health,DEVOTED PREMIUM 005 OR (HMO),H2923_005,0,HMO,43,650,5900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_005_0,General MAPD
+Yamhill,Kaiser Permanente,Kaiser Permanente Senior Advantage Enhanced (HMO-POS),H9003_001,0,HMO-POS,134,0,4000,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_001_0,General MAPD
+Yamhill,Kaiser Permanente,Kaiser Permanente Senior Advantage Standard (HMO-POS),H9003_006,0,HMO-POS,49,0,5250,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_006_0,General MAPD
+Yamhill,Kaiser Permanente,Kaiser Permanente Senior Advantage Value (HMO-POS),H9003_009,0,HMO-POS,0,0,6750,Not Applicable,No,"Kaiser Foundation Health Plan, Inc.",KAISER FOUNDATION HP OF THE N W,H9003_009_0,General MAPD
+Yamhill,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Classic (PPO),H3817_008,1,PPO,130,590,6700,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_008_1,General MAPD
+Yamhill,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Enhanced (PPO),H3817_009,1,PPO,244,305,5900,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_009_1,General MAPD
+Yamhill,Regence BlueCross BlueShield of Oregon,Regence MedAdvantage + Rx Primary (PPO),H3817_011,1,PPO,88,700,7150,Yes,No,"Cambia Health Solutions, Inc.",REGENCE BLUECROSS BLUESHIELD OF OREGON,H3817_011_1,General MAPD
+Yamhill,UnitedHealthcare,AARP Medicare Advantage Essentials from UHC OR-7 (HMO-POS),H3805_048,0,HMO-POS,0,685,6700,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_048_0,General MAPD
+Yamhill,UnitedHealthcare,AARP Medicare Advantage Extras from UHC OR-6 (HMO-POS),H3805_041,0,HMO-POS,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_041_0,General MAPD
+Yamhill,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0001 (PPO),H2406_042,0,PPO,94,595,6700,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_042_0,General MAPD
+Yamhill,UnitedHealthcare,AARP Medicare Advantage from UHC OR-0002 (PPO),H2406_070,0,PPO,0,685,7150,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H2406_070_0,General MAPD
+Yamhill,Wellcare,Wellcare Low Premium (HMO-POS),H6815_038,0,HMO-POS,44.5,700,7900,Yes,No,Centene Corporation,"HEALTH NET HEALTH PLAN OF OREGON, INC.",H6815_038_0,General MAPD
+Yamhill,Wellcare,Wellcare Low Premium Open (PPO),H5439_015,0,PPO,29,700,9250,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_015_0,General MAPD
+Yamhill,Wellcare,Wellcare Low Premium Value Open (PPO),H5439_023,0,PPO,22,700,7900,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_023_0,General MAPD
+Yamhill,Wellcare,Wellcare Premium Enhanced Open (PPO),H5439_019,0,PPO,76.6,700,7000,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_019_0,General MAPD
+Yamhill,Wellcare,Wellcare Premium Ultra Open (PPO),H5439_011,0,PPO,206,700,6500,Yes,No,Centene Corporation,HEALTH NET LIFE INSURANCE COMPANY,H5439_011_0,General MAPD
+Benton,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Benton,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Benton,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Benton,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 018 OR (HMO C-SNP),H2923_018,0,HMO C-SNP,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_018_0,Special Needs MAPD
+Benton,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Benton,Samaritan Advantage Health Plans,Samaritan Dual Advantage (HMO D-SNP),H3811_003,0,HMO D-SNP,6.3,700,9850,Yes,No,"Samaritan Health Services, Inc.","SAMARITAN HEALTH PLANS, INC.",H3811_003_0,Special Needs MAPD
+Benton,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Benton,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Benton,UnitedHealthcare,UHC Nursing Home Plan OR-F001 (PPO I-SNP),H0710_036,0,PPO I-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_036_0,Special Needs MAPD
+Clackamas,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Clackamas,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Clackamas,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Clackamas,CareOregon Advantage,CareOregon Advantage Plus (HMO D-SNP),H5859_001,0,HMO D-SNP,0,700,9850,Yes,No,"CareOregon, Inc.","HEALTH PLAN OF CAREOREGON, INC.",H5859_001_0,Special Needs MAPD
+Clackamas,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 019 OR (HMO C-SNP),H2923_019,0,HMO C-SNP,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_019_0,Special Needs MAPD
+Clackamas,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Clackamas,Humana,Humana Gold Plus - Diabetes and Heart (HMO C-SNP),H1036_306,0,HMO C-SNP,0,500,4550,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_306_0,Special Needs MAPD
+Clackamas,Humana,Humana Gold Plus - Diabetes and Heart (HMO C-SNP),H1036_317,0,HMO C-SNP,0,700,9850,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_317_0,Special Needs MAPD
+Clackamas,SCAN Health Plan,"Springs Advantage, a SCAN Medicare Plan (HMO-POS I-SNP)",H3879_001,0,HMO-POS I-SNP,55,200,4000,Yes,No,SCAN Group,SCAN HEALTH PLAN (OR),H3879_001_0,Special Needs MAPD
+Clackamas,SCAN Health Plan,"Springs Together, a SCAN Medicare Plan (HMO-POS I-SNP)",H3879_002,0,HMO-POS I-SNP,0,700,9850,Yes,No,SCAN Group,SCAN HEALTH PLAN (OR),H3879_002_0,Special Needs MAPD
+Clackamas,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Clackamas,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Clackamas,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Clackamas,UnitedHealthcare,UHC Nursing Home Plan OR-F001 (PPO I-SNP),H0710_036,0,PPO I-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_036_0,Special Needs MAPD
+Clackamas,Wellcare,Wellcare Trillium Health Plan Dual Select Sync (HMO D-SNP),H2174_001,0,HMO D-SNP,0,700,9850,Yes,No,Centene Corporation,"TRILLIUM COMMUNITY HEALTH PLAN, INC.",H2174_001_0,Special Needs MAPD
+Clatsop,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 030 OR (HMO C-SNP),H2923_030,0,HMO C-SNP,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_030_0,Special Needs MAPD
+Clatsop,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Columbia,CareOregon Advantage,CareOregon Advantage Plus (HMO D-SNP),H5859_001,0,HMO D-SNP,0,700,9850,Yes,No,"CareOregon, Inc.","HEALTH PLAN OF CAREOREGON, INC.",H5859_001_0,Special Needs MAPD
+Columbia,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 019 OR (HMO C-SNP),H2923_019,0,HMO C-SNP,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_019_0,Special Needs MAPD
+Columbia,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Columbia,Humana,Humana Gold Plus - Diabetes and Heart (HMO C-SNP),H1036_306,0,HMO C-SNP,0,500,4550,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_306_0,Special Needs MAPD
+Columbia,Humana,Humana Gold Plus - Diabetes and Heart (HMO C-SNP),H1036_317,0,HMO C-SNP,0,700,9850,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_317_0,Special Needs MAPD
+Columbia,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Columbia,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Crook,Devoted Health,DEVOTED C-SNP ENHANCED 013 OR (HMO C-SNP),H2923_013,0,HMO C-SNP,0,650,6400,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_013_0,Special Needs MAPD
+Crook,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 020 OR (HMO C-SNP),H2923_020,0,HMO C-SNP,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_020_0,Special Needs MAPD
+Crook,Devoted Health,DEVOTED C-SNP PLUS 014 OR (HMO C-SNP),H2923_014,0,HMO C-SNP,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_014_0,Special Needs MAPD
+Crook,PacificSource Medicare,PacificSource Oregon Dual Rx (HMO D-SNP),H3864_043,0,HMO D-SNP,0,400,9250,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_043_0,Special Needs MAPD
+Curry,AllCare Advantage,AllCare Advantage Redwood Rx (HMO D-SNP),H3810_023,0,HMO D-SNP,0,495,9850,No,No,"AllCare Health, Inc.","ALLCARE HEALTH PLAN, INC.",H3810_023_0,Special Needs MAPD
+Deschutes,PacificSource Medicare,PacificSource Oregon Dual Rx (HMO D-SNP),H3864_043,0,HMO D-SNP,0,400,9250,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_043_0,Special Needs MAPD
+Douglas,ATRIO Health Plans,ATRIO Special Needs Plan (HMO D-SNP),H3814_030,0,HMO D-SNP,0,500,9850,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H3814_030_0,Special Needs MAPD
+Douglas,AllCare Advantage,AllCare Advantage Redwood Rx (HMO D-SNP),H3810_023,0,HMO D-SNP,0,495,9850,No,No,"AllCare Health, Inc.","ALLCARE HEALTH PLAN, INC.",H3810_023_0,Special Needs MAPD
+Gilliam,Devoted Health,DEVOTED C-SNP ENHANCED 013 OR (HMO C-SNP),H2923_013,0,HMO C-SNP,0,650,6400,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_013_0,Special Needs MAPD
+Gilliam,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 020 OR (HMO C-SNP),H2923_020,0,HMO C-SNP,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_020_0,Special Needs MAPD
+Gilliam,Devoted Health,DEVOTED C-SNP PLUS 014 OR (HMO C-SNP),H2923_014,0,HMO C-SNP,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_014_0,Special Needs MAPD
+Hood River,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 019 OR (HMO C-SNP),H2923_019,0,HMO C-SNP,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_019_0,Special Needs MAPD
+Hood River,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Hood River,PacificSource Medicare,PacificSource Oregon Dual Rx (HMO D-SNP),H3864_043,0,HMO D-SNP,0,400,9250,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_043_0,Special Needs MAPD
+Hood River,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Jackson,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Jackson,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Jackson,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Jackson,AllCare Advantage,AllCare Advantage Redwood Rx (HMO D-SNP),H3810_023,0,HMO D-SNP,0,495,9850,No,No,"AllCare Health, Inc.","ALLCARE HEALTH PLAN, INC.",H3810_023_0,Special Needs MAPD
+Jackson,CareOregon Advantage,CareOregon Advantage Plus (HMO D-SNP),H5859_001,0,HMO D-SNP,0,700,9850,Yes,No,"CareOregon, Inc.","HEALTH PLAN OF CAREOREGON, INC.",H5859_001_0,Special Needs MAPD
+Jackson,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Jefferson,PacificSource Medicare,PacificSource Oregon Dual Rx (HMO D-SNP),H3864_043,0,HMO D-SNP,0,400,9250,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_043_0,Special Needs MAPD
+Josephine,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Josephine,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Josephine,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Josephine,AllCare Advantage,AllCare Advantage Redwood Rx (HMO D-SNP),H3810_023,0,HMO D-SNP,0,495,9850,No,No,"AllCare Health, Inc.","ALLCARE HEALTH PLAN, INC.",H3810_023_0,Special Needs MAPD
+Josephine,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Klamath,ATRIO Health Plans,ATRIO Special Needs Plan (HMO D-SNP),H3814_007,0,HMO D-SNP,0,350,9850,Yes,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H3814_007_0,Special Needs MAPD
+Klamath,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Klamath,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Klamath,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Klamath,PacificSource Medicare,PacificSource Oregon Dual Rx (HMO D-SNP),H3864_043,0,HMO D-SNP,0,400,9250,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_043_0,Special Needs MAPD
+Lane,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Lane,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Lane,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Lane,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 018 OR (HMO C-SNP),H2923_018,0,HMO C-SNP,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_018_0,Special Needs MAPD
+Lane,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Lane,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Lane,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Lane,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Lane,UnitedHealthcare,UHC Nursing Home Plan OR-F001 (PPO I-SNP),H0710_036,0,PPO I-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_036_0,Special Needs MAPD
+Lane,Wellcare,Wellcare Trillium Health Plan Dual Select Sync (HMO D-SNP),H2174_001,0,HMO D-SNP,0,700,9850,Yes,No,Centene Corporation,"TRILLIUM COMMUNITY HEALTH PLAN, INC.",H2174_001_0,Special Needs MAPD
+Lincoln,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 030 OR (HMO C-SNP),H2923_030,0,HMO C-SNP,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_030_0,Special Needs MAPD
+Lincoln,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Lincoln,Samaritan Advantage Health Plans,Samaritan Dual Advantage (HMO D-SNP),H3811_003,0,HMO D-SNP,6.3,700,9850,Yes,No,"Samaritan Health Services, Inc.","SAMARITAN HEALTH PLANS, INC.",H3811_003_0,Special Needs MAPD
+Linn,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Linn,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Linn,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Linn,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 030 OR (HMO C-SNP),H2923_030,0,HMO C-SNP,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_030_0,Special Needs MAPD
+Linn,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Linn,Samaritan Advantage Health Plans,Samaritan Dual Advantage (HMO D-SNP),H3811_003,0,HMO D-SNP,6.3,700,9850,Yes,No,"Samaritan Health Services, Inc.","SAMARITAN HEALTH PLANS, INC.",H3811_003_0,Special Needs MAPD
+Linn,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Linn,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Linn,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Linn,UnitedHealthcare,UHC Nursing Home Plan OR-F001 (PPO I-SNP),H0710_036,0,PPO I-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_036_0,Special Needs MAPD
+Marion,ATRIO Health Plans,ATRIO Support Rx (PPO C-SNP),H7006_022,0,PPO C-SNP,0,0,5300,Not Applicable,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_022_0,Special Needs MAPD
+Marion,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Marion,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Marion,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Marion,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 018 OR (HMO C-SNP),H2923_018,0,HMO C-SNP,0,700,7900,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_018_0,Special Needs MAPD
+Marion,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Marion,PacificSource Medicare,PacificSource Oregon Dual Rx (HMO D-SNP),H3864_043,0,HMO D-SNP,0,400,9250,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_043_0,Special Needs MAPD
+Marion,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Marion,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Marion,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Marion,UnitedHealthcare,UHC Nursing Home Plan OR-F001 (PPO I-SNP),H0710_036,0,PPO I-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_036_0,Special Needs MAPD
+Multnomah,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Multnomah,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Multnomah,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Multnomah,CareOregon Advantage,CareOregon Advantage Plus (HMO D-SNP),H5859_001,0,HMO D-SNP,0,700,9850,Yes,No,"CareOregon, Inc.","HEALTH PLAN OF CAREOREGON, INC.",H5859_001_0,Special Needs MAPD
+Multnomah,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 019 OR (HMO C-SNP),H2923_019,0,HMO C-SNP,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_019_0,Special Needs MAPD
+Multnomah,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Multnomah,Humana,Humana Gold Plus - Diabetes and Heart (HMO C-SNP),H1036_306,0,HMO C-SNP,0,500,4550,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_306_0,Special Needs MAPD
+Multnomah,Humana,Humana Gold Plus - Diabetes and Heart (HMO C-SNP),H1036_317,0,HMO C-SNP,0,700,9850,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_317_0,Special Needs MAPD
+Multnomah,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Multnomah,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Multnomah,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Multnomah,UnitedHealthcare,UHC Nursing Home Plan OR-F001 (PPO I-SNP),H0710_036,0,PPO I-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_036_0,Special Needs MAPD
+Multnomah,Wellcare,Wellcare Trillium Health Plan Dual Select Sync (HMO D-SNP),H2174_001,0,HMO D-SNP,0,700,9850,Yes,No,Centene Corporation,"TRILLIUM COMMUNITY HEALTH PLAN, INC.",H2174_001_0,Special Needs MAPD
+Polk,ATRIO Health Plans,ATRIO Support Rx (PPO C-SNP),H7006_022,0,PPO C-SNP,0,0,5300,Not Applicable,No,ATRIO Health Plans,ATRIO HEALTH PLANS,H7006_022_0,Special Needs MAPD
+Polk,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 019 OR (HMO C-SNP),H2923_019,0,HMO C-SNP,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_019_0,Special Needs MAPD
+Polk,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Polk,PacificSource Medicare,PacificSource Oregon Dual Rx (HMO D-SNP),H3864_043,0,HMO D-SNP,0,400,9250,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_043_0,Special Needs MAPD
+Polk,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Polk,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Polk,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Sherman,Devoted Health,DEVOTED C-SNP ENHANCED 013 OR (HMO C-SNP),H2923_013,0,HMO C-SNP,0,650,6400,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_013_0,Special Needs MAPD
+Sherman,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 020 OR (HMO C-SNP),H2923_020,0,HMO C-SNP,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_020_0,Special Needs MAPD
+Sherman,Devoted Health,DEVOTED C-SNP PLUS 014 OR (HMO C-SNP),H2923_014,0,HMO C-SNP,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_014_0,Special Needs MAPD
+Tillamook,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 019 OR (HMO C-SNP),H2923_019,0,HMO C-SNP,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_019_0,Special Needs MAPD
+Tillamook,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Wasco,Devoted Health,DEVOTED C-SNP ENHANCED 013 OR (HMO C-SNP),H2923_013,0,HMO C-SNP,0,650,6400,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_013_0,Special Needs MAPD
+Wasco,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 020 OR (HMO C-SNP),H2923_020,0,HMO C-SNP,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_020_0,Special Needs MAPD
+Wasco,Devoted Health,DEVOTED C-SNP PLUS 014 OR (HMO C-SNP),H2923_014,0,HMO C-SNP,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_014_0,Special Needs MAPD
+Wasco,PacificSource Medicare,PacificSource Oregon Dual Rx (HMO D-SNP),H3864_043,0,HMO D-SNP,0,400,9250,Yes,No,PacificSource,PACIFICSOURCE COMMUNITY HEALTH PLANS,H3864_043_0,Special Needs MAPD
+Washington,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Washington,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Washington,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Washington,CareOregon Advantage,CareOregon Advantage Plus (HMO D-SNP),H5859_001,0,HMO D-SNP,0,700,9850,Yes,No,"CareOregon, Inc.","HEALTH PLAN OF CAREOREGON, INC.",H5859_001_0,Special Needs MAPD
+Washington,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 019 OR (HMO C-SNP),H2923_019,0,HMO C-SNP,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_019_0,Special Needs MAPD
+Washington,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Washington,Humana,Humana Gold Plus - Diabetes and Heart (HMO C-SNP),H1036_306,0,HMO C-SNP,0,500,4550,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_306_0,Special Needs MAPD
+Washington,Humana,Humana Gold Plus - Diabetes and Heart (HMO C-SNP),H1036_317,0,HMO C-SNP,0,700,9850,Yes,No,Humana Inc.,"HUMANA MEDICAL PLAN, INC.",H1036_317_0,Special Needs MAPD
+Washington,SCAN Health Plan,"Springs Advantage, a SCAN Medicare Plan (HMO-POS I-SNP)",H3879_001,0,HMO-POS I-SNP,55,200,4000,Yes,No,SCAN Group,SCAN HEALTH PLAN (OR),H3879_001_0,Special Needs MAPD
+Washington,SCAN Health Plan,"Springs Together, a SCAN Medicare Plan (HMO-POS I-SNP)",H3879_002,0,HMO-POS I-SNP,0,700,9850,Yes,No,SCAN Group,SCAN HEALTH PLAN (OR),H3879_002_0,Special Needs MAPD
+Washington,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Washington,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Washington,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Washington,UnitedHealthcare,UHC Nursing Home Plan OR-F001 (PPO I-SNP),H0710_036,0,PPO I-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_036_0,Special Needs MAPD
+Washington,Wellcare,Wellcare Trillium Health Plan Dual Select Sync (HMO D-SNP),H2174_001,0,HMO D-SNP,0,700,9850,Yes,No,Centene Corporation,"TRILLIUM COMMUNITY HEALTH PLAN, INC.",H2174_001_0,Special Needs MAPD
+Wheeler,Devoted Health,DEVOTED C-SNP ENHANCED 013 OR (HMO C-SNP),H2923_013,0,HMO C-SNP,0,650,6400,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_013_0,Special Needs MAPD
+Wheeler,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 020 OR (HMO C-SNP),H2923_020,0,HMO C-SNP,0,700,7950,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_020_0,Special Needs MAPD
+Wheeler,Devoted Health,DEVOTED C-SNP PLUS 014 OR (HMO C-SNP),H2923_014,0,HMO C-SNP,0,650,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_014_0,Special Needs MAPD
+Yamhill,AgeRight Advantage,AgeRight Advantage Health Plan (HMO I-SNP),H1372_001,0,HMO I-SNP,0,475,9850,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_001_0,Special Needs MAPD
+Yamhill,AgeRight Advantage,AgeRight Advantage Plus Health Plan (HMO I-SNP),H1372_002,0,HMO I-SNP,74,300,6000,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_002_0,Special Needs MAPD
+Yamhill,AgeRight Advantage,AgeRight Advantage Premier Health Plan (HMO C-SNP),H1372_003,0,HMO C-SNP,69,400,6500,Yes,No,"Marquis Companies I, Inc.","MARQUIS ADVANTAGE, INC.",H1372_003_0,Special Needs MAPD
+Yamhill,Devoted Health,DEVOTED C-SNP GIVEBACK EXTRAS 019 OR (HMO C-SNP),H2923_019,0,HMO C-SNP,0,700,7700,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_019_0,Special Needs MAPD
+Yamhill,Devoted Health,DEVOTED C-SNP PLUS 009 OR (HMO C-SNP),H2923_009,0,HMO C-SNP,0,461,9850,Yes,No,"Devoted Health, Inc.",DEVOTED HEALTH PLAN OF OREGON INC,H2923_009_0,Special Needs MAPD
+Yamhill,UnitedHealthcare,UHC Care Advantage OR-E001 (PPO I-SNP),H0710_037,0,PPO I-SNP,6.3,270,4000,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_037_0,Special Needs MAPD
+Yamhill,UnitedHealthcare,UHC Complete Care OR-5 (HMO-POS C-SNP),H3805_040,0,HMO-POS C-SNP,0,685,7150,Yes,No,"UnitedHealth Group, Inc.","UnitedHealthcare Benefits of Texas, Inc.",H3805_040_0,Special Needs MAPD
+Yamhill,UnitedHealthcare,UHC Complete Care Support OR-1A (PPO C-SNP),H2001_045,0,PPO C-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.","SIERRA HEALTH AND LIFE INSURANCE COMPANY, INC.",H2001_045_0,Special Needs MAPD
+Yamhill,UnitedHealthcare,UHC Nursing Home Plan OR-F001 (PPO I-SNP),H0710_036,0,PPO I-SNP,0,700,9850,Yes,No,"UnitedHealth Group, Inc.",CARE IMPROVEMENT PLUS SOUTH CENTRAL INSURANCE CO.,H0710_036_0,Special Needs MAPD

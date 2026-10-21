@@ -1,0 +1,456 @@
+{% extends "base.html" %}
+
+{% block title %}Power Dialer | WSBCO Medicare Sales{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/dialer_v3.css?v=3.0">
+
+<section class="dialer-page">
+
+  <header class="dialer-hero">
+    <div>
+      <p class="dialer-eyebrow">Outbound Calling</p>
+      <h1>Power Dialer</h1>
+      <p class="dialer-subtitle">
+        Review the next lead, call through Twilio, and keep your follow-up queue moving.
+      </p>
+    </div>
+
+    <div class="dialer-hero-actions">
+      <a href="/leads" class="btn btn-outline-primary">
+        <i class="bi bi-people"></i>
+        Contacts
+      </a>
+
+      <a href="/leads/new" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i>
+        New Contact
+      </a>
+    </div>
+  </header>
+
+  {% if not configured %}
+  <div class="dialer-alert warning">
+    <div class="dialer-alert-icon">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+
+    <div>
+      <strong>Twilio is not configured.</strong>
+      <span>
+        Check your <code>.env</code> values and restart Uvicorn before placing calls.
+      </span>
+    </div>
+  </div>
+  {% endif %}
+
+  <section class="dialer-workspace">
+
+    <article class="dialer-card lead-card">
+
+      <header class="dialer-card-header">
+        <div>
+          <p class="section-eyebrow">Next in Queue</p>
+          <h2>Current Lead</h2>
+        </div>
+
+        {% if next_lead %}
+        <span class="queue-badge">
+          <i class="bi bi-lightning-charge-fill"></i>
+          Ready
+        </span>
+        {% endif %}
+      </header>
+
+      {% if next_lead %}
+
+      {% set initials =
+        (next_lead.first_name[:1] if next_lead.first_name else "") ~
+        (next_lead.last_name[:1] if next_lead.last_name else "")
+      %}
+
+      {% set status_key =
+        (next_lead.status or "New")
+        |lower
+        |replace(" ", "-")
+      %}
+
+      <div class="lead-profile">
+
+        <div class="lead-profile-top">
+
+          <div class="lead-avatar">
+            {{ initials|upper or "?" }}
+          </div>
+
+          <div class="lead-identity">
+            <a href="/leads/{{ next_lead.id }}" class="lead-name">
+              {{ next_lead.first_name }} {{ next_lead.last_name }}
+            </a>
+
+            <a
+              class="lead-phone"
+              href="tel:{{ next_lead.phone or next_lead.mobile }}"
+            >
+              <i class="bi bi-telephone"></i>
+              {{ next_lead.phone or next_lead.mobile or "No phone" }}
+            </a>
+          </div>
+
+          <span class="dialer-status status-{{ status_key }}">
+            <span class="status-dot"></span>
+            {{ next_lead.status or "New" }}
+          </span>
+
+        </div>
+
+        <div class="lead-facts">
+
+          <div class="lead-fact">
+            <span>Priority</span>
+            <strong>{{ next_lead.priority or "Normal" }}</strong>
+          </div>
+
+          <div class="lead-fact">
+            <span>Call Attempts</span>
+            <strong>{{ next_lead.call_attempts or 0 }}</strong>
+          </div>
+
+          <div class="lead-fact">
+            <span>Medicare Effective</span>
+            <strong>{{ next_lead.medicare_effective_date or "—" }}</strong>
+          </div>
+
+          <div class="lead-fact">
+            <span>Next Follow-up</span>
+            <strong>{{ next_lead.next_follow_up or "—" }}</strong>
+          </div>
+
+        </div>
+
+        <div class="lead-products">
+          {% if next_lead.interested_supplement %}
+            <span class="product-pill supplement">Medicare Supplement</span>
+          {% endif %}
+          {% if next_lead.interested_advantage %}
+            <span class="product-pill advantage">Medicare Advantage</span>
+          {% endif %}
+          {% if next_lead.interested_pdp %}
+            <span class="product-pill pdp">PDP</span>
+          {% endif %}
+          {% if next_lead.interested_dental %}
+            <span class="product-pill dental">Dental</span>
+          {% endif %}
+        </div>
+
+        <div class="lead-notes-panel">
+          <div class="notes-heading">
+            <span>
+              <i class="bi bi-journal-text"></i>
+              Contact Notes
+            </span>
+
+            <a href="/leads/{{ next_lead.id }}/edit">
+              Edit
+            </a>
+          </div>
+
+          <div class="lead-notes">
+            {{ next_lead.notes or "No contact notes have been entered." }}
+          </div>
+        </div>
+
+        <div class="dialer-call-area">
+
+          <form method="post" action="/dialer/call-next" class="call-next-form">
+            <button
+              type="submit"
+              class="call-next-button"
+              {% if not configured or not (next_lead.phone or next_lead.mobile) %}disabled{% endif %}
+            >
+              <span class="call-icon">
+                <i class="bi bi-telephone-fill"></i>
+              </span>
+
+              <span class="call-button-copy">
+                <strong>Call Next Lead</strong>
+                <small>Twilio calls you first, then connects the prospect</small>
+              </span>
+
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </form>
+
+          <div class="secondary-call-actions">
+            <a href="/leads/{{ next_lead.id }}" class="btn btn-light">
+              <i class="bi bi-folder2-open"></i>
+              Open Contact
+            </a>
+
+            <a href="/leads/{{ next_lead.id }}/edit" class="btn btn-light">
+              <i class="bi bi-pencil"></i>
+              Edit
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+
+      {% else %}
+
+      <div class="dialer-empty">
+        <div class="dialer-empty-icon">
+          <i class="bi bi-check2-circle"></i>
+        </div>
+
+        <h3>Your call queue is clear</h3>
+        <p>
+          New, Attempt Again, Callback, and Interested contacts will appear here.
+        </p>
+
+        <a href="/leads" class="btn btn-primary">
+          Review Contacts
+        </a>
+      </div>
+
+      {% endif %}
+
+    </article>
+
+
+    <aside class="dialer-side-column">
+
+      <article class="dialer-card workflow-card">
+
+        <header class="dialer-card-header compact">
+          <div>
+            <p class="section-eyebrow">Agent-First Calling</p>
+            <h2>Call Workflow</h2>
+          </div>
+        </header>
+
+        <ol class="dialer-workflow">
+          <li>
+            <span>1</span>
+            <div>
+              <strong>Start the call</strong>
+              <small>Click Call Next Lead.</small>
+            </div>
+          </li>
+
+          <li>
+            <span>2</span>
+            <div>
+              <strong>Answer your phone</strong>
+              <small>Twilio calls your agent number first.</small>
+            </div>
+          </li>
+
+          <li>
+            <span>3</span>
+            <div>
+              <strong>Prospect connects</strong>
+              <small>Twilio dials the contact after you answer.</small>
+            </div>
+          </li>
+
+          <li>
+            <span>4</span>
+            <div>
+              <strong>Save the result</strong>
+              <small>Record disposition and follow-up on the contact screen.</small>
+            </div>
+          </li>
+        </ol>
+
+      </article>
+
+
+      <article class="dialer-card queue-rules-card">
+
+        <header class="dialer-card-header compact">
+          <div>
+            <p class="section-eyebrow">Queue Logic</p>
+            <h2>Eligible Statuses</h2>
+          </div>
+        </header>
+
+        <div class="queue-rules">
+          <span>New</span>
+          <span>Attempt Again</span>
+          <span>Callback</span>
+          <span>Interested</span>
+        </div>
+
+        <p class="queue-note">
+          Contacts marked Do Not Call are excluded from outbound dialing.
+        </p>
+
+      </article>
+
+    </aside>
+
+  </section>
+
+
+  <section class="dialer-card call-history-card">
+
+    <header class="dialer-card-header">
+      <div>
+        <p class="section-eyebrow">Twilio Activity</p>
+        <h2>Recent Call History</h2>
+      </div>
+
+      <span class="history-count">
+        {{ history|length }}
+        {% if history|length == 1 %}call{% else %}calls{% endif %}
+      </span>
+    </header>
+
+    {% if history %}
+
+    <div class="history-table">
+
+      <div class="history-head">
+        <div>Contact</div>
+        <div>Started</div>
+        <div>Status</div>
+        <div>Duration</div>
+        <div>Disposition</div>
+        <div></div>
+      </div>
+
+      {% for call in history %}
+
+      {% set call_status_key =
+        (call.status or "queued")
+        |lower
+        |replace(" ", "-")
+      %}
+
+      <div class="history-row">
+
+        <div class="history-contact">
+          <div class="history-avatar">
+            <i class="bi bi-telephone"></i>
+          </div>
+
+          <div>
+            <a href="/leads/{{ call.lead_id }}">
+              {{ lead_names.get(call.lead_id, "Contact") }}
+            </a>
+            <span>{{ call.lead_phone }}</span>
+          </div>
+        </div>
+
+        <div class="history-muted">
+          {{ call.started_at }}
+        </div>
+
+        <div>
+          <span class="call-status status-{{ call_status_key }}">
+            <span class="status-dot"></span>
+            {{ call.status or "queued" }}
+          </span>
+        </div>
+
+        <div class="history-duration">
+          {% if call.duration_seconds %}
+            {{ call.duration_seconds }} sec
+          {% else %}
+            —
+          {% endif %}
+        </div>
+
+        <div class="history-disposition">
+          {{ call.disposition or "—" }}
+        </div>
+
+        <div class="history-open">
+          <a href="/leads/{{ call.lead_id }}" title="Open contact">
+            <i class="bi bi-arrow-up-right"></i>
+          </a>
+        </div>
+
+      </div>
+
+      {% endfor %}
+
+    </div>
+
+
+    <div class="mobile-history">
+
+      {% for call in history %}
+
+      {% set call_status_key =
+        (call.status or "queued")
+        |lower
+        |replace(" ", "-")
+      %}
+
+      <article class="mobile-history-card">
+
+        <div class="mobile-history-top">
+          <div>
+            <a href="/leads/{{ call.lead_id }}">
+              {{ lead_names.get(call.lead_id, "Contact") }}
+            </a>
+            <span>{{ call.lead_phone }}</span>
+          </div>
+
+          <span class="call-status status-{{ call_status_key }}">
+            <span class="status-dot"></span>
+            {{ call.status or "queued" }}
+          </span>
+        </div>
+
+        <div class="mobile-history-grid">
+          <div>
+            <small>Started</small>
+            <strong>{{ call.started_at }}</strong>
+          </div>
+
+          <div>
+            <small>Duration</small>
+            <strong>
+              {% if call.duration_seconds %}
+                {{ call.duration_seconds }} sec
+              {% else %}
+                —
+              {% endif %}
+            </strong>
+          </div>
+
+          <div>
+            <small>Disposition</small>
+            <strong>{{ call.disposition or "—" }}</strong>
+          </div>
+        </div>
+
+      </article>
+
+      {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="dialer-empty history-empty">
+      <div class="dialer-empty-icon">
+        <i class="bi bi-clock-history"></i>
+      </div>
+
+      <h3>No call history yet</h3>
+      <p>Your Twilio call attempts will appear here automatically.</p>
+    </div>
+
+    {% endif %}
+
+  </section>
+
+</section>
+
+<script src="/static/js/dialer_v3.js?v=3.0"></script>
+{% endblock %}

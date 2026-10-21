@@ -15,7 +15,7 @@ from sqlalchemy.orm import Mapped, Session, mapped_column
 from app.database import Base, get_db
 from app.models import Lead
 from app.services.contact_import import (
-    FIELDS, LABELS, MAX_BYTES, ImportProblem, hydrate, preview_import,
+    FIELDS, LABELS, MAX_BYTES, ImportProblem, bulk_correct, hydrate, preview_import,
     read_file, read_google_sheet, signature, suggested_mapping,
 )
 
@@ -52,7 +52,7 @@ def require_form(request, form):
 
 def page(request, **context):
     response = templates.TemplateResponse(request=request, name='imports_v35.html', context={
-        'step': 'source', 'labels': LABELS, 'fields': FIELDS, 'csrf': browser(request), **context,
+        'signature': signature, 'step': 'source', 'labels': LABELS, 'fields': FIELDS, 'csrf': browser(request), **context,
     })
     response.headers['Cache-Control'] = 'no-store'
     response.headers['Referrer-Policy'] = 'same-origin'
@@ -188,9 +188,10 @@ async def commit(request: Request, batch_id: str, db: Session = Depends(get_db))
                 for key, value in hydrate(row['data']).items():
                     setattr(lead, key, value)
                 lead.updated = datetime.utcnow()
-        # Retain only row numbers and outcomes after commit, not staged raw records.
+        # Retain rejected source rows until expiry so they can be corrected and retried.
         summary = {'counts': result['counts'], 'rows': [{k: row[k] for k in ('row', 'action', 'message')} for row in result['rows']], 'completed': datetime.utcnow().isoformat() + 'Z'}
-        batch.payload = json.dumps({'summary': summary})
+        rejected = [row for row in result['rows'] if row['action'] == 'error']
+        batch.payload = json.dumps({'summary': summary, 'rejected': {'headers': payload['table']['headers'], 'rows': rejected}})
         batch.state = 'done'
         db.commit()
     except Exception:
@@ -226,3 +227,73 @@ def results_csv(request: Request, batch_id: str, db: Session = Depends(get_db)):
     for row in result['rows']:
         writer.writerow([row['row'], row['action'], safe_csv(row['message'])])
     return Response(output.getvalue(), media_type='text/csv', headers={'Content-Disposition': 'attachment; filename="WSBCO_Import_Results.csv"', 'Cache-Control': 'no-store'})
+
+
+@router.post('/{batch_id}/correct')
+async def correct(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    form = await request.form(max_fields=10)
+    token = require_form(request, form)
+    batch = get_batch(db, batch_id, token)
+    payload = json.loads(batch.payload)
+    if batch.state != 'preview':
+        raise HTTPException(409, 'Preview this import before applying a correction.')
+    # A stale tab must not overwrite newer corrections or a committed batch.
+    if form.get('revision') != signature(payload['preview']):
+        raise HTTPException(409, 'The preview changed. Refresh it before correcting rows.')
+    try:
+        table = bulk_correct(payload['table'], payload['mapping'], str(form.get('field', '')), str(form.get('old', '')), str(form.get('replacement', '')))
+        result = preview_import(db, table, payload['mapping'], payload['mode'])
+    except ImportProblem as exc:
+        return page(request, step='preview', batch=batch, result=payload['preview'], error=str(exc))
+    previous = batch.payload
+    payload.update(table=table, preview=result)
+    changed = db.execute(update(ContactImportBatch).where(ContactImportBatch.id == batch_id, ContactImportBatch.state == 'preview', ContactImportBatch.payload == previous).values(payload=json.dumps(payload)))
+    if changed.rowcount != 1:
+        db.rollback()
+        raise HTTPException(409, 'The import changed. Refresh before trying again.')
+    db.commit()
+    return page(request, step='preview', batch=batch, result=result)
+
+
+def source_csv_response(headers, rows, filename):
+    output = io.StringIO(newline='')
+    writer = csv.writer(output)
+    writer.writerow([safe_csv(v) for v in headers])
+    writer.writerows([[safe_csv(v) for v in row] for row in rows])
+    return Response(output.getvalue(), media_type='text/csv', headers={'Content-Disposition': f'attachment; filename="{filename}"', 'Cache-Control': 'no-store'})
+
+
+@router.get('/{batch_id}/errors.csv')
+def errors_csv(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    batch = get_batch(db, batch_id, browser(request))
+    payload = json.loads(batch.payload)
+    if batch.state == 'done':
+        rejected = payload.get('rejected', {'headers': [], 'rows': []})
+        headers, rows = rejected['headers'], rejected['rows']
+    elif payload.get('preview'):
+        headers = payload['table']['headers']
+        rows = [r for r in payload['preview']['rows'] if r['action'] == 'error']
+    else:
+        raise HTTPException(409, 'Preview this import first.')
+    # Original columns retain the original source values; first columns are ready for retry.
+    meta = ['Import source row', 'Import error details', 'Original source values (JSON)']
+    return source_csv_response(headers + meta, [r['cleaned_values'] + [r['row'], r['message'], json.dumps(dict(zip(headers, r['original_values'])), ensure_ascii=False)] for r in rows], 'WSBCO_Rejected_Rows.csv')
+
+
+@router.get('/{batch_id}/cleaned.csv')
+def cleaned_csv(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    batch = get_batch(db, batch_id, browser(request))
+    payload = json.loads(batch.payload)
+    if not payload.get('preview'):
+        raise HTTPException(409, 'Download the cleaned file from the preview before committing.')
+    return source_csv_response(payload['table']['headers'], [r['cleaned_values'] for r in payload['preview']['rows']], 'WSBCO_Cleaned_Contacts.csv')
+
+
+@router.get('/{batch_id}/original.csv')
+def original_csv(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    batch = get_batch(db, batch_id, browser(request))
+    payload = json.loads(batch.payload)
+    if 'table' not in payload:
+        raise HTTPException(409, 'The full source is cleared after commit. Rejected rows retain their original values.')
+    table = payload['table']
+    return source_csv_response(table['headers'], [r.get('original_values', r['values']) for r in table['rows']], 'WSBCO_Original_Source_Values.csv')

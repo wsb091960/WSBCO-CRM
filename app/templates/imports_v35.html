@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Import Data | WSBCO CRM{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="/static/css/imports_v35.css?v=3.5">
+<link rel="stylesheet" href="/static/css/imports_v35.css?v=3.5.1">
 <section class="imports-page">
   <header class="import-heading">
     <div><p class="import-eyebrow">Contact management</p><h1>Import Data</h1><p>Bring your contacts into WSBCO from a spreadsheet.</p></div>
@@ -60,7 +60,14 @@
   <section class="import-card">
     <h2>Review before saving</h2><p><strong>{{ batch.source }}</strong> · Nothing has been saved yet.</p>
     <div class="import-counts">{% for action, label in [('create','New contacts'),('update','Updates'),('skip','Skipped'),('error','Needs correction')] %}<div><strong>{{ result.counts[action] }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
-    <p>Rows marked Needs correction will be left out. Fix them in your source file and import them again. <a href="/imports/{{ batch.id }}/results.csv">Download all row results</a></p>
+    <p>Valid rows can be imported now. Download rejected rows, correct them, and upload that smaller file to retry. Leave the added import-details and original-source columns set to Skip. <a href="/imports/{{ batch.id }}/results.csv">Download all row results</a></p>
+    <p><strong>{{ result.total }} source rows</strong> · {{ result.corrections|length }} cell corrections shown in this preview.</p>
+    <p><a href="/imports/{{ batch.id }}/cleaned.csv">Download cleaned CSV</a> · <a href="/imports/{{ batch.id }}/errors.csv">Download rejected rows for retry</a> · <a href="/imports/{{ batch.id }}/original.csv">Download original source values</a></p>
+    <p class="import-help">CSV downloads preserve text values, but spreadsheet programs may reinterpret ZIP codes. When editing a CSV, import ZIP and identifier columns as Text.</p>
+    {% if result.corrections %}<details><summary>Review corrections ({{ result.corrections|length }} cells)</summary><div class="import-table-wrap"><table class="table"><thead><tr><th>Row</th><th>Field</th><th>Original</th><th>Corrected</th></tr></thead><tbody>{% for c in result.corrections[:200] %}<tr><td>{{ c.row }}</td><td>{{ c.field }}</td><td>{{ c.before }}</td><td>{{ c.after }}</td></tr>{% endfor %}</tbody></table></div><p>Showing up to 200 corrections. The cleaned download includes every row.</p></details>{% endif %}
+    {% if result.error_groups %}<h3>Fix repeated errors together</h3><p>Choose a replacement for an exact source value. Applying it updates this preview; no contacts are saved until you confirm the import. Call outcomes and lead status have different meanings—choose the appropriate CRM status deliberately.</p>
+    {% for group in result.error_groups %}<div class="import-card"><strong>{{ group.rows|length }} row(s): {{ group.message }}</strong><p>Source rows: {{ group.rows[:20]|join(', ') }}{% if group.rows|length > 20 %}…{% endif %}</p>
+    {% if group.field %}<form method="post" action="/imports/{{ batch.id }}/correct"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="revision" value="{{ signature(result) }}"><input type="hidden" name="field" value="{{ group.field }}"><input type="hidden" name="old" value="{{ group.value }}"><label>Replace {{ labels[group.field] }} value “{{ group.value or '(blank)' }}” in all matching source rows <input class="form-control" name="replacement" required aria-label="Replacement for {{ labels[group.field] }}"></label><button class="btn btn-outline-primary" type="submit">Apply to matching rows and preview</button></form>{% else %}<p>Resolve the identity conflict or missing identifiers in the rejected-rows file before retrying.</p>{% endif %}</div>{% endfor %}{% endif %}
     <div class="import-table-wrap"><table class="table"><thead><tr><th>Row</th><th>Name</th><th>Result</th><th>Details / fields to save</th></tr></thead><tbody>
     {% for row in result.rows[:200] %}<tr><td>{{ row.row }}</td><td>{{ row.name or '—' }}</td><td><span class="import-badge import-{{ row.action }}">{{ {'create':'New','update':'Update','skip':'Skip','error':'Needs correction'}[row.action] }}</span></td><td>{{ row.message }}{% if row.action in ['create','update'] %}<details><summary>View matched values{% if row.action == 'update' %} and current values{% endif %}</summary><dl class="import-values">{% for field,value in row.data.items() %}<dt>{{ labels[field] }}</dt><dd>{% if row.action == 'update' %}<span class="import-before">{{ row.before[field] if row.before[field] is not none else 'Blank' }} → </span>{% endif %}{{ value }}</dd>{% endfor %}</dl></details>{% endif %}</td></tr>{% endfor %}
     </tbody></table></div>
@@ -72,7 +79,8 @@
   {% elif step == 'done' %}
   <section class="import-card">
     <h2><i class="bi bi-check-circle"></i> Import complete</h2><p>{{ batch.source }}</p>
-    <div class="import-counts">{% for action,label in [('create','Added'),('update','Updated'),('skip','Skipped'),('error','Left out — fix source')] %}<div><strong>{{ summary.counts[action] }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
+    <div class="import-counts">{% for action,label in [('create','Added'),('update','Updated'),('skip','Skipped'),('error','Rejected — ready to retry')] %}<div><strong>{{ summary.counts[action] }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
+    {% if summary.counts.error %}<p><a class="btn btn-outline-primary" href="/imports/{{ batch.id }}/errors.csv">Download rejected rows for retry</a></p><p>Correct this smaller file, then choose Import another source. Original values and error reasons are included. Skip the added metadata columns during mapping. Successfully imported rows are excluded.</p>{% endif %}
     <div class="import-actions"><a class="btn btn-primary" href="/leads">View Contacts</a><a class="btn btn-outline-primary" href="/imports/{{ batch.id }}/results.csv">Download results</a><a class="btn btn-outline-primary" href="/imports">Import another source</a></div>
   </section>
   {% endif %}

@@ -30,7 +30,7 @@ ALIASES = {
     'medicaredate': 'medicare_effective_date', 'mbi': 'medicare_mbi', 'medicaid': 'medicaid_number',
     'medicaidno': 'medicaid_number', 'phone1': 'phone', 'homephone': 'phone', 'telephone': 'phone',
     'cell': 'mobile', 'cellphone': 'mobile', 'mobilephone': 'mobile', 'emailaddress': 'email',
-    'street': 'address', 'streetaddress': 'address', 'zip': 'zip_code', 'postalcode': 'zip_code',
+    'address1': 'address', 'street': 'address', 'streetaddress': 'address', 'zip': 'zip_code', 'postalcode': 'zip_code',
     'supp': 'interested_supplement', 'supplement': 'interested_supplement', 'medigap': 'interested_supplement',
     'adv': 'interested_advantage', 'advantage': 'interested_advantage', 'ma': 'interested_advantage',
     'pdp': 'interested_pdp', 'partd': 'interested_pdp', 'dental': 'interested_dental',
@@ -61,14 +61,14 @@ def cell_text(value):
         return 'yes' if value else 'no'
     if isinstance(value, float) and value.is_integer():
         return str(int(value))
-    return str(value).strip()
+    return str(value)
 
 
 def table_from_rows(rows):
     """First row is always the header; never silently discard extra columns."""
     rows = iter(rows)
     try:
-        headers = [cell_text(c) for c in next(rows)]
+        headers = [cell_text(c).strip() for c in next(rows)]
     except StopIteration:
         raise ImportProblem('The source is empty.')
     while headers and not headers[-1]:
@@ -82,7 +82,7 @@ def table_from_rows(rows):
         if row_number > MAX_ROWS + 1:
             raise ImportProblem(f'Import at most {MAX_ROWS:,} source rows at a time.')
         values = [cell_text(v) for v in values]
-        if not any(values):
+        if not any(v.strip() for v in values):
             continue
         if any(values[len(headers):]):
             raise ImportProblem(f'Row {row_number} has values beyond the last column heading.')
@@ -282,10 +282,12 @@ def validate_values(values, mapping):
                     value = value.lower()
                     if not re.fullmatch(r'[^\s@]+@[^\s@]+\.[^\s@]+', value):
                         raise ValueError('enter a valid email address')
-                if field in {'state', 'medicare_mbi', 'plan_id'}:
+                if field == 'state':
+                    value = normalize_state(value)
+                if field in {'medicare_mbi', 'plan_id'}:
                     value = value.upper()
-                if field == 'state' and not re.fullmatch('[A-Z]{2}', value):
-                    raise ValueError('use a two-letter state abbreviation')
+                if field == 'state' and value not in STATE_CODES:
+                    raise ValueError('use a recognized US state name or postal abbreviation')
                 if field == 'zip_code':
                     if value.isdecimal() and len(value) < 5:
                         value = value.zfill(5)
@@ -398,9 +400,110 @@ def preview_import(db, table, mapping, mode):
                 seen_names_without_keys.add(name_key)
         else:
             action, message = 'error', ' '.join(errors)
-        results.append({'row': item['row'], 'action': action, 'lead_id': lead_id, 'name': f"{data.get('first_name', '')} {data.get('last_name', '')}".strip(), 'message': message, 'data': json_data(data), 'before': json_data(existing[lead_id]) if lead_id else None})
-    return {'rows': results, 'counts': {a: sum(r['action'] == a for r in results) for a in ['create', 'update', 'skip', 'error']}, 'mode': mode}
+        results.append({'row': item['row'], 'action': action, 'lead_id': lead_id, 'name': f"{data.get('first_name', '')} {data.get('last_name', '')}".strip(), 'message': message, 'data': json_data(data), 'before': json_data(existing[lead_id]) if lead_id else None, 'errors': errors, 'values': item['values'], 'original_values': item.get('original_values', item['values'])})
+    corrections = []
+    groups = {}
+    for row in results:
+        cleaned = list(row['values'])
+        for i, field in enumerate(mapping):
+            if field in row['data']:
+                cleaned[i] = cell_text(row['data'][field])
+            if cleaned[i] != row['original_values'][i]:
+                corrections.append({'row': row['row'], 'field': LABELS.get(field, table['headers'][i]), 'before': row['original_values'][i], 'after': cleaned[i]})
+        row['cleaned_values'] = cleaned
+        for error in row['errors']:
+            field = next((f for f in mapping if f and (error.startswith(LABELS[f] + ':') or error.startswith(LABELS[f] + ' is required'))), '')
+            value = row['values'][mapping.index(field)] if field else ''
+            key = (field, value, error)
+            group = groups.setdefault(key, {'field': field, 'value': value, 'message': error, 'rows': []})
+            group['rows'].append(row['row'])
+    return {'total': len(results), 'corrections': corrections, 'error_groups': list(groups.values()), 'rows': results, 'counts': {a: sum(r['action'] == a for r in results) for a in ['create', 'update', 'skip', 'error']}, 'mode': mode}
 
 
 def signature(preview):
     return hashlib.sha256(json.dumps(preview, sort_keys=True).encode()).hexdigest()
+
+
+# Exact state names and postal abbreviations only; misspellings require review.
+STATE_NAMES = """Alabama|AL
+Alaska|AK
+Arizona|AZ
+Arkansas|AR
+California|CA
+Colorado|CO
+Connecticut|CT
+Delaware|DE
+District of Columbia|DC
+Florida|FL
+Georgia|GA
+Hawaii|HI
+Idaho|ID
+Illinois|IL
+Indiana|IN
+Iowa|IA
+Kansas|KS
+Kentucky|KY
+Louisiana|LA
+Maine|ME
+Maryland|MD
+Massachusetts|MA
+Michigan|MI
+Minnesota|MN
+Mississippi|MS
+Missouri|MO
+Montana|MT
+Nebraska|NE
+Nevada|NV
+New Hampshire|NH
+New Jersey|NJ
+New Mexico|NM
+New York|NY
+North Carolina|NC
+North Dakota|ND
+Ohio|OH
+Oklahoma|OK
+Oregon|OR
+Pennsylvania|PA
+Rhode Island|RI
+South Carolina|SC
+South Dakota|SD
+Tennessee|TN
+Texas|TX
+Utah|UT
+Vermont|VT
+Virginia|VA
+Washington|WA
+West Virginia|WV
+Wisconsin|WI
+Wyoming|WY
+Puerto Rico|PR
+Guam|GU
+American Samoa|AS
+Northern Mariana Islands|MP
+Virgin Islands|VI"""
+STATE_LOOKUP = {name.casefold(): code for name, code in (line.split('|') for line in STATE_NAMES.splitlines())}
+STATE_CODES = set(STATE_LOOKUP.values()) | {'AA', 'AE', 'AP'}
+
+
+def normalize_state(value):
+    value = value.strip()
+    return STATE_LOOKUP.get(value.casefold(), value.upper())
+
+
+def bulk_correct(table, mapping, field, old, replacement):
+    """Change a staged copy only; commit always requires a fresh preview."""
+    if field not in mapping or field not in FIELDS:
+        raise ImportProblem('Choose a mapped field to correct.')
+    if len(replacement) > 32767:
+        raise ImportProblem('The replacement is too long.')
+    column = mapping.index(field)
+    corrected = json.loads(json.dumps(table))
+    changed = 0
+    for item in corrected['rows']:
+        if item['values'][column] == old:
+            item.setdefault('original_values', list(item['values']))
+            item['values'][column] = replacement
+            changed += 1
+    if not changed:
+        raise ImportProblem('No rows match that value. Refresh the preview.')
+    return corrected

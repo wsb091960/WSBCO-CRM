@@ -7,7 +7,7 @@
 {% set ph=lead.mobile or lead.phone %}
 <div class="console">
 <header class="contact-head"><div><small>CONTACT CONSOLE · #{{ lead.id }}</small><h1>{{ nm }}</h1><p><b>{{ lead.status or 'New' }}</b> · {{ lead.priority or 'Normal' }} priority · {{ lead.call_attempts or 0 }} call attempts</p></div>
-<div class="actions"><a href="/leads">Contacts</a><a href="/leads/{{lead.id}}/edit">Edit</a><form method="post" action="/leads/{{lead.id}}/call"><button {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ Call {{ ph or '' }}</button></form></div></header>
+<div class="actions"><a href="/leads/{{lead.id}}/compare" onclick="window.open(this.href, 'wsbco_plan_compare_{{lead.id}}', 'width=1180,height=850,resizable=yes,scrollbars=yes'); return false;">Compare Plans</a><a href="/leads">Contacts</a><a href="/leads/{{lead.id}}/edit">Edit</a><form method="post" action="/leads/{{lead.id}}/call"><button {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ Call {{ ph or '' }}</button></form></div></header>
 {% if calling %}<div class="notice">Calling your agent phone first. Answer to connect with {{lead.first_name}}.</div>{% endif %}
 {% if call_error %}<div class="notice err">{{call_error}}</div>{% endif %}
 <div class="columns">
