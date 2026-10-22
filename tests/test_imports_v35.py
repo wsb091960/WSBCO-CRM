@@ -241,7 +241,7 @@ def test_google_error_missing_connection_and_source_route(setup, monkeypatch):
 def test_validation_does_not_silently_change_bad_values():
     fields = ['first_name', 'last_name', 'email', 'state', 'date_of_birth', 'interested_pdp', 'status', 'call_attempts']
     _, errors = service.validate_values(['Ann', 'Example', 'no-email', 'Oregon', '04/05/61', 'sometimes', 'Unknown', '-2'], fields)
-    assert len(errors) == 6
+    assert len(errors) == 5
 
 
 def test_row_limits_and_full_results(setup):

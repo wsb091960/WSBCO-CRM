@@ -306,6 +306,8 @@ def validate_values(values, mapping):
                     if not re.fullmatch(r'\d{5}(?:-\d{4})?', value):
                         raise ValueError('use a five-digit ZIP or ZIP+4')
                 if field == 'status':
+                    if value.strip().casefold() in ('follow up', 'follow-up'):
+                        value = 'Callback'
                     canonical = next((s for s in STATUSES if s.casefold() == value.casefold()), None)
                     if not canonical:
                         raise ValueError('use a CRM status such as New, Sold, or Do Not Call')
@@ -506,8 +508,15 @@ STATE_CODES = set(STATE_LOOKUP.values()) | {'AA', 'AE', 'AP'}
 
 def normalize_state(value):
     value = value.strip()
-    return STATE_LOOKUP.get(value.casefold(), value.upper())
+    compact = re.sub(r'[^a-z]', '', value.casefold())
 
+    if compact in {'or', 'ore', 'oregon', 'oregonor', 'orgeron', 'orgon'}:
+        return 'OR'
+
+    if re.fullmatch(r'(?:oregon|or)\.?\s*(?:\(or\))?\s*\d{5}', value, re.I):
+        return 'OR'
+
+    return STATE_LOOKUP.get(value.casefold(), value.upper())
 
 def bulk_correct(table, mapping, field, old, replacement):
     """Change a staged copy only; commit always requires a fresh preview."""
