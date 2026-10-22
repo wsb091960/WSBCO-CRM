@@ -1,3 +1,5 @@
+from app.website_leads import router as website_leads_router
+from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -44,3 +46,7 @@ def health_check():
         "app": "WSBCO Insurance CRM",
         "phase": "3.6",
     }
+
+app.add_middleware(CORSMiddleware, allow_origins=["https://turning65medicaremadeeasy.com", "https://www.turning65medicaremadeeasy.com"], allow_methods=["POST"], allow_headers=["Content-Type"])
+
+app.include_router(website_leads_router)
