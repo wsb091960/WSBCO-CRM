@@ -1,6 +1,22 @@
 {% extends "base.html" %}
 {% block title %}Contacts | WSBCO Medicare Sales{% endblock %}
 {% block content %}
+
+<style>
+/* Manual dialing: prominent contact phone numbers */
+.contacts-page .mobile-name span,
+.contacts-page .person-cell .secondary {
+    display: block;
+    font-size: 24px !important;
+    font-weight: 800 !important;
+    line-height: 1.4;
+    letter-spacing: 0.5px;
+    color: #123c32 !important;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+}
+</style>
+
 <link rel="stylesheet" href="/static/css/contacts.css?v=3.0">
 
 <section class="contacts-page">
