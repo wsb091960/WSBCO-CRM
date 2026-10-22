@@ -1,6 +1,21 @@
 {% extends "base.html" %}
 {% block title %}{{ lead.first_name }} {{ lead.last_name }} | Contact Console{% endblock %}
 {% block content %}
+
+<style>
+/* Larger phone numbers for manual dialing */
+.console .panel.left .field:nth-of-type(1) b,
+.console .panel.left .field:nth-of-type(2) b,
+.console .panel.right .person span {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    font-variant-numeric: tabular-nums;
+}
+</style>
+
 <link rel="stylesheet" href="/static/css/contact_console_v31.css?v=31">
 <link rel="stylesheet" href="/static/css/activity_v33.css?v=33">
 {% set nm=((lead.first_name or '') ~ ' ' ~ (lead.last_name or ''))|trim %}
