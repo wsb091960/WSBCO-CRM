@@ -260,6 +260,18 @@ def parse_date(value, with_time=False):
     raise ValueError('use YYYY-MM-DD or MM/DD/YYYY' + (' with optional HH:MM:SS' if with_time else ''))
 
 
+
+def split_import_full_name(value):
+    """Split First Middle Last, preserving middle names."""
+    name = " ".join(str(value or "").strip().split())
+    if not name:
+        return "", ""
+    parts = name.split(" ")
+    if len(parts) < 2:
+        return name, ""
+    return " ".join(parts[:-1]), parts[-1]
+
+
 def validate_values(values, mapping):
     data, errors = {}, []
     for value, field in zip(values, mapping):
@@ -309,6 +321,13 @@ def validate_values(values, mapping):
                 data[field] = value
         except ValueError as exc:
             errors.append(f'{LABELS[field]}: {exc}.')
+    # Repair combined First Last names before required-field validation.
+    if data.get('first_name') and not data.get('last_name'):
+        first, last = split_import_full_name(data['first_name'])
+        if last:
+            data['first_name'] = first
+            data['last_name'] = last
+
     for field in ('first_name', 'last_name'):
         if not data.get(field):
             errors.append(f'{LABELS[field]} is required.')
