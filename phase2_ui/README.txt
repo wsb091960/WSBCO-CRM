@@ -1,0 +1,1 @@
+Copy templates into app/templates and static files into app/static.

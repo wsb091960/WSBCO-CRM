@@ -1,0 +1,228 @@
+"""Browser-bound, restart-safe import preview and transactional commit."""
+import csv
+import hashlib
+import io
+import json
+import secrets
+from datetime import datetime, timedelta
+
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import RedirectResponse, Response
+from fastapi.templating import Jinja2Templates
+from sqlalchemy import DateTime, String, Text, delete, select, update
+from sqlalchemy.orm import Mapped, Session, mapped_column
+
+from app.database import Base, get_db
+from app.models import Lead
+from app.services.contact_import import (
+    FIELDS, LABELS, MAX_BYTES, ImportProblem, hydrate, preview_import,
+    read_file, read_google_sheet, signature, suggested_mapping,
+)
+
+router = APIRouter(prefix='/imports', tags=['Contact imports'])
+templates = Jinja2Templates(directory='app/templates')
+COOKIE = 'crm_import_browser'
+
+
+class ContactImportBatch(Base):
+    __tablename__ = 'contact_import_batches'
+    id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    owner: Mapped[str] = mapped_column(String(64), index=True)
+    source: Mapped[str] = mapped_column(String(255))
+    state: Mapped[str] = mapped_column(String(20), default='mapping')
+    payload: Mapped[str] = mapped_column(Text)
+    expires: Mapped[datetime] = mapped_column(DateTime, index=True)
+
+
+def owner_hash(value):
+    return hashlib.sha256(value.encode()).hexdigest()
+
+
+def browser(request):
+    value = request.cookies.get(COOKIE, '')
+    return value if len(value) >= 32 else ''
+
+
+def require_form(request, form):
+    token = browser(request)
+    if not token or not secrets.compare_digest(str(form.get('csrf', '')), token):
+        raise HTTPException(403, 'Open Import Data again, then resubmit the form.')
+    return token
+
+
+def page(request, **context):
+    response = templates.TemplateResponse(request=request, name='imports_v35.html', context={
+        'step': 'source', 'labels': LABELS, 'fields': FIELDS, 'csrf': browser(request), **context,
+    })
+    response.headers['Cache-Control'] = 'no-store'
+    response.headers['Referrer-Policy'] = 'same-origin'
+    return response
+
+
+def get_batch(db, batch_id, token):
+    batch = db.get(ContactImportBatch, batch_id)
+    if not batch or not token or not secrets.compare_digest(batch.owner, owner_hash(token)):
+        raise HTTPException(404, 'Import not found. Open Import Data to start again.')
+    if batch.expires < datetime.utcnow():
+        db.delete(batch)
+        db.commit()
+        raise HTTPException(410, 'This import expired. Upload the source again.')
+    return batch
+
+
+@router.get('')
+def start(request: Request):
+    token = browser(request) or secrets.token_urlsafe(32)
+    response = page(request, csrf=token)
+    response.set_cookie(COOKIE, token, httponly=True, secure=request.url.scheme == 'https', samesite='strict', max_age=86400)
+    return response
+
+
+@router.get('/template.csv')
+def template():
+    output = io.StringIO(newline='')
+    writer = csv.writer(output)
+    writer.writerow(list(FIELDS))
+    # Header-only template avoids accidentally importing demonstration contacts.
+    return Response(output.getvalue(), media_type='text/csv', headers={'Content-Disposition': 'attachment; filename="WSBCO_Contact_Import_Template.csv"'})
+
+
+@router.post('/source')
+async def source(request: Request, db: Session = Depends(get_db)):
+    form = await request.form(max_files=1, max_fields=10)
+    token = require_form(request, form)
+    try:
+        worksheet = str(form.get('worksheet', '')).strip()
+        if len(worksheet) > 100:
+            raise ImportProblem('The worksheet name is too long.')
+        if form.get('source_type') == 'sheets':
+            from starlette.concurrency import run_in_threadpool
+            table = await run_in_threadpool(read_google_sheet, str(form.get('sheet_url', '')), worksheet)
+            label = 'Google Sheets · ' + table['worksheet']
+        elif form.get('source_type') == 'file':
+            upload = form.get('file')
+            if not hasattr(upload, 'read'):
+                raise ImportProblem('Choose a CSV or Excel file.')
+            content = await upload.read(MAX_BYTES + 1)
+            await upload.close()
+            from starlette.concurrency import run_in_threadpool
+            table = await run_in_threadpool(read_file, upload.filename or '', content, worksheet)
+            label = (upload.filename or 'File').replace('\\', '/').rsplit('/', 1)[-1][:150]
+            if table.get('worksheet'):
+                label += ' · ' + table['worksheet']
+        else:
+            raise ImportProblem('Choose a file upload or Google Sheets.')
+    except ImportProblem as exc:
+        return page(request, error=str(exc))
+    db.execute(delete(ContactImportBatch).where(ContactImportBatch.expires < datetime.utcnow()))
+    batch = ContactImportBatch(id=secrets.token_urlsafe(24), owner=owner_hash(token), source=label[:255], payload=json.dumps({'table': table}), expires=datetime.utcnow() + timedelta(hours=1))
+    db.add(batch)
+    db.commit()
+    return RedirectResponse('/imports/' + batch.id, status_code=303)
+
+
+@router.get('/{batch_id}')
+def show(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    batch = get_batch(db, batch_id, browser(request))
+    payload = json.loads(batch.payload)
+    if batch.state == 'done':
+        return page(request, step='done', batch=batch, summary=payload['summary'])
+    table = payload['table']
+    return page(request, step='mapping', batch=batch, table=table, mapping=payload.get('mapping', suggested_mapping(table['headers'])), mode=payload.get('mode', 'skip'))
+
+
+@router.post('/{batch_id}/preview')
+async def preview(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    form = await request.form(max_fields=110)
+    token = require_form(request, form)
+    batch = get_batch(db, batch_id, token)
+    if batch.state == 'done':
+        return RedirectResponse('/imports/' + batch.id, status_code=303)
+    payload = json.loads(batch.payload)
+    table = payload['table']
+    mapping = [str(form.get(f'column_{i}', '')) for i in range(len(table['headers']))]
+    mode = str(form.get('mode', 'skip'))
+    try:
+        result = preview_import(db, table, mapping, mode)
+    except ImportProblem as exc:
+        return page(request, step='mapping', batch=batch, table=table, mapping=mapping, mode=mode, error=str(exc))
+    payload.update(mapping=mapping, mode=mode, preview=result)
+    saved = db.execute(update(ContactImportBatch).where(ContactImportBatch.id == batch_id, ContactImportBatch.state.in_(['mapping', 'preview'])).values(payload=json.dumps(payload), state='preview'))
+    if saved.rowcount != 1:
+        db.rollback()
+        return RedirectResponse('/imports/' + batch.id, status_code=303)
+    db.commit()
+    return page(request, step='preview', batch=batch, result=result)
+
+
+@router.post('/{batch_id}/commit')
+async def commit(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    form = await request.form()
+    token = require_form(request, form)
+    if form.get('confirm') != 'yes':
+        raise HTTPException(400, 'Confirm the preview before importing.')
+    batch = get_batch(db, batch_id, token)
+    if batch.state == 'done':
+        return RedirectResponse('/imports/' + batch.id, status_code=303)
+    # Claim before re-reading source or contacts. The database write lock serializes
+    # competing imports; claiming and all contact writes share one transaction.
+    claim = db.execute(update(ContactImportBatch).where(ContactImportBatch.id == batch_id, ContactImportBatch.state == 'preview').values(state='committing'))
+    if claim.rowcount != 1:
+        db.rollback()
+        raise HTTPException(409, 'Open the import preview before saving.')
+    db.refresh(batch)
+    payload = json.loads(batch.payload)
+    result = preview_import(db, payload['table'], payload['mapping'], payload['mode'])
+    if signature(result) != signature(payload['preview']):
+        batch.state = 'preview'
+        payload['preview'] = result
+        batch.payload = json.dumps(payload)
+        db.commit()
+        return page(request, step='preview', batch=batch, result=result, error='Contacts changed since your preview. Review the refreshed results and confirm again.')
+    try:
+        for row in result['rows']:
+            if row['action'] == 'create':
+                db.add(Lead(**hydrate(row['data'])))
+            elif row['action'] == 'update':
+                lead = db.get(Lead, row['lead_id'])
+                for key, value in hydrate(row['data']).items():
+                    setattr(lead, key, value)
+                lead.updated = datetime.utcnow()
+        # Retain only row numbers and outcomes after commit, not staged raw records.
+        summary = {'counts': result['counts'], 'rows': [{k: row[k] for k in ('row', 'action', 'message')} for row in result['rows']], 'completed': datetime.utcnow().isoformat() + 'Z'}
+        batch.payload = json.dumps({'summary': summary})
+        batch.state = 'done'
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(500, 'The import could not be saved. No rows were committed. Try again from the preview.')
+    return RedirectResponse('/imports/' + batch.id, status_code=303)
+
+
+@router.post('/{batch_id}/cancel')
+async def cancel(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    token = require_form(request, await request.form())
+    batch = get_batch(db, batch_id, token)
+    db.delete(batch)
+    db.commit()
+    return RedirectResponse('/imports', status_code=303)
+
+
+def safe_csv(value):
+    value = str(value)
+    return "'" + value if value.lstrip().startswith(('=', '+', '-', '@', '\t', '\r')) else value
+
+
+@router.get('/{batch_id}/results.csv')
+def results_csv(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    batch = get_batch(db, batch_id, browser(request))
+    payload = json.loads(batch.payload)
+    result = payload.get('summary') or payload.get('preview')
+    if not result:
+        raise HTTPException(409, 'Preview this import first.')
+    output = io.StringIO(newline='')
+    writer = csv.writer(output)
+    writer.writerow(['Source row', 'Result', 'Details'])
+    for row in result['rows']:
+        writer.writerow([row['row'], row['action'], safe_csv(row['message'])])
+    return Response(output.getvalue(), media_type='text/csv', headers={'Content-Disposition': 'attachment; filename="WSBCO_Import_Results.csv"', 'Cache-Control': 'no-store'})

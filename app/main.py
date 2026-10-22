@@ -8,12 +8,14 @@ from app.routers.calls import router as calls_router
 from app.routers.leads import router as leads_router
 from app.activity_v33 import router as activity_v33_router
 from app.followup_v34 import router as followup_v34_router
+from app.imports_v35 import router as imports_v35_router
+from app.plan_compare_v36 import router as plan_compare_v36_router
 
 BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI(
     title="WSBCO Insurance CRM",
-    version="1.2.0",
+    version="3.6.0",
 )
 
 app.mount(
@@ -26,6 +28,8 @@ app.include_router(leads_router)
 app.include_router(calls_router)
 app.include_router(activity_v33_router)
 app.include_router(followup_v34_router)
+app.include_router(imports_v35_router)
+app.include_router(plan_compare_v36_router)
 
 
 @app.on_event("startup")
@@ -38,5 +42,5 @@ def health_check():
     return {
         "status": "ok",
         "app": "WSBCO Insurance CRM",
-        "phase": "1.2",
+        "phase": "3.6",
     }

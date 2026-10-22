@@ -1,0 +1,16 @@
+<!-- V3.3 ACTIVITY TIMELINE: replace the existing contents of the Activity tab with this block -->
+<div class="v33-wrap" data-lead-id="{{ lead.id }}">
+  <div class="v33-toolbar"><h3>Activity Timeline</h3><span class="cc-kicker">NEWEST FIRST</span></div>
+  <form id="v33-add-activity" class="v33-add">
+    <select name="activity_type">
+      <option value="note">Note</option><option value="call">Call</option>
+      <option value="followup">Follow-up</option><option value="email">Email</option>
+      <option value="status">Status Change</option>
+    </select>
+    <input name="detail" placeholder="Add a quick activity note..." required>
+    <input type="hidden" name="title" value="Manual activity">
+    <button type="submit">Add Activity</button>
+  </form>
+  <div id="v33-empty" class="v33-empty"><i class="bi bi-clock-history"></i><b>No activity yet</b><span>Calls, dispositions and notes will appear here.</span></div>
+  <div id="v33-activity-list" class="v33-list"></div>
+</div>

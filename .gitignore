@@ -5,3 +5,7 @@ __pycache__/
 data/*.db
 .pytest_cache/
 .DS_Store
+backups/
+
+# Local installation archives
+*.zip

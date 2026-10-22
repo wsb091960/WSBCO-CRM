@@ -1,0 +1,18 @@
+{
+  "app/services/contact_import.py": [
+    "dd309e210599ab526894f6140b79b5521b1006eb6184076322d46e76ad0d1c24",
+    "084235dbda0ed80817116b43c3ccb96839e636543eb96191ead0c8225207bb3f"
+  ],
+  "app/imports_v35.py": [
+    "af29bb14be57602235bbcd1806eb36227620ab212fc4f1f7feba247dcf8b39c2",
+    "88c9fc7f11711f84d534d59fad354f4c6c57e7253275a0922e694a2fbd5158c9"
+  ],
+  "app/templates/imports_v35.html": [
+    "cefd58c60c01e2f4d24da9c4f1697476824c4805a1e6b6c6dfb22afafbc34c83",
+    "f47da426700c89e3eef1d717aa58ff8a7cca7c4a9bcd8b57ee34167d5d61201e"
+  ],
+  "app/static/css/imports_v35.css": [
+    "7991bf7ca635ea7cd51dee2486364e2418bd1d389ff6f0fd676a7c6d62377a5a",
+    "7991bf7ca635ea7cd51dee2486364e2418bd1d389ff6f0fd676a7c6d62377a5a"
+  ]
+}

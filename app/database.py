@@ -4,7 +4,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "data"
+import os
+DATA_DIR = Path(os.environ.get("CRM_DATA_DIR", str(BASE_DIR / "data")))
 DATA_DIR.mkdir(exist_ok=True)
 
 DATABASE_URL = f"sqlite:///{DATA_DIR / 'insurance_crm.db'}"

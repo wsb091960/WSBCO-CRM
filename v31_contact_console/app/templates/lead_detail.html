@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ lead.first_name }} {{ lead.last_name }} | Contact Console{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/contact_console_v31.css?v=31">
+{% set nm=((lead.first_name or '') ~ ' ' ~ (lead.last_name or ''))|trim %}
+{% set ph=lead.mobile or lead.phone %}
+<div class="console">
+<header class="contact-head"><div><small>CONTACT CONSOLE · #{{ lead.id }}</small><h1>{{ nm }}</h1><p><b>{{ lead.status or 'New' }}</b> · {{ lead.priority or 'Normal' }} priority · {{ lead.call_attempts or 0 }} call attempts</p></div>
+<div class="actions"><a href="/leads">Contacts</a><a href="/leads/{{lead.id}}/edit">Edit</a><form method="post" action="/leads/{{lead.id}}/call"><button {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ Call {{ ph or '' }}</button></form></div></header>
+{% if calling %}<div class="notice">Calling your agent phone first. Answer to connect with {{lead.first_name}}.</div>{% endif %}
+{% if call_error %}<div class="notice err">{{call_error}}</div>{% endif %}
+<div class="columns">
+<section class="panel left"><h3>CONTACT</h3>
+{% for label,val in [('Phone',lead.phone),('Mobile',lead.mobile),('Email',lead.email),('Address',lead.address),('Location',(lead.city or '') ~ (', ' if lead.city and lead.state else '') ~ (lead.state or '') ~ (' ' if lead.zip_code else '') ~ (lead.zip_code or '')),('County',lead.county)] %}<div class="field"><label>{{label}}</label><b>{{val or '—'}}</b></div>{% endfor %}
+<h3>MEDICARE</h3><div class="grid">
+<div><label>DOB</label><b>{{lead.date_of_birth or '—'}}</b></div><div><label>EFFECTIVE</label><b>{{lead.medicare_effective_date or '—'}}</b></div>
+<div><label>COVERAGE</label><b>{{lead.current_coverage or '—'}}</b></div><div><label>PLAN ID</label><b>{{lead.plan_id or '—'}}</b></div>
+<div><label>MBI</label><b>{% if lead.medicare_mbi %}••••{{lead.medicare_mbi[-4:]}}{% else %}—{% endif %}</b></div><div><label>MEDICAID</label><b>{% if lead.medicaid_number %}••••{{lead.medicaid_number[-4:]}}{% else %}—{% endif %}</b></div></div>
+<h3>PRODUCT INTEREST</h3><div class="pills"><span class="{{'on' if lead.interested_supplement else ''}}">Med Supp</span><span class="{{'on' if lead.interested_advantage else ''}}">Advantage</span><span class="{{'on' if lead.interested_pdp else ''}}">Part D</span><span class="{{'on' if lead.interested_dental else ''}}">Dental</span></div>
+</section>
+<section class="panel center"><nav class="tabs"><button class="active" data-tab="notes">Notes</button><button data-tab="activity">Activity</button><button data-tab="follow">Follow-up</button></nav>
+<div id="notes" class="tab active"><div class="sectionhead"><div><small>CALL PREP</small><h2>Contact Notes</h2></div><a href="/leads/{{lead.id}}/edit">Edit notes</a></div><div class="notes">{{lead.notes or 'No notes have been entered for this contact.'}}</div>
+<div class="facts"><div><label>SPOUSE</label><b>{{lead.spouse or '—'}}</b></div><div><label>LEAD SOURCE</label><b>{{lead.lead_source or '—'}}</b></div><div><label>AGENT</label><b>{{lead.agent or '—'}}</b></div><div><label>LAST CONTACT</label><b>{{lead.last_contact or '—'}}</b></div></div></div>
+<div id="activity" class="tab"><div class="sectionhead"><div><small>HISTORY</small><h2>Activity</h2></div></div><div class="timeline"><p>☎ <b>{{lead.call_attempts or 0}} call attempts</b></p><p>◷ Last contact: <b>{{lead.last_contact or '—'}}</b></p><p>✎ Updated: <b>{{lead.updated or '—'}}</b></p><p>＋ Created: <b>{{lead.created or '—'}}</b></p></div></div>
+<div id="follow" class="tab"><div class="sectionhead"><div><small>NEXT ACTION</small><h2>Follow-up</h2></div></div><div class="follow"><label>NEXT FOLLOW-UP</label><b>{{lead.next_follow_up or 'Not scheduled'}}</b><span>{{lead.follow_up_type or 'No follow-up type selected'}}</span></div></div>
+</section>
+<aside class="panel right"><h3>CALL WORKSPACE <em>● Ready</em></h3><div class="person"><strong>{{nm}}</strong><span>{{ph or 'No phone number'}}</span></div><form method="post" action="/leads/{{lead.id}}/call"><button class="call" {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ <b>CALL CONTACT</b><small>Agent-first Twilio call</small></button></form>
+<div class="callfacts"><p><span>Status</span><b>{{lead.status or 'New'}}</b></p><p><span>Attempts</span><b>{{lead.call_attempts or 0}}</b></p><p><span>Next follow-up</span><b>{{lead.next_follow_up or '—'}}</b></p></div><h3>DISPOSITION</h3>
+{% if call_id %}<form method="post" action="/calls/{{call_id}}/disposition"><input type="hidden" name="disposition" id="disp"><div class="disps">{% for x in ['Interested','Appointment Set','Callback','Voicemail','No Answer','Not Interested','Do Not Call','Sold'] %}<button type="button" data-value="{{x}}">{{x}}</button>{% endfor %}</div><label>FOLLOW-UP DATE</label><input type="date" name="next_follow_up"><label>CALL NOTE</label><textarea name="notes" rows="3"></textarea><button id="save" class="save" disabled>Save Call Result</button></form>{% else %}<div class="locked">☎<b>Start a call to record an outcome</b><span>Disposition controls appear after the call begins.</span></div>{% endif %}
+</aside></div></div><script src="/static/js/contact_console_v31.js?v=31"></script>
+{% endblock %}

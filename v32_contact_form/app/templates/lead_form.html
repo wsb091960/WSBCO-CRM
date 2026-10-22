@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{% if lead %}Edit {{ lead.first_name }} {{ lead.last_name }}{% else %}New Contact{% endif %} | WSBCO{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/contact_form_v32.css?v=32">
+{% set L = lead if lead else none %}
+<div class="cf">
+<header class="cf-head">
+ <div><div class="eyebrow">{% if L %}CONTACT #{{L.id}}{% else %}NEW PROSPECT{% endif %}</div>
+ <h1>{% if L %}Edit Contact{% else %}Add New Contact{% endif %}</h1>
+ <p>{% if L %}Update client, Medicare, coverage and follow-up information.{% else %}Create a Medicare prospect and set the next sales action.{% endif %}</p></div>
+ <a href="{% if L %}/leads/{{L.id}}{% else %}/leads{% endif %}" class="cancel">Cancel</a>
+</header>
+
+<form method="post" class="cf-form">
+<div class="cf-grid">
+<main>
+<section class="card">
+ <div class="card-head"><span>1</span><div><h2>Contact Information</h2><p>Client identity and communication details</p></div></div>
+ <div class="fields">
+  <label>First Name<input name="first_name" required value="{{L.first_name if L else ''}}"></label>
+  <label>Last Name<input name="last_name" required value="{{L.last_name if L else ''}}"></label>
+  <label>Spouse<input name="spouse" value="{{L.spouse if L else ''}}"></label>
+  <label>Phone<input name="phone" type="tel" value="{{L.phone if L else ''}}"></label>
+  <label>Mobile<input name="mobile" type="tel" value="{{L.mobile if L else ''}}"></label>
+  <label>Email<input name="email" type="email" value="{{L.email if L else ''}}"></label>
+  <label class="wide">Address<input name="address" value="{{L.address if L else ''}}"></label>
+  <label>City<input name="city" value="{{L.city if L else ''}}"></label>
+  <label>State<input name="state" maxlength="2" value="{{L.state if L else 'OR'}}"></label>
+  <label>ZIP Code<input name="zip_code" inputmode="numeric" value="{{L.zip_code if L else ''}}"></label>
+  <label>County<input name="county" value="{{L.county if L else ''}}"></label>
+ </div>
+</section>
+
+<section class="card">
+ <div class="card-head"><span>2</span><div><h2>Medicare Information</h2><p>Eligibility, identifiers and current coverage</p></div></div>
+ <div class="fields">
+  <label>Date of Birth<input id="dob" name="date_of_birth" type="date" value="{{L.date_of_birth if L and L.date_of_birth else ''}}"></label>
+  <label>Medicare Effective<input id="med-effective" name="medicare_effective_date" type="date" value="{{L.medicare_effective_date if L and L.medicare_effective_date else ''}}"></label>
+  <div class="eligibility"><small>AGE-65 REFERENCE</small><b id="eligibility-text">Enter date of birth</b><span>This is a planning reference, not a determination of Medicare eligibility.</span></div>
+  <label>Medicare MBI<input name="medicare_mbi" autocomplete="off" value="{{L.medicare_mbi if L else ''}}"></label>
+  <label>Medicaid #<input name="medicaid_number" autocomplete="off" value="{{L.medicaid_number if L else ''}}"></label>
+  <label>Plan ID<input name="plan_id" value="{{L.plan_id if L else ''}}"></label>
+  <label class="wide">Current Coverage<input name="current_coverage" value="{{L.current_coverage if L else ''}}" placeholder="Original Medicare, MAPD, Med Supp, employer coverage..."></label>
+ </div>
+</section>
+
+<section class="card">
+ <div class="card-head"><span>3</span><div><h2>Product Interest</h2><p>Select all products the prospect wants to discuss</p></div></div>
+ <div class="checks">
+  <label><input type="checkbox" name="interested_supplement" value="1" {% if L and L.interested_supplement %}checked{% endif %}><i class="bi bi-file-medical"></i><b>Medicare Supplement</b><small>Medigap coverage</small></label>
+  <label><input type="checkbox" name="interested_advantage" value="1" {% if L and L.interested_advantage %}checked{% endif %}><i class="bi bi-hospital"></i><b>Medicare Advantage</b><small>Part C / MAPD</small></label>
+  <label><input type="checkbox" name="interested_pdp" value="1" {% if L and L.interested_pdp %}checked{% endif %}><i class="bi bi-capsule"></i><b>Prescription Drug</b><small>Part D / PDP</small></label>
+  <label><input type="checkbox" name="interested_dental" value="1" {% if L and L.interested_dental %}checked{% endif %}><i class="bi bi-emoji-smile"></i><b>Dental</b><small>Dental coverage</small></label>
+ </div>
+</section>
+</main>
+
+<aside>
+<section class="card sticky">
+ <div class="card-head"><span>4</span><div><h2>Sales & Follow-up</h2><p>Pipeline and next action</p></div></div>
+ <div class="side-fields">
+  <label>Status<select name="status">
+   {% set cur=L.status if L else 'New' %}
+   {% for x in ['New','Attempt Again','Callback','Interested','Appointment Set','Sold','Not Interested','Do Not Call'] %}<option {% if cur==x %}selected{% endif %}>{{x}}</option>{% endfor %}
+  </select></label>
+  <label>Priority<select name="priority">{% set pri=L.priority if L else 'Normal' %}{% for x in ['Low','Normal','High','Urgent'] %}<option {% if pri==x %}selected{% endif %}>{{x}}</option>{% endfor %}</select></label>
+  <label>Lead Source<input name="lead_source" value="{{L.lead_source if L else ''}}" placeholder="Referral, web, seminar..."></label>
+  <label>Agent<input name="agent" value="{{L.agent if L else ''}}"></label>
+  <label>Next Follow-up<input name="next_follow_up" type="date" value="{{L.next_follow_up if L and L.next_follow_up else ''}}"></label>
+  <label>Follow-up Type<select name="follow_up_type"><option value="">Select...</option>{% set ft=L.follow_up_type if L else '' %}{% for x in ['Phone Call','Email','Appointment','Quote Follow-up','Enrollment Follow-up','Other'] %}<option {% if ft==x %}selected{% endif %}>{{x}}</option>{% endfor %}</select></label>
+  <label>Notes<textarea name="notes" rows="8" placeholder="Needs, concerns, current plan, appointment details...">{{L.notes if L else ''}}</textarea></label>
+ </div>
+ <div class="savebar"><button type="submit"><i class="bi bi-check2-circle"></i> {% if L %}Save Changes{% else %}Create Contact{% endif %}</button><a href="{% if L %}/leads/{{L.id}}{% else %}/leads{% endif %}">Cancel</a></div>
+</section>
+</aside>
+</div>
+</form>
+</div>
+<script src="/static/js/contact_form_v32.js?v=32"></script>
+{% endblock %}
