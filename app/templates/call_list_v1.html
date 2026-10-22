@@ -1,1 +1,39 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>10-Contact Call List | WSBCO</title><style>body{font:16px system-ui;background:#f5f7f5;color:#17362b;margin:0}header{background:#123e30;color:white;padding:18px 5%}main{max-width:1100px;margin:28px auto;padding:0 20px}a{color:#145d45}button{background:#165d43;color:white;border:0;border-radius:8px;padding:12px 16px;cursor:pointer}table{width:100%;border-collapse:collapse;background:white}th,td{padding:14px;text-align:left;border-bottom:1px solid #e1e8e4}th{background:#e8f0eb}input,select{padding:8px;max-width:180px}form.inline{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.muted{color:#63756c}.panel{background:white;padding:18px;border-radius:12px;margin-bottom:18px}small{display:block;color:#65756b}</style></head><body><header><strong>WSBCO Medicare Sales · Manual Call List</strong></header><main><p><a href="/">← Dashboard</a> · <a href="/leads">Contacts</a></p><div class="panel"><h1>Today's 10-Contact Call List</h1><p>Prioritizes due follow-ups, callbacks, and new leads. Excludes Do Not Call contacts and contacts already called today.</p><p class="muted">{{available}} eligible contacts currently available</p><form method="post" action="/call-list/generate"><button type="submit">Generate New List of 10</button></form></div>{% if request.query_params.get('recorded') %}<p>Call outcome saved. Generate the next list to continue.</p>{% endif %}{% if generated %}{% if contacts %}<table><thead><tr><th>#</th><th>Contact</th><th>Phone</th><th>Priority / Follow-up</th><th>Record manual call</th></tr></thead><tbody>{% for c in contacts %}<tr><td>{{loop.index}}</td><td><a href="/leads/{{c.id}}">{{c.first_name}} {{c.last_name}}</a><small>{{c.status}}</small></td><td><strong>{{c.phone or c.mobile}}</strong></td><td>{{c.priority or 'Normal'}}<small>{{c.next_follow_up or ''}}</small></td><td><form class="inline" method="post" action="/call-list/{{c.id}}/outcome"><select name="outcome" required><option value="">Call outcome</option>{% for outcome in outcomes %}<option>{{outcome}}</option>{% endfor %}</select><input name="next_follow_up" type="date" title="Callback date"><input name="notes" placeholder="Call notes"><button type="submit">Save</button></form></td></tr>{% endfor %}</tbody></table>{% else %}<p>No eligible contacts available.</p>{% endif %}{% endif %}</main></body></html>
+{% extends "base.html" %}
+{% block title %}10-Contact Call List | WSBCO{% endblock %}
+{% block content %}
+<section style="max-width:1200px;margin:auto">
+  <p class="text-uppercase text-success fw-bold">Manual dialing</p>
+  <h1>Today's 10-Contact Call List</h1>
+  <p class="text-muted">Your unfinished list is saved automatically. You can leave this page and return without losing your place.</p>
+  {% if request.query_params.get('recorded') %}<div class="alert alert-success">Call outcome saved.</div>{% endif %}
+  <div class="card p-3 mb-3">
+    {% if batch %}
+      <h5>Current list · {{done}} of {{rows|length}} completed</h5>
+      <div class="progress mb-2"><div class="progress-bar bg-success" role="progressbar" style="width:{{(100 * done / rows|length)|round}}%" aria-valuenow="{{done}}" aria-valuemin="0" aria-valuemax="{{rows|length}}"></div></div>
+      <p class="text-muted mb-0">Finish this list before generating another. Completed calls remain visible below.</p>
+    {% else %}
+      <p>{{available}} eligible contacts available.</p>
+      <form method="post" action="/call-list/generate"><button class="btn btn-success" type="submit">Generate New List of 10</button></form>
+    {% endif %}
+  </div>
+  {% if rows %}
+  <div class="table-responsive"><table class="table table-striped align-middle">
+    <thead><tr><th>#</th><th>Contact</th><th>Phone</th><th>Priority / Follow-up</th><th>Call result</th></tr></thead>
+    <tbody>
+    {% for row in rows %}{% set c=row.lead %}{% set item=row.item %}
+    <tr><td>{{loop.index}}</td><td>{% if c %}<a href="/leads/{{c.id}}">{{c.first_name}} {{c.last_name}}</a><small class="d-block text-muted">{{c.status}}</small>{% else %}Contact unavailable{% endif %}</td>
+    <td>{% if c %}<strong>{{c.phone or c.mobile}}</strong>{% endif %}</td>
+    <td>{% if c %}{{c.priority or 'Normal'}}<small class="d-block">{{c.next_follow_up or ''}}</small>{% endif %}</td>
+    <td>{% if item.completed_at %}<span class="badge bg-success">Completed · {{item.outcome}}</span>{% elif c %}
+      {% if (c.status or '')|lower == 'do not call' %}<span class="badge bg-warning text-dark">Do Not Call — cannot call</span>{% else %}
+      <form method="post" action="/call-list/{{c.id}}/outcome" class="d-flex flex-wrap gap-2">
+        <select class="form-select form-select-sm" style="max-width:170px" name="outcome" required><option value="">Call outcome</option>{% for outcome in outcomes %}<option value="{{outcome}}">{{outcome}}</option>{% endfor %}</select>
+        <input class="form-control form-control-sm" style="max-width:160px" name="next_follow_up" type="date" title="Follow-up date">
+        <input class="form-control form-control-sm" style="max-width:190px" name="notes" placeholder="Notes">
+        <button class="btn btn-success btn-sm" type="submit">Save</button>
+      </form>{% endif %}{% endif %}</td></tr>
+    {% endfor %}
+    </tbody></table></div>
+  {% elif not batch %}<p class="text-muted">Generate a list to begin manual calling.</p>{% endif %}
+</section>
+{% endblock %}
