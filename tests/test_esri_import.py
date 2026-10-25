@@ -55,3 +55,27 @@ def test_missing_esri_county_explains_review(monkeypatch):
     result = suggest_county(data, fake)
     assert result["status"] == "review"
     assert "county_missing" in result["reasons"]
+
+
+def test_esri_full_state_name_matches_postal_abbreviation(monkeypatch):
+    monkeypatch.setenv("ARCGIS_API_KEY", "test-key")
+    data = {"address": "123 Main St", "city": "Salem", "state": "OR", "zip_code": "97301"}
+    def fake(_):
+        return {"candidates": [{"score": 99, "attributes": {
+            "Addr_type": "PointAddress", "Region": "Oregon",
+            "Postal": "97301", "Subregion": "Marion County"}}]}
+    result = suggest_county(data, fake)
+    assert result["status"] == "verified"
+    assert result["county"] == "Marion County"
+
+
+def test_esri_different_full_state_name_is_rejected(monkeypatch):
+    monkeypatch.setenv("ARCGIS_API_KEY", "test-key")
+    data = {"address": "123 Main St", "city": "Salem", "state": "OR", "zip_code": "97301"}
+    def fake(_):
+        return {"candidates": [{"score": 99, "attributes": {
+            "Addr_type": "PointAddress", "Region": "Washington",
+            "Postal": "97301", "Subregion": "Some County"}}]}
+    result = suggest_county(data, fake)
+    assert result["status"] == "review"
+    assert "state_mismatch" in result["reasons"]
