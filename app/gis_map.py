@@ -122,7 +122,7 @@ def _geocode(lead, token):
     location = candidate.get("location") or {}
     lat, lon = location.get("y"), location.get("x")
     if (score < 95 or match_type not in ("PointAddress", "StreetAddress")
-            or (lead.state and region != str(lead.state).upper())
+            or (lead.state and region not in ({str(lead.state).strip().upper()} | {"OREGON" if str(lead.state).strip().upper() == "OR" else str(lead.state).strip().upper()}))
             or (expected_zip and postal != expected_zip)
             or not isinstance(lat, (float, int)) or not isinstance(lon, (float, int))):
         return None
