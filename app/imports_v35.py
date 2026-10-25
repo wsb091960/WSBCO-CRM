@@ -148,7 +148,8 @@ async def preview(request: Request, batch_id: str, db: Session = Depends(get_db)
         result = preview_import(db, table, mapping, mode)
     except ImportProblem as exc:
         return page(request, step='mapping', batch=batch, table=table, mapping=mapping, mode=mode, error=str(exc))
-    payload.pop('esri_suggestions', None)  # Mapping changes invalidate earlier geocodes.\n    payload.update(mapping=mapping, mode=mode, preview=result)
+    payload.pop('esri_suggestions', None)  # Mapping changes invalidate earlier geocodes.
+    payload.update(mapping=mapping, mode=mode, preview=result)
     saved = db.execute(update(ContactImportBatch).where(ContactImportBatch.id == batch_id, ContactImportBatch.state.in_(['mapping', 'preview'])).values(payload=json.dumps(payload), state='preview'))
     if saved.rowcount != 1:
         db.rollback()
@@ -178,7 +179,7 @@ async def esri_preview(request: Request, batch_id: str, db: Session = Depends(ge
     batch.payload = json.dumps(payload)
     db.commit()
     return page(request, step='preview', batch=batch, result=payload['preview'],
-                esri_suggestions=suggestions)
+                esri_suggestions=suggestions, esri_eligible_count=len(eligible_rows(payload['preview'])))
 
 
 @router.post('/{batch_id}/commit')
@@ -280,7 +281,8 @@ async def correct(request: Request, batch_id: str, db: Session = Depends(get_db)
     except ImportProblem as exc:
         return page(request, step='preview', batch=batch, result=payload['preview'], error=str(exc))
     previous = batch.payload
-    payload.pop('esri_suggestions', None)  # Corrected addresses invalidate geocodes.\n    payload.update(table=table, preview=result)
+    payload.pop('esri_suggestions', None)  # Corrected addresses invalidate geocodes.
+    payload.update(table=table, preview=result)
     changed = db.execute(update(ContactImportBatch).where(ContactImportBatch.id == batch_id, ContactImportBatch.state == 'preview', ContactImportBatch.payload == previous).values(payload=json.dumps(payload)))
     if changed.rowcount != 1:
         db.rollback()
