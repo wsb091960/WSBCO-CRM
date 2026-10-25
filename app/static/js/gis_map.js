@@ -111,6 +111,24 @@
         : 'No contacts match these filters.';
     } catch (err) { message.textContent = 'Unable to load GIS data: ' + err.message; }
   }
+  $('geocode-next').addEventListener('click', async () => {
+    const button = $('geocode-next');
+    button.disabled = true;
+    message.textContent = 'Geocoding up to 20 street addresses…';
+    try {
+      const response = await fetch('/gis/geocode-batch', {
+        method: 'POST', credentials: 'same-origin'
+      });
+      if (!response.ok) throw Error('Server returned ' + response.status);
+      const result = await response.json();
+      await refresh();
+      if (!result.processed) message.textContent += ' No additional addresses to process.';
+    } catch (error) {
+      message.textContent = 'Unable to geocode: ' + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
   $('gis-form').addEventListener('submit', refresh);
   refresh();
 })();
