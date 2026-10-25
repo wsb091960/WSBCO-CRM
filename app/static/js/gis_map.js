@@ -1,9 +1,23 @@
 /* ZIP-only aggregate map: never send personal contact details to a third party. */
 (() => {
   const map = L.map('gis-map').setView([43.5, -123.5], 7);
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
-    maxZoom: 18, attribution: 'Tiles &copy; Esri'
-  }).addTo(map);
+  // Public Esri raster services. No credential is embedded in client-side code.
+  // These provide a usable selector until authenticated Basemap Styles is configured.
+  const esri = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
+  const layers = {
+    streets: L.tileLayer(esri + 'World_Street_Map/MapServer/tile/{z}/{y}/{x}', {maxZoom: 18, attribution: 'Tiles &copy; Esri'}),
+    navigation: L.tileLayer(esri + 'World_Transportation/MapServer/tile/{z}/{y}/{x}', {maxZoom: 18, attribution: 'Tiles &copy; Esri'}),
+    light: L.tileLayer(esri + 'Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {maxZoom: 16, attribution: 'Tiles &copy; Esri'}),
+    satellite: L.tileLayer(esri + 'World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom: 18, attribution: 'Imagery &copy; Esri'})
+  };
+  let activeBasemap = layers.streets.addTo(map);
+  const layerSelect = document.getElementById('basemap-style');
+  layerSelect.addEventListener('change', () => {
+    const next = layers[layerSelect.value];
+    if (!next || next === activeBasemap) return;
+    map.removeLayer(activeBasemap);
+    activeBasemap = next.addTo(map);
+  });
   const layer = L.layerGroup().addTo(map);
   const cache = new Map();
   const $ = id => document.getElementById(id);
