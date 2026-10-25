@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Annotated
 from uuid import uuid4
 from app.services.manual_calls import OUTCOMES, pending_item, save_manual_call, usable_phone
+from app.services.contact_map import contact_map_url
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
@@ -209,6 +210,7 @@ def lead_detail(
             "submission_token": str(uuid4()),
             "list_item": pending_item(db, lead_id),
             "manual_phone": usable_phone(lead),
+            "contact_map_url": contact_map_url(db, lead),
         },
     )
 
