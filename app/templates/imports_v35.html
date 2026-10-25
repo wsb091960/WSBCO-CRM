@@ -61,6 +61,98 @@
     <h2>Review before saving</h2><p><strong>{{ batch.source }}</strong> · Nothing has been saved yet.</p>
     <div class="import-counts">{% for action, label in [('create','New contacts'),('update','Updates'),('skip','Skipped'),('error','Needs correction')] %}<div><strong>{{ result.counts[action] }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
     <p>Valid rows can be imported now. Download rejected rows, correct them, and upload that smaller file to retry. Leave the added import-details and original-source columns set to Skip. <a href="/imports/{{ batch.id }}/results.csv">Download all row results</a></p>
+    <form id="esri-batch-form" method="post" action="/imports/{{ batch.id }}/esri-preview">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button class="btn btn-outline-primary" type="submit">Check next 10 missing counties with Esri</button>
+      <small>Optional. May use Esri credits. No contacts are saved until you confirm import.</small>
+    </form>
+    <div id="esri-auto-progress" data-done="{{ esri_suggestions | length if esri_suggestions else 0 }}" data-total="{{ esri_eligible_count or 0 }}" role="status" aria-live="polite">
+      <button type="button" id="esri-process-all" class="btn btn-outline-primary">Process all remaining addresses</button>
+      <button type="button" id="esri-stop-all" class="btn btn-outline-primary" hidden>Stop after current batch</button>
+      <span id="esri-auto-status">Ready to continue in batches of 10.</span>
+    </div>
+    <script>
+    (() => {
+      const form = document.getElementById('esri-batch-form');
+      const progress = document.getElementById('esri-auto-progress');
+      const start = document.getElementById('esri-process-all');
+      const stop = document.getElementById('esri-stop-all');
+      const status = document.getElementById('esri-auto-status');
+      let cancelled = false;
+      let running = false;
+      let done = Number(progress.dataset.done);
+      const total = Number(progress.dataset.total);
+      if (!total || done >= total) start.disabled = true;
+      stop.addEventListener('click', () => {
+        cancelled = true;
+        status.textContent = 'Stopping after the current batch…';
+      });
+      start.addEventListener('click', async () => {
+        if (running || !total || done >= total) return;
+        running = true;
+        cancelled = false;
+        start.disabled = true;
+        stop.hidden = false;
+        while (!cancelled && done < total) {
+          try {
+            status.textContent = 'Checking ' + done + ' of ' + total + ' addresses. Keep this tab open.';
+            const response = await fetch(form.action, {
+              method: 'POST', body: new FormData(form),
+              credentials: 'same-origin', headers: {'Accept': 'text/html'}
+            });
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const html = await response.text();
+            const documentResult = new DOMParser().parseFromString(html, 'text/html');
+            const next = documentResult.getElementById('esri-auto-progress');
+            if (!next) throw new Error('Unexpected response; refresh the preview.');
+            const nextDone = Number(next.dataset.done);
+            if (!Number.isFinite(nextDone) || nextDone <= done) throw new Error('No progress made; stopping to avoid repeat requests.');
+            done = nextDone;
+            progress.dataset.done = String(done);
+            status.textContent = done + ' / ' + total + ' checked.';
+            if (done < total && !cancelled) await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (error) {
+            cancelled = true;
+            status.textContent = 'Stopped: ' + error.message + '. Refresh the preview to review saved progress.';
+          }
+        }
+        running = false;
+        stop.hidden = true;
+        if (done >= total) {
+          status.textContent = 'All eligible addresses checked. Refreshing results…';
+          location.reload();
+        } else {
+          start.disabled = false;
+          status.textContent += ' You can resume later.';
+        }
+      });
+    })();
+    </script>
+    {% if esri_suggestions %}
+      <h3>Esri county-check diagnostics</h3>
+      <p><strong>Progress: {{ esri_suggestions | length }} / {{ esri_eligible_count or 0 }} eligible contacts checked.</strong> Each click processes up to 10 more. Only verified missing counties can be filled on import; all other values remain unchanged.</p>
+      {% set esri_status_labels = {'verified':'Verified county','review':'Needs manual review','incomplete':'Incomplete address','no_match':'No Esri match','service_error':'Esri service error','unconfigured':'API key missing','existing':'County already present'} %}
+      <ul>
+      {% for status, label in esri_status_labels.items() %}
+        {% set count = esri_suggestions.values() | selectattr('status', 'equalto', status) | list | length %}
+        {% if count %}<li>{{ label }}: {{ count }}</li>{% endif %}
+      {% endfor %}
+      </ul>
+      {% set reasons = {'low_score':'Score below 95','not_street_level':'Not a street-level match','state_mismatch':'State mismatch','zip_mismatch':'ZIP mismatch','county_missing':'Esri returned no county'} %}
+      {% for reason, label in reasons.items() %}
+        {% set matches = namespace(count=0) %}
+        {% for item in esri_suggestions.values() %}
+          {% if reason in item.get('reasons', []) %}{% set matches.count = matches.count + 1 %}{% endif %}
+        {% endfor %}
+        {% if matches.count %}<p>{{ label }}: {{ matches.count }}</p>{% endif %}
+      {% endfor %}
+      {% if esri_eligible_count and esri_suggestions | length >= esri_eligible_count %}
+        <p><strong>Esri verification complete.</strong> Review the results before importing.</p>
+      {% else %}
+        <p class="import-help">Click the Esri button again to continue the next batch. You can stop and resume while this import preview remains active.</p>
+      {% endif %}
+      <p class="import-help">A row may have multiple mismatch reasons. No names, addresses, Medicare IDs, or API keys are shown in these diagnostics.</p>
+    {% endif %}
     <p><strong>{{ result.total }} source rows</strong> · {{ result.corrections|length }} cell corrections shown in this preview.</p>
     <p><a href="/imports/{{ batch.id }}/cleaned.csv">Download cleaned CSV</a> · <a href="/imports/{{ batch.id }}/errors.csv">Download rejected rows for retry</a> · <a href="/imports/{{ batch.id }}/original.csv">Download original source values</a></p>
     <p class="import-help">CSV downloads preserve text values, but spreadsheet programs may reinterpret ZIP codes. When editing a CSV, import ZIP and identifier columns as Text.</p>
