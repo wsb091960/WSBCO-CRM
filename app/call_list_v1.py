@@ -1,8 +1,9 @@
 from datetime import date, datetime
 from fastapi import APIRouter, Depends, HTTPException, Request
+from urllib.parse import urlencode
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import DateTime, ForeignKey, Integer, String, select
+from sqlalchemy import DateTime, ForeignKey, Integer, String, select, and_, or_
 from sqlalchemy.orm import Mapped, Session, mapped_column
 from app.database import Base, get_db
 from app.models import Lead, CallLog
@@ -26,10 +27,25 @@ class ManualCallItem(Base):
     completed_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     outcome: Mapped[str] = mapped_column(String(60), default="")
 
-def candidates(db):
+def territory_query(request):
+    q = request.query_params
+    return {k: q.get(k, "").strip() for k in ("state", "county", "zip_code")} | {"mode": q.get("mode", "and") if q.get("mode") in ("and", "or") else "and"}
+
+def candidates(db, territory=None):
     today = date.today()
     contacted_today = set(db.scalars(select(CallLog.lead_id).where(CallLog.started_at >= datetime.combine(today, datetime.min.time()))).all())
-    leads = db.scalars(select(Lead).where((Lead.phone != "") | (Lead.mobile != ""))).all()
+    stmt = select(Lead).where((Lead.phone != "") | (Lead.mobile != ""))
+    if territory:
+        parts = []
+        if territory["state"]:
+            parts.append(Lead.state.ilike(territory["state"]))
+        if territory["county"]:
+            parts.append(Lead.county.ilike(territory["county"]))
+        if territory["zip_code"]:
+            parts.append(Lead.zip_code.like(territory["zip_code"] + "%"))
+        if parts:
+            stmt = stmt.where((and_ if territory["mode"] == "and" else or_)(*parts))
+    leads = db.scalars(stmt).all()
     eligible = [l for l in leads if (l.status or "").strip().lower() not in EXCLUDED and l.id not in contacted_today and (l.last_contact is None or l.last_contact.date() != today)]
     def score(l):
         due = l.next_follow_up
@@ -48,18 +64,19 @@ def render_list(request, db):
     leads = {l.id: l for l in db.scalars(select(Lead).where(Lead.id.in_(lead_ids))).all()} if lead_ids else {}
     rows = [{"item": item, "lead": leads.get(item.lead_id)} for item in items]
     done = sum(item.completed_at is not None for item in items)
-    return templates.TemplateResponse(request=request, name="call_list_v1.html", context={"rows": rows, "batch": batch, "done": done, "available": len(candidates(db)), "outcomes": OUTCOMES})
+    territory = territory_query(request)
+    return templates.TemplateResponse(request=request, name="call_list_v1.html", context={"rows": rows, "batch": batch, "done": done, "available": len(candidates(db, territory)), "outcomes": OUTCOMES, "territory": territory, "territory_qs": urlencode(territory)})
 
 @router.get("")
 def call_list(request: Request, db: Session = Depends(get_db)):
     return render_list(request, db)
 
 @router.post("/generate")
-def generate(db: Session = Depends(get_db)):
+def generate(request: Request, db: Session = Depends(get_db)):
     # An unfinished list must never be replaced by clicking Generate again.
     if active_batch(db):
         return RedirectResponse('/call-list', status_code=303)
-    leads = candidates(db)[:10]
+    leads = candidates(db, territory_query(request))[:10]
     if leads:
         batch = ManualCallBatch()
         db.add(batch)
