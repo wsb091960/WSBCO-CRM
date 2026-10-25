@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}GIS Territory Map | WSBCO CRM{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+.gis-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px;align-items:end}
+#gis-map{height:min(65vh,650px);min-height:390px;border-radius:14px;border:1px solid #dce6df}
+.gis-stat{border:1px solid #dce6df;border-radius:12px;padding:14px;background:#fff}
+.gis-stat strong{font-size:1.5rem;color:#174f37}
+.gis-legend{font-size:.9rem;color:#58665d}
+</style>
+<section class="container-fluid">
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+<div><p class="text-uppercase text-success fw-bold mb-1">Territory intelligence</p><h1>CRM GIS Map</h1><p class="text-muted">Explore contact concentration by ZIP code, county, and state. No individual addresses are shared with map providers.</p></div>
+<a class="btn btn-outline-success" href="/call-list">Open 10-Call List</a>
+</div>
+<form id="gis-form" class="card p-3 mb-3">
+<div class="gis-controls">
+<label class="form-label">State <input id="state" class="form-control" maxlength="2" placeholder="OR" value="OR"></label>
+<label class="form-label">County <input id="county" class="form-control" placeholder="Douglas"></label>
+<label class="form-label">ZIP code <input id="zip_code" class="form-control" maxlength="10" placeholder="97467"></label>
+<label class="form-label">Combine filters <select id="mode" class="form-select"><option value="and">AND — all conditions</option><option value="or">OR — any condition</option></select></label>
+<label class="form-label">Contact status <input id="status" class="form-control" placeholder="Optional"></label>
+<button class="btn btn-success" type="submit">Update Map</button>
+</div></form>
+<div class="row g-3 mb-3"><div class="col-sm-4"><div class="gis-stat"><small>Mapped contacts</small><div><strong id="total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>ZIP areas</small><div><strong id="zip-total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>Largest ZIP cluster</small><div><strong id="largest">—</strong></div></div></div></div>
+<div id="gis-map" role="region" aria-label="ZIP code contact concentration map"></div>
+<p class="gis-legend mt-2">Circle size indicates CRM contact count by ZIP. Pins are approximate ZIP locations, not home addresses. Population age 65+ overlays require separately sourced Census data and are not included in this version.</p>
+<p id="gis-message" class="text-muted" role="status"></p>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/js/gis_map.js"></script>
+{% endblock %}
