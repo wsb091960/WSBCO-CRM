@@ -48,7 +48,18 @@ def suggest_county(data, request_fn=None):
                 and (not original_postal or postal == original_postal)
                 and county):
             return {"status": "verified", "county": county, "score": score}
-        return {"status": "review", "county": "", "score": score}
+        reasons = []
+        if score < 95:
+            reasons.append("low_score")
+        if attrs.get("Addr_type") not in {"PointAddress", "StreetAddress"}:
+            reasons.append("not_street_level")
+        if state != fields[2].upper():
+            reasons.append("state_mismatch")
+        if original_postal and postal != original_postal:
+            reasons.append("zip_mismatch")
+        if not county:
+            reasons.append("county_missing")
+        return {"status": "review", "county": "", "score": score, "reasons": reasons}
     except Exception:
         return {"status": "service_error", "county": ""}
 
