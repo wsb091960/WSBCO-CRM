@@ -1,4 +1,4 @@
-/* ZIP-only aggregate map: never send personal contact details to a third party. */
+/* CRM-authenticated GIS popups. Never send contact details to Esri or tile providers. */
 (() => {
   const map = L.map('gis-map').setView([43.5, -123.5], 7);
   // Public Esri raster services. No credential is embedded in client-side code.
@@ -75,10 +75,14 @@
         entries.forEach((point, index) => {
           if (index) popup.append(document.createElement('hr'));
           const title = document.createElement('strong');
-          title.textContent = 'Contact ' + (index + 1);
+          title.textContent = point.name || 'Unnamed contact';
           const details = document.createElement('p');
-          details.textContent = point.status || 'Status not specified';
-          popup.append(title, details);
+          details.style.whiteSpace = 'pre-line';
+          details.textContent = [point.address || 'Address unavailable', point.phone || 'Phone unavailable', 'Status: ' + (point.status || 'Not specified')].join('\n');
+          const link = document.createElement('a');
+          link.href = point.url;
+          link.textContent = 'Open Contact / Update Disposition';
+          popup.append(title, details, link);
         });
         marker.bindPopup(popup);
         bounds.push([first.lat, first.lon]);
