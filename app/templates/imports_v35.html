@@ -61,6 +61,16 @@
     <h2>Review before saving</h2><p><strong>{{ batch.source }}</strong> · Nothing has been saved yet.</p>
     <div class="import-counts">{% for action, label in [('create','New contacts'),('update','Updates'),('skip','Skipped'),('error','Needs correction')] %}<div><strong>{{ result.counts[action] }}</strong><span>{{ label }}</span></div>{% endfor %}</div>
     <p>Valid rows can be imported now. Download rejected rows, correct them, and upload that smaller file to retry. Leave the added import-details and original-source columns set to Skip. <a href="/imports/{{ batch.id }}/results.csv">Download all row results</a></p>
+    <form method="post" action="/imports/{{ batch.id }}/esri-preview">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <button class="btn btn-outline-primary" type="submit">Check up to 10 missing counties with Esri</button>
+      <small>Optional. May use Esri credits. No contacts are saved until you confirm import.</small>
+    </form>
+    {% if esri_suggestions %}
+      <p><strong>Esri review:</strong>
+      {{ esri_suggestions.values() | selectattr('status', 'equalto', 'verified') | list | length }} verified county suggestions;
+      {{ esri_suggestions | length }} rows checked. Verified counties will be filled on import; others remain unchanged.</p>
+    {% endif %}
     <p><strong>{{ result.total }} source rows</strong> · {{ result.corrections|length }} cell corrections shown in this preview.</p>
     <p><a href="/imports/{{ batch.id }}/cleaned.csv">Download cleaned CSV</a> · <a href="/imports/{{ batch.id }}/errors.csv">Download rejected rows for retry</a> · <a href="/imports/{{ batch.id }}/original.csv">Download original source values</a></p>
     <p class="import-help">CSV downloads preserve text values, but spreadsheet programs may reinterpret ZIP codes. When editing a CSV, import ZIP and identifier columns as Text.</p>
