@@ -69,9 +69,9 @@
     {% if esri_suggestions %}
       <h3>Esri county-check diagnostics</h3>
       <p>{{ esri_suggestions | length }} rows examined (maximum 10). Only verified missing counties can be filled on import; all other values remain unchanged.</p>
-      {% set labels = {'verified':'Verified county','review':'Needs manual review','incomplete':'Incomplete address','no_match':'No Esri match','service_error':'Esri service error','unconfigured':'API key missing','existing':'County already present'} %}
+      {% set esri_status_labels = {'verified':'Verified county','review':'Needs manual review','incomplete':'Incomplete address','no_match':'No Esri match','service_error':'Esri service error','unconfigured':'API key missing','existing':'County already present'} %}
       <ul>
-      {% for status, label in labels.items() %}
+      {% for status, label in esri_status_labels.items() %}
         {% set count = esri_suggestions.values() | selectattr('status', 'equalto', status) | list | length %}
         {% if count %}<li>{{ label }}: {{ count }}</li>{% endif %}
       {% endfor %}
