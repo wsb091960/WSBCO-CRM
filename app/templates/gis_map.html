@@ -17,8 +17,8 @@
 <form id="gis-form" class="card p-3 mb-3">
 <div class="gis-controls">
 <label class="form-label">State <input id="state" class="form-control" maxlength="2" placeholder="OR" value="OR"></label>
-<label class="form-label">County <input id="county" class="form-control" placeholder="Douglas"></label>
-<label class="form-label">ZIP code <input id="zip_code" class="form-control" maxlength="10" placeholder="97467"></label>
+<label class="form-label">County <input id="county" class="form-control" placeholder="e.g. Douglas"></label>
+<label class="form-label">ZIP code <input id="zip_code" class="form-control" maxlength="10" placeholder="e.g. 97467"></label>
 <label class="form-label">Combine filters <select id="mode" class="form-select"><option value="and">AND — all conditions</option><option value="or">OR — any condition</option></select></label>
 <label class="form-label">Contact status <input id="status" class="form-control" placeholder="Optional"></label>
 <button class="btn btn-success" type="submit">Update Map</button>
@@ -29,5 +29,5 @@
 <p id="gis-message" class="text-muted" role="status"></p>
 </section>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/js/gis_map.js"></script>
+<script src="/static/js/gis_map.js?v=2"></script>
 {% endblock %}
