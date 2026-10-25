@@ -19,7 +19,7 @@ from app.services.contact_import import (
     FIELDS, LABELS, MAX_BYTES, ImportProblem, bulk_correct, hydrate, preview_import,
     read_file, read_google_sheet, signature, suggested_mapping,
 )
-from app.services.esri_import import enrich_preview
+from app.services.esri_import import eligible_rows, enrich_next_batch
 
 router = APIRouter(prefix='/imports', tags=['Contact imports'])
 templates = Jinja2Templates(directory='app/templates')
@@ -148,7 +148,7 @@ async def preview(request: Request, batch_id: str, db: Session = Depends(get_db)
         result = preview_import(db, table, mapping, mode)
     except ImportProblem as exc:
         return page(request, step='mapping', batch=batch, table=table, mapping=mapping, mode=mode, error=str(exc))
-    payload.update(mapping=mapping, mode=mode, preview=result)
+    payload.pop('esri_suggestions', None)  # Mapping changes invalidate earlier geocodes.\n    payload.update(mapping=mapping, mode=mode, preview=result)
     saved = db.execute(update(ContactImportBatch).where(ContactImportBatch.id == batch_id, ContactImportBatch.state.in_(['mapping', 'preview'])).values(payload=json.dumps(payload), state='preview'))
     if saved.rowcount != 1:
         db.rollback()
@@ -159,7 +159,7 @@ async def preview(request: Request, batch_id: str, db: Session = Depends(get_db)
 
 @router.post('/{batch_id}/esri-preview')
 async def esri_preview(request: Request, batch_id: str, db: Session = Depends(get_db)):
-    """Explicitly geocode up to ten eligible import rows; never expose API token."""
+    """Resume bounded Esri geocoding in explicit batches; no contact writes."""
     token = require_form(request, await request.form())
     batch = get_batch(db, batch_id, token)
     if batch.state != 'preview':
@@ -171,7 +171,7 @@ async def esri_preview(request: Request, batch_id: str, db: Session = Depends(ge
         return page(request, step='preview', batch=batch, result=payload['preview'],
                     error='Esri API key is not configured.')
     from starlette.concurrency import run_in_threadpool
-    suggestions = await run_in_threadpool(enrich_preview, payload['preview'])
+    suggestions = await run_in_threadpool(enrich_next_batch, payload['preview'], payload.get('esri_suggestions'), 10)
     # Preserve raw preview signature. Verified suggestions are applied only after
     # recomputing the source preview at commit time.
     payload['esri_suggestions'] = suggestions
@@ -280,7 +280,7 @@ async def correct(request: Request, batch_id: str, db: Session = Depends(get_db)
     except ImportProblem as exc:
         return page(request, step='preview', batch=batch, result=payload['preview'], error=str(exc))
     previous = batch.payload
-    payload.update(table=table, preview=result)
+    payload.pop('esri_suggestions', None)  # Corrected addresses invalidate geocodes.\n    payload.update(table=table, preview=result)
     changed = db.execute(update(ContactImportBatch).where(ContactImportBatch.id == batch_id, ContactImportBatch.state == 'preview', ContactImportBatch.payload == previous).values(payload=json.dumps(payload)))
     if changed.rowcount != 1:
         db.rollback()
