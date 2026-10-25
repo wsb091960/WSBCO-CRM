@@ -69,7 +69,6 @@ from urllib.parse import urlencode
 from urllib.request import Request as UrlRequest, urlopen
 from fastapi import HTTPException
 from sqlalchemy import text
-from app.address_cleanup import owner
 
 def _cache(db):
     db.execute(text("""CREATE TABLE IF NOT EXISTS gis_address_points (
@@ -136,7 +135,7 @@ def individual_points(
     zip_code: str = Query("", max_length=10),
     mode: str = Query("and", pattern="^(and|or)$"),
     status: str = Query("", max_length=50),
-    db: Session = Depends(get_db), _: bool = Depends(owner),
+    db: Session = Depends(get_db),
 ):
     _cache(db)
     leads = _matching_leads(db, state, county, zip_code, mode, status)
@@ -154,8 +153,7 @@ def individual_points(
         if row[4] != "matched":
             continue
         points.append({"id": lead.id, "lat": row[2], "lon": row[3],
-                       "name": (str(lead.first_name or "") + " " + str(lead.last_name or "")).strip(),
-                       "address": _address(lead), "status": lead.status or ""})
+                       "status": lead.status or ""})
     return {"points": points, "pending": pending, "total": len(leads),
             "unmapped": len(leads) - len(points)}
 
