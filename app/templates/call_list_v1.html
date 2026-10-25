@@ -1,39 +1,101 @@
 {% extends "base.html" %}
 {% block title %}10-Contact Call List | WSBCO{% endblock %}
 {% block content %}
-<section style="max-width:1200px;margin:auto">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="/static/css/call_list_gis.css?v=3">
+<section class="call-gis-page">
   <p class="text-uppercase text-success fw-bold">Manual dialing</p>
-  <h1>Today's 10-Contact Call List</h1>
+  <h1>10-Contact Call List</h1>
   <p class="text-muted">Your unfinished list is saved automatically. You can leave this page and return without losing your place.</p>
-  {% if request.query_params.get('recorded') %}<div class="alert alert-success">Call outcome saved.</div>{% endif %}
+  {% if request.query_params.get('recorded') %}<div class="alert alert-success" role="status">Disposition saved. Contact status and call history updated.</div>{% endif %}
+  {% if error %}<div class="alert alert-danger" role="alert">{{error}}</div>{% endif %}
+  <div class="card p-3 mb-3">
+    <h2 class="h5">GIS call selection</h2>
+    <form method="get" action="/call-list" id="geo-search" class="row g-3">
+      <div class="col-sm-6 col-lg-3"><label for="geo-states" class="form-label">State</label>
+        <input id="geo-states" name="states" class="form-control" list="geo-state-options" value="{{filters.get('states', filters.get('state', ''))}}" placeholder="e.g. OR" maxlength="80" autocomplete="address-level1">
+        <datalist id="geo-state-options">{% for code, name in state_names.items() %}<option value="{{code}}">{{name}}</option>{% endfor %}</datalist>
+      </div>
+      <div class="col-sm-6 col-lg-3"><label for="geo-counties" class="form-label">County</label>
+        <input id="geo-counties" name="counties" class="form-control" value="{{filters.get('counties', filters.get('county', ''))}}" placeholder="e.g. Douglas" maxlength="100"></div>
+      <div class="col-sm-6 col-lg-3"><label for="geo-cities" class="form-label">City</label>
+        <input id="geo-cities" name="cities" class="form-control" value="{{filters.get('cities', filters.get('city', ''))}}" placeholder="e.g. Reedsport" maxlength="100" autocomplete="address-level2"></div>
+      <div class="col-sm-6 col-lg-3"><label for="geo-zips" class="form-label">ZIP</label>
+        <input id="geo-zips" name="zips" class="form-control" value="{{filters.get('zips', filters.get('zip_code', ''))}}" placeholder="e.g. 97467" maxlength="10" inputmode="numeric" autocomplete="postal-code"></div>
+      <div class="col-12"><small class="d-block text-muted mb-2">Fill in any fields to narrow your search. Leave fields blank to include all locations.</small>
+        <button class="btn btn-success" type="submit">Search</button>
+        <a href="/call-list?states=&amp;counties=&amp;cities=&amp;zips=" class="btn btn-outline-secondary">Clear</a>
+        <a href="{{map_url}}" class="btn btn-outline-success">View Territory Map</a>
+      </div>
+    </form>
+    <p class="mt-3 mb-1"><strong>{{available}} eligible contacts match</strong> · {{geo_label}}</p>
+    <small class="text-muted">Excludes Do Not Call, Sold, Wrong Number, Not Interested, contacts already called today, and contacts without a phone number. Call priority still determines the next 10.</small>
+  </div>
   <div class="card p-3 mb-3">
     {% if batch %}
-      <h5>Current list · {{done}} of {{rows|length}} completed</h5>
+      <h2 class="h5">Current list · {{done}} of {{rows|length}} completed</h2>
       <div class="progress mb-2"><div class="progress-bar bg-success" role="progressbar" style="width:{{(100 * done / rows|length)|round}}%" aria-valuenow="{{done}}" aria-valuemin="0" aria-valuemax="{{rows|length}}"></div></div>
-      <p class="text-muted mb-0">Finish this list before generating another. Completed calls remain visible below.</p>
+      <p class="text-muted mb-0">Saved selection: {{batch_geo_label}}. Finish this list before generating another. Searching previews another area without changing these calls. Completed calls remain visible below.</p>
     {% else %}
       <p>{{available}} eligible contacts available.</p>
-      <form method="post" action="/call-list/generate"><button class="btn btn-success" type="submit">Generate New List of 10</button></form>
+      <form method="post" action="/call-list/generate">
+        {% for key, value in filters.items() %}{% if key != "geo_mode" %}<input type="hidden" name="{{key}}" value="{{value}}">{% endif %}{% endfor %}
+        <button class="btn btn-success" type="submit" {% if not available or error %}disabled{% endif %}>Generate {{[available, 10]|min}} Calls from This Search</button>
+      </form>
     {% endif %}
   </div>
+  <div class="card p-3 mb-3">
+    <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+      <div><h2 class="h5 mb-1">Spatial analysis</h2><small>Green: eligible search matches · Gold: saved call list. Larger circles mean more contacts at a ZIP center.</small></div>
+      <div><label for="geo-layer" class="visually-hidden">Map layer</label><select id="geo-layer" class="form-select form-select-sm"><option value="all">Matches + saved list</option><option value="matches">Search matches only</option><option value="selected">Saved list only</option></select></div>
+    </div>
+    <p class="small text-muted">ZIP centers are approximate, not individual addresses. Counts describe your CRM contacts, not population density. Click a circle to inspect counts and select that ZIP.</p>
+    <div id="call-gis-map" aria-label="ZIP-level contact map"></div>
+    <p id="geo-map-status" class="small mt-2 mb-1" role="status" aria-live="polite">Loading map…</p>
+    <p id="geo-tile-status" class="small text-danger mb-1" role="status"></p>
+    <p class="small text-muted mb-1">{{summary.missing_zip}} search matches and {{summary.selected_missing_zip}} saved calls have missing or invalid ZIP codes. They remain eligible for calling but cannot be mapped.</p>
+    {% if summary.total_groups > 200 %}<div class="alert alert-warning">Map limited to the first 200 of {{summary.total_groups}} ZIP/state groups, prioritizing saved calls then largest contact groups. Narrow your search to see the rest. County totals below include every match.</div>{% endif %}
+    <details class="mt-2"><summary>County totals (all eligible matches)</summary>
+      <div class="table-responsive geo-summary"><table class="table table-sm"><thead><tr><th>State</th><th>County</th><th>Eligible</th></tr></thead><tbody>
+      {% for county in summary.counties %}<tr><td>{{county.state}}</td><td>{{county.county}}</td><td>{{county.count}}</td></tr>{% else %}<tr><td colspan="3">No matches. Adjust the search.</td></tr>{% endfor %}
+      </tbody></table></div>
+    </details>
+    <details class="mt-2"><summary>ZIP groups included in the map</summary><div class="table-responsive geo-summary"><table class="table table-sm"><thead><tr><th>State</th><th>ZIP</th><th>Eligible</th><th>Saved / Pending</th></tr></thead><tbody>
+      {% for group in summary.groups %}<tr><td>{{group.state or 'Unknown'}}</td><td>{{group.zip}}</td><td>{{group.eligible}}</td><td>{{group.selected}} / {{group.pending}}</td></tr>{% else %}<tr><td colspan="4">No valid ZIP groups.</td></tr>{% endfor %}
+      </tbody></table></div></details>
+    <small class="text-muted mt-2">ZIP locations: <a href="https://www.zippopotam.us/" target="_blank" rel="noopener noreferrer">Zippopotam.us</a> / <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a>. Only ZIP codes are sent for lookup. Names, phone numbers and street addresses remain in your CRM. First-time ZIP lookups and the map background need internet access.</small>
+  </div>
   {% if rows %}
+  <h2 class="h5 mt-4">Manual calls &amp; dispositions</h2>
+  <p class="text-muted">Dial the number on your phone, then select a disposition, add notes or a follow-up date, and save to complete that call.</p>
   <div class="table-responsive"><table class="table table-striped align-middle">
-    <thead><tr><th>#</th><th>Contact</th><th>Phone</th><th>Priority / Follow-up</th><th>Call result</th></tr></thead>
+    <thead><tr><th>#</th><th>Contact / Location</th><th>Phone</th><th>Priority / Follow-up</th><th>Call disposition</th></tr></thead>
     <tbody>
     {% for row in rows %}{% set c=row.lead %}{% set item=row.item %}
-    <tr><td>{{loop.index}}</td><td>{% if c %}<a href="/leads/{{c.id}}">{{c.first_name}} {{c.last_name}}</a><small class="d-block text-muted">{{c.status}}</small>{% else %}Contact unavailable{% endif %}</td>
-    <td>{% if c %}<strong>{{c.phone or c.mobile}}</strong>{% endif %}</td>
+    <tr><td>{{loop.index}}</td><td>{% if c %}<a href="/leads/{{c.id}}">{{c.first_name}} {{c.last_name}}</a><small class="d-block text-muted">{{c.status}}</small><small class="d-block">{{c.city}}{% if c.county %} · {{c.county}} County{% endif %} · {{c.state}} {{c.zip_code}}</small>{% else %}Contact unavailable{% endif %}</td>
+    <td>{% if c %}<strong class="geo-phone">{{c.phone or c.mobile}}</strong>{% endif %}</td>
     <td>{% if c %}{{c.priority or 'Normal'}}<small class="d-block">{{c.next_follow_up or ''}}</small>{% endif %}</td>
-    <td>{% if item.completed_at %}<span class="badge bg-success">Completed · {{item.outcome}}</span>{% elif c %}
-      {% if (c.status or '')|lower == 'do not call' %}<span class="badge bg-warning text-dark">Do Not Call — cannot call</span>{% else %}
-      <form method="post" action="/call-list/{{c.id}}/outcome" class="d-flex flex-wrap gap-2">
-        <select class="form-select form-select-sm" style="max-width:170px" name="outcome" required><option value="">Call outcome</option>{% for outcome in outcomes %}<option value="{{outcome}}">{{outcome}}</option>{% endfor %}</select>
-        <input class="form-control form-control-sm" style="max-width:160px" name="next_follow_up" type="date" title="Follow-up date">
-        <input class="form-control form-control-sm" style="max-width:190px" name="notes" placeholder="Notes">
-        <button class="btn btn-success btn-sm" type="submit">Save</button>
+    <td>{% if item.completed_at %}<span class="badge bg-success">Completed · {{item.outcome}}</span>
+      <small class="d-block text-muted">{{item.completed_at.strftime('%Y-%m-%d %H:%M')}} UTC</small>
+      {% if row.log and row.log.notes %}<p class="geo-call-notes mb-0 mt-1">{{row.log.notes}}</p>{% endif %}
+      {% elif c %}
+      {% if (c.status or '')|trim|lower == 'do not call' %}<span class="badge bg-warning text-dark">Do Not Call — cannot call</span>{% else %}
+      <form method="post" action="/call-list/{{c.id}}/disposition" class="geo-disposition-form">
+        <label for="disposition-{{item.id}}" class="form-label mb-0">Disposition</label>
+        <select id="disposition-{{item.id}}" class="form-select form-select-sm" name="outcome" required><option value="">Select disposition…</option>{% for outcome in outcomes %}<option value="{{outcome}}">{{outcome}}</option>{% endfor %}</select>
+        <div class="geo-disposition-details">
+          <label for="followup-{{item.id}}" class="form-label mb-0">Follow-up date <small>(optional)</small>
+            <input id="followup-{{item.id}}" class="form-control form-control-sm" name="next_follow_up" type="date"></label>
+          <label for="notes-{{item.id}}" class="form-label mb-0">Call notes <small>(optional)</small>
+            <textarea id="notes-{{item.id}}" class="form-control form-control-sm" name="notes" rows="2" maxlength="2000" placeholder="What happened on this call?"></textarea></label>
+        </div>
+        <button class="btn btn-success btn-sm" type="submit">Save Disposition</button>
       </form>{% endif %}{% endif %}</td></tr>
     {% endfor %}
     </tbody></table></div>
   {% elif not batch %}<p class="text-muted">Generate a list to begin manual calling.</p>{% endif %}
 </section>
+<script id="call-gis-data" type="application/json">{{summary|tojson}}</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/js/call_list_gis.js?v=2" defer></script>
 {% endblock %}

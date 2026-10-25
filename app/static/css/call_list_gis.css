@@ -1,0 +1,12 @@
+.call-gis-page {max-width:1400px;margin:auto}
+#call-gis-map {height:440px;min-height:300px;border:1px solid #cbd6ce;border-radius:10px;z-index:0;background:#eef2ee}
+.geo-summary {max-height:300px;overflow:auto}
+.geo-phone {font-size:1.2rem;white-space:nowrap}
+.geo-disposition-form {display:grid;gap:7px;min-width:250px;max-width:400px}
+.geo-disposition-details {display:grid;gap:7px;grid-template-columns:140px minmax(0,1fr)}
+.geo-disposition-form .btn {justify-self:start}
+.geo-call-notes {white-space:pre-wrap;overflow-wrap:anywhere;max-width:400px}
+.geo-zip-label {color:#123a26;background:#ffffffe8;border:1px solid #bac8bf;border-radius:5px;box-shadow:none;font-weight:700}
+.call-gis-page .leaflet-popup-content {min-width:190px;line-height:1.6}
+.call-gis-page .leaflet-popup-content a {display:block;margin-top:8px}
+@media(max-width:600px) {#call-gis-map {height:350px}.geo-phone {font-size:1.1rem}.geo-disposition-details {grid-template-columns:1fr}}

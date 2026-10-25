@@ -1,15 +1,20 @@
 from datetime import date, datetime
+import json
+from urllib.parse import urlencode
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import DateTime, ForeignKey, Integer, String, select
 from sqlalchemy.orm import Mapped, Session, mapped_column
+from sqlalchemy.exc import IntegrityError
 from app.database import Base, get_db
 from app.models import Lead, CallLog
+from app.call_list_gis import (GeoFilter, ManualCallGeography, CallListZipLocation,
+    STATE_NAMES, saved_filter, spatial_summary, fetch_zip_location, zip5)
 
 router = APIRouter(prefix="/call-list")
 templates = Jinja2Templates(directory="app/templates")
-OUTCOMES = {"No Answer": "Attempt Again", "Left Message": "Attempt Again", "Live Voicemail": "Attempt Again", "Callback": "Callback", "Interested": "Interested", "Appointment Set": "Appointment Set", "Not Interested": "Not Interested", "Do Not Call": "Do Not Call", "Wrong Number": "Wrong Number", "Sold": "Sold"}
+OUTCOMES = {"No Answer": "Attempt Again", "Busy": "Attempt Again", "Left Message": "Attempt Again", "Live Voicemail": "Attempt Again", "Callback": "Callback", "Interested": "Interested", "Appointment Set": "Appointment Set", "Not Interested": "Not Interested", "Do Not Call": "Do Not Call", "Wrong Number": "Wrong Number", "Disconnected": "Wrong Number", "Sold": "Sold"}
 EXCLUDED = {"do not call", "sold", "wrong number", "not interested"}
 
 class ManualCallBatch(Base):
@@ -30,7 +35,7 @@ def candidates(db):
     today = date.today()
     contacted_today = set(db.scalars(select(CallLog.lead_id).where(CallLog.started_at >= datetime.combine(today, datetime.min.time()))).all())
     leads = db.scalars(select(Lead).where((Lead.phone != "") | (Lead.mobile != ""))).all()
-    eligible = [l for l in leads if (l.status or "").strip().lower() not in EXCLUDED and l.id not in contacted_today and (l.last_contact is None or l.last_contact.date() != today)]
+    eligible = [l for l in leads if ((l.phone or '').strip() or (l.mobile or '').strip()) and (l.status or "").strip().lower() not in EXCLUDED and l.id not in contacted_today and (l.last_contact is None or l.last_contact.date() != today)]
     def score(l):
         due = l.next_follow_up
         group = 0 if due and due < today else 1 if due == today else 2 if (l.status or '').lower() == 'callback' else 3 if (l.status or '').lower() == 'new' else 4
@@ -41,33 +46,75 @@ def candidates(db):
 def active_batch(db):
     return db.scalar(select(ManualCallBatch).where(ManualCallBatch.completed_at.is_(None)).order_by(ManualCallBatch.id.desc()).limit(1))
 
-def render_list(request, db):
+def render_list(request, db, form_data=None, error='', status_code=200):
     batch = active_batch(db)
     items = db.scalars(select(ManualCallItem).where(ManualCallItem.batch_id == batch.id).order_by(ManualCallItem.id)).all() if batch else []
     lead_ids = [i.lead_id for i in items]
     leads = {l.id: l for l in db.scalars(select(Lead).where(Lead.id.in_(lead_ids))).all()} if lead_ids else {}
-    rows = [{"item": item, "lead": leads.get(item.lead_id)} for item in items]
+    logs = db.scalars(select(CallLog).where(CallLog.lead_id.in_(lead_ids), CallLog.direction == 'manual')).all() if lead_ids else []
+    log_by_call = {(log.lead_id, log.completed_at): log for log in logs}
+    rows = [{"item": item, "lead": leads.get(item.lead_id),
+             "log": log_by_call.get((item.lead_id, item.completed_at)) if item.completed_at else None} for item in items]
     done = sum(item.completed_at is not None for item in items)
-    return templates.TemplateResponse(request=request, name="call_list_v1.html", context={"rows": rows, "batch": batch, "done": done, "available": len(candidates(db)), "outcomes": OUTCOMES})
+    batch_geo = saved_filter(db, batch)
+    source = form_data if form_data is not None else request.query_params
+    explicit_search = any(key in source for key in ('state', 'county', 'city', 'zip_code', 'states', 'counties', 'cities', 'zips', 'geo_mode'))
+    if not explicit_search:
+        source = batch_geo.fields()
+    try:
+        geo = GeoFilter.search(source) if explicit_search else batch_geo
+    except HTTPException as exc:
+        geo, error, status_code = GeoFilter(), exc.detail, 400
+    eligible = [] if error else [lead for lead in candidates(db) if geo.matches(lead)]
+    summary = spatial_summary(eligible, rows)
+    return templates.TemplateResponse(request=request, name="call_list_v1.html", status_code=status_code,
+        context={"rows": rows, "batch": batch, "done": done, "available": len(eligible),
+                 "outcomes": OUTCOMES, "filters": dict(source) if error else geo.fields(),
+                 "geo_label": geo.label(), "batch_geo_label": batch_geo.label(),
+                 "map_url": '/gis?' + urlencode(geo.map_fields()),
+                 "summary": summary, "error": error, "state_names": STATE_NAMES})
 
 @router.get("")
 def call_list(request: Request, db: Session = Depends(get_db)):
     return render_list(request, db)
 
 @router.post("/generate")
-def generate(db: Session = Depends(get_db)):
+async def generate(request: Request, db: Session = Depends(get_db)):
     # An unfinished list must never be replaced by clicking Generate again.
     if active_batch(db):
         return RedirectResponse('/call-list', status_code=303)
-    leads = candidates(db)[:10]
+    form = await request.form()
+    try:
+        geo = GeoFilter.search(form)
+    except HTTPException:
+        return render_list(request, db, form_data=form)
+    leads = [lead for lead in candidates(db) if geo.matches(lead)][:10]
     if leads:
         batch = ManualCallBatch()
         db.add(batch)
         db.flush()
         db.add_all([ManualCallItem(batch_id=batch.id, lead_id=lead.id) for lead in leads])
+        db.add(ManualCallGeography(batch_id=batch.id, filters_json=json.dumps(geo.fields())))
         db.commit()
-    return RedirectResponse('/call-list', status_code=303)
+    return RedirectResponse('/call-list?' + urlencode(geo.fields()), status_code=303)
 
+@router.get('/gis/zip/{zip_code}')
+def zip_location(zip_code: str, db: Session = Depends(get_db)):
+    if len(zip_code) != 5 or zip5(zip_code) != zip_code:
+        raise HTTPException(400, 'A five-digit US ZIP is required.')
+    cached = db.get(CallListZipLocation, zip_code)
+    if not cached:
+        location = fetch_zip_location(zip_code)
+        db.add(CallListZipLocation(**location))
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()  # Another request may have cached this ZIP first.
+        cached = db.get(CallListZipLocation, zip_code)
+    return JSONResponse({'zip': cached.zip_code, 'lat': cached.latitude, 'lon': cached.longitude,
+                         'state': cached.state, 'place': cached.place}, headers={'Cache-Control': 'no-store'})
+
+@router.post("/{lead_id}/disposition")
 @router.post("/{lead_id}/outcome")
 async def record_outcome(lead_id: int, request: Request, db: Session = Depends(get_db)):
     batch = active_batch(db)
