@@ -1,5 +1,8 @@
 """Owner-only Esri address audit. Preview only: never mutates CRM records."""
 import json
+import sqlite3
+from datetime import datetime, timezone
+from pathlib import Path
 import os
 import re
 import secrets
@@ -76,3 +79,71 @@ def preview(db: Session = Depends(get_db), _: bool = Depends(owner)):
                 "existing":{"state":lead.state or "","zip":lead.zip_code or "","county":lead.county or ""},
                 "suggested":{},"score":0,"match_type":"Error","review":"Manual review","error":str(exc)[:120]})
     return {"results":results,"notice":"Preview only. No CRM records changed. Esri may charge for requests."}
+
+# Phase 2: explicitly approved, backed-up, conservative county-only updates.
+_STATE_NAMES = {"OR":"OREGON","WV":"WEST VIRGINIA","WA":"WASHINGTON","CA":"CALIFORNIA","TX":"TEXAS"}
+def _normalize_county(value):
+    return re.sub(r"\\s+County$", "", (value or "").strip(), flags=re.I).strip()
+
+@router.post("/apply-first-10")
+def apply_first_ten(db: Session = Depends(get_db), _: bool = Depends(owner)):
+    """Geocode first ten eligible missing-county records; back up SQLite before writes."""
+    token = os.getenv("ARCGIS_API_KEY", "")
+    if not token:
+        raise HTTPException(503, "ArcGIS key missing")
+    url = db.get_bind().url
+    if url.get_backend_name() != "sqlite" or not url.database or url.database == ":memory:":
+        raise HTTPException(503, "Automatic backup only supports file-based SQLite; no updates performed")
+    source = Path(url.database).resolve()
+    if not source.is_file():
+        raise HTTPException(503, "Database file not found; no updates performed")
+    # Database backup must succeed before contacting Esri or making any edits.
+    backup_dir = source.parent / "backups"
+    backup_dir.mkdir(parents=True, exist_ok=True)
+    backup_path = backup_dir / ("before_county_update_" + datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f") + ".db")
+    try:
+        with sqlite3.connect(str(source)) as original, sqlite3.connect(str(backup_path)) as copy:
+            original.backup(copy)
+    except Exception:
+        raise HTTPException(503, "Database backup failed; no records changed")
+    leads = db.scalars(select(Lead).where((Lead.county == None) | (Lead.county == "")).order_by(Lead.id)).all()
+    updated, skipped, checked = [], [], 0
+    for lead in leads:
+        if checked >= 10:
+            break
+        if not all([(lead.address or "").strip(), (lead.city or "").strip(), (lead.state or "").strip(), valid_zip(lead.zip_code)]):
+            continue
+        checked += 1
+        address = ", ".join(v.strip() for v in (lead.address, lead.city, lead.state, lead.zip_code) if v)
+        payload = urlencode({"SingleLine":address,"outFields":"Addr_type,Region,Postal,Subregion","f":"json","token":token}).encode()
+        try:
+            req = UrlRequest("https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates",data=payload,headers={"Content-Type":"application/x-www-form-urlencoded","User-Agent":"WSBCO-CRM-county-cleanup/1.0"})
+            with urlopen(req,timeout=12) as response:
+                obj=json.load(response)
+            if obj.get("error"):
+                raise ValueError(obj["error"].get("message","ArcGIS error"))
+            cand=(obj.get("candidates") or [None])[0]
+            a=cand.get("attributes",{}) if cand else {}
+            score=float(cand.get("score",0)) if cand else 0
+            state=(lead.state or "").upper().strip()
+            matched_state=(a.get("Region") or "").upper().strip()
+            matched_zip=(a.get("Postal") or "").strip()[:5]
+            county=_normalize_county(a.get("Subregion"))
+            kind=a.get("Addr_type")
+            eligible=(score>=95 and kind in ("PointAddress","StreetAddress","Subaddress")
+                and matched_state in (state,_STATE_NAMES.get(state,""))
+                and matched_zip == (lead.zip_code or "")[:5] and bool(county))
+            if eligible and not (lead.county or "").strip():
+                lead.county=county
+                updated.append({"id":lead.id,"county":county,"score":score})
+            else:
+                skipped.append({"id":lead.id,"reason":"Uncertain match or state/ZIP mismatch"})
+        except Exception as exc:
+            skipped.append({"id":lead.id,"reason":str(exc)[:100]})
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise HTTPException(500,"Database write failed; backup retained")
+    return {"checked":checked,"updated":updated,"skipped":skipped,"backup_file":backup_path.name,
+            "note":"County only; state, ZIP and existing county values were not overwritten."}
