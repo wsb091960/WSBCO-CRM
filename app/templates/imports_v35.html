@@ -63,12 +63,12 @@
     <p>Valid rows can be imported now. Download rejected rows, correct them, and upload that smaller file to retry. Leave the added import-details and original-source columns set to Skip. <a href="/imports/{{ batch.id }}/results.csv">Download all row results</a></p>
     <form method="post" action="/imports/{{ batch.id }}/esri-preview">
       <input type="hidden" name="csrf" value="{{ csrf }}">
-      <button class="btn btn-outline-primary" type="submit">Check up to 10 missing counties with Esri</button>
+      <button class="btn btn-outline-primary" type="submit">Check next 10 missing counties with Esri</button>
       <small>Optional. May use Esri credits. No contacts are saved until you confirm import.</small>
     </form>
     {% if esri_suggestions %}
       <h3>Esri county-check diagnostics</h3>
-      <p>{{ esri_suggestions | length }} rows examined (maximum 10). Only verified missing counties can be filled on import; all other values remain unchanged.</p>
+      <p><strong>Progress: {{ esri_suggestions | length }} / {{ esri_eligible_count or 0 }} eligible contacts checked.</strong> Each click processes up to 10 more. Only verified missing counties can be filled on import; all other values remain unchanged.</p>
       {% set esri_status_labels = {'verified':'Verified county','review':'Needs manual review','incomplete':'Incomplete address','no_match':'No Esri match','service_error':'Esri service error','unconfigured':'API key missing','existing':'County already present'} %}
       <ul>
       {% for status, label in esri_status_labels.items() %}
@@ -84,6 +84,11 @@
         {% endfor %}
         {% if matches.count %}<p>{{ label }}: {{ matches.count }}</p>{% endif %}
       {% endfor %}
+      {% if esri_eligible_count and esri_suggestions | length >= esri_eligible_count %}
+        <p><strong>Esri verification complete.</strong> Review the results before importing.</p>
+      {% else %}
+        <p class="import-help">Click the Esri button again to continue the next batch. You can stop and resume while this import preview remains active.</p>
+      {% endif %}
       <p class="import-help">A row may have multiple mismatch reasons. No names, addresses, Medicare IDs, or API keys are shown in these diagnostics.</p>
     {% endif %}
     <p><strong>{{ result.total }} source rows</strong> · {{ result.corrections|length }} cell corrections shown in this preview.</p>
