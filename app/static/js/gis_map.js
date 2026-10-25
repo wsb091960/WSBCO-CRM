@@ -19,6 +19,7 @@
     activeBasemap = next.addTo(map);
   });
   const layer = L.layerGroup().addTo(map);
+  const addressLayer = L.layerGroup().addTo(map);
   const cache = new Map();
   const $ = id => document.getElementById(id);
   const message = $('gis-message');
@@ -41,6 +42,7 @@
   async function refresh(e) {
     if (e) e.preventDefault();
     layer.clearLayers();
+    addressLayer.clearLayers();
     message.textContent = 'Loading ZIP-level contact counts…';
     const qs = new URLSearchParams();
     ['state','county','zip_code','mode','status'].forEach(id => {
@@ -57,6 +59,34 @@
       const top = data.locations.find(x => x.count === max);
       $('largest').textContent = top ? top.zip + ' (' + top.count + ')' : '—';
       const bounds = [];
+      const pointResponse = await fetch('/gis/points?' + qs.toString(), {credentials:'same-origin'});
+      if (!pointResponse.ok) throw Error('Owner sign-in required for individual address pins (' + pointResponse.status + ')');
+      const individual = await pointResponse.json();
+      const byLocation = new Map();
+      individual.points.forEach(point => {
+        const key = point.lat.toFixed(7) + ',' + point.lon.toFixed(7);
+        if (!byLocation.has(key)) byLocation.set(key, []);
+        byLocation.get(key).push(point);
+      });
+      for (const entries of byLocation.values()) {
+        const first = entries[0];
+        const marker = L.marker([first.lat, first.lon]).addTo(addressLayer);
+        const popup = document.createElement('div');
+        entries.forEach((point, index) => {
+          if (index) popup.append(document.createElement('hr'));
+          const title = document.createElement('strong');
+          title.textContent = point.name || 'Contact';
+          const details = document.createElement('p');
+          details.textContent = point.address + ' · ' + point.status;
+          popup.append(title, details);
+        });
+        marker.bindPopup(popup);
+        bounds.push([first.lat, first.lon]);
+      }
+      if (bounds.length) map.fitBounds(bounds, {padding:[35,35],maxZoom:16});
+      message.textContent = individual.points.length + ' individual contact pins loaded; ' + individual.unmapped + ' not yet mapped. Use Geocode next 20 addresses to add more.';
+      return;
+      /* Legacy ZIP markers retained below for reference but no longer displayed. */
       let mapped = 0;
       // Avoid overloading the public ZIP lookup API.
       for (const item of data.locations.slice(0, 120)) {
@@ -81,6 +111,24 @@
         : 'No contacts match these filters.';
     } catch (err) { message.textContent = 'Unable to load GIS data: ' + err.message; }
   }
+  $('geocode-next').addEventListener('click', async () => {
+    const button = $('geocode-next');
+    button.disabled = true;
+    message.textContent = 'Geocoding up to 20 street addresses…';
+    try {
+      const response = await fetch('/gis/geocode-batch', {
+        method: 'POST', credentials: 'same-origin'
+      });
+      if (!response.ok) throw Error('Server returned ' + response.status);
+      const result = await response.json();
+      await refresh();
+      if (!result.processed) message.textContent += ' No additional addresses to process.';
+    } catch (error) {
+      message.textContent = 'Unable to geocode: ' + error.message;
+    } finally {
+      button.disabled = false;
+    }
+  });
   $('gis-form').addEventListener('submit', refresh);
   refresh();
 })();
