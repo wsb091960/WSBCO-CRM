@@ -67,9 +67,24 @@
       <small>Optional. May use Esri credits. No contacts are saved until you confirm import.</small>
     </form>
     {% if esri_suggestions %}
-      <p><strong>Esri review:</strong>
-      {{ esri_suggestions.values() | selectattr('status', 'equalto', 'verified') | list | length }} verified county suggestions;
-      {{ esri_suggestions | length }} rows checked. Verified counties will be filled on import; others remain unchanged.</p>
+      <h3>Esri county-check diagnostics</h3>
+      <p>{{ esri_suggestions | length }} rows examined (maximum 10). Only verified missing counties can be filled on import; all other values remain unchanged.</p>
+      {% set labels = {'verified':'Verified county','review':'Needs manual review','incomplete':'Incomplete address','no_match':'No Esri match','service_error':'Esri service error','unconfigured':'API key missing','existing':'County already present'} %}
+      <ul>
+      {% for status, label in labels.items() %}
+        {% set count = esri_suggestions.values() | selectattr('status', 'equalto', status) | list | length %}
+        {% if count %}<li>{{ label }}: {{ count }}</li>{% endif %}
+      {% endfor %}
+      </ul>
+      {% set reasons = {'low_score':'Score below 95','not_street_level':'Not a street-level match','state_mismatch':'State mismatch','zip_mismatch':'ZIP mismatch','county_missing':'Esri returned no county'} %}
+      {% for reason, label in reasons.items() %}
+        {% set matches = namespace(count=0) %}
+        {% for item in esri_suggestions.values() %}
+          {% if reason in item.get('reasons', []) %}{% set matches.count = matches.count + 1 %}{% endif %}
+        {% endfor %}
+        {% if matches.count %}<p>{{ label }}: {{ matches.count }}</p>{% endif %}
+      {% endfor %}
+      <p class="import-help">A row may have multiple mismatch reasons. No names, addresses, Medicare IDs, or API keys are shown in these diagnostics.</p>
     {% endif %}
     <p><strong>{{ result.total }} source rows</strong> · {{ result.corrections|length }} cell corrections shown in this preview.</p>
     <p><a href="/imports/{{ batch.id }}/cleaned.csv">Download cleaned CSV</a> · <a href="/imports/{{ batch.id }}/errors.csv">Download rejected rows for retry</a> · <a href="/imports/{{ batch.id }}/original.csv">Download original source values</a></p>
