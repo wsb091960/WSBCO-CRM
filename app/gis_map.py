@@ -1,4 +1,4 @@
-"""Aggregate-only GIS map. Never expose contact names, addresses or phones."""
+"""GIS territory map. Contact details are served only behind CRM authentication."""
 from collections import defaultdict
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.templating import Jinja2Templates
@@ -153,7 +153,11 @@ def individual_points(
         if row[4] != "matched":
             continue
         points.append({"id": lead.id, "lat": row[2], "lon": row[3],
-                       "status": lead.status or ""})
+                       "status": lead.status or "",
+                       "name": " ".join(v for v in (lead.first_name, lead.last_name) if v).strip(),
+                       "address": _address(lead),
+                       "phone": lead.phone or lead.mobile or "",
+                       "url": f"/leads/{lead.id}"})
     return {"points": points, "pending": pending, "total": len(leads),
             "unmapped": len(leads) - len(points)}
 

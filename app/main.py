@@ -1,3 +1,4 @@
+from app.crm_auth import router as auth_router, CRMSignInMiddleware
 from app.address_cleanup import router as address_cleanup_router
 from app.gis_map import router as gis_router
 from app.call_list_v1 import router as call_list_router
@@ -29,6 +30,8 @@ app.mount(
     name="static",
 )
 
+app.add_middleware(CRMSignInMiddleware)
+app.include_router(auth_router)
 app.include_router(leads_router)
 app.include_router(calls_router)
 app.include_router(activity_v33_router)
