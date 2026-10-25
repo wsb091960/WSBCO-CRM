@@ -6,6 +6,7 @@
   <h1>Today's 10-Contact Call List</h1>
   <p class="text-muted">Your unfinished list is saved automatically. You can leave this page and return without losing your place.</p>
   {% if request.query_params.get('recorded') %}<div class="alert alert-success">Call outcome saved.</div>{% endif %}
+  {% if territory.state or territory.county or territory.zip_code %}<div class="alert alert-info">Selected territory: {{territory.state}} {{territory.county}} {{territory.zip_code}} ({{territory.mode|upper}}). <a href="/gis">Edit GIS filters</a></div>{% endif %}
   <div class="card p-3 mb-3">
     {% if batch %}
       <h5>Current list · {{done}} of {{rows|length}} completed</h5>
@@ -13,7 +14,7 @@
       <p class="text-muted mb-0">Finish this list before generating another. Completed calls remain visible below.</p>
     {% else %}
       <p>{{available}} eligible contacts available.</p>
-      <form method="post" action="/call-list/generate"><button class="btn btn-success" type="submit">Generate New List of 10</button></form>
+      <form method="post" action="/call-list/generate?{{ territory_qs }}"><button class="btn btn-success" type="submit">Generate New List of 10</button></form>
     {% endif %}
   </div>
   {% if rows %}
