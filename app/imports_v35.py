@@ -18,6 +18,7 @@ from app.services.contact_import import (
     FIELDS, LABELS, MAX_BYTES, ImportProblem, bulk_correct, hydrate, preview_import,
     read_file, read_google_sheet, signature, suggested_mapping,
 )
+from app.services.esri_import import enrich_preview
 
 router = APIRouter(prefix='/imports', tags=['Contact imports'])
 templates = Jinja2Templates(directory='app/templates')
@@ -155,6 +156,30 @@ async def preview(request: Request, batch_id: str, db: Session = Depends(get_db)
     return page(request, step='preview', batch=batch, result=result)
 
 
+@router.post('/{batch_id}/esri-preview')
+async def esri_preview(request: Request, batch_id: str, db: Session = Depends(get_db)):
+    """Explicitly geocode up to ten eligible import rows; never expose API token."""
+    token = require_form(request, await request.form())
+    batch = get_batch(db, batch_id, token)
+    if batch.state != 'preview':
+        raise HTTPException(409, 'Preview the import first.')
+    payload = json.loads(batch.payload)
+    if not payload.get('preview'):
+        raise HTTPException(409, 'Import preview missing.')
+    if not os.getenv('ARCGIS_API_KEY'):
+        return page(request, step='preview', batch=batch, result=payload['preview'],
+                    error='Esri API key is not configured.')
+    from starlette.concurrency import run_in_threadpool
+    suggestions = await run_in_threadpool(enrich_preview, payload['preview'])
+    # Preserve raw preview signature. Verified suggestions are applied only after
+    # recomputing the source preview at commit time.
+    payload['esri_suggestions'] = suggestions
+    batch.payload = json.dumps(payload)
+    db.commit()
+    return page(request, step='preview', batch=batch, result=payload['preview'],
+                esri_suggestions=suggestions)
+
+
 @router.post('/{batch_id}/commit')
 async def commit(request: Request, batch_id: str, db: Session = Depends(get_db)):
     form = await request.form()
@@ -179,8 +204,16 @@ async def commit(request: Request, batch_id: str, db: Session = Depends(get_db))
         batch.payload = json.dumps(payload)
         db.commit()
         return page(request, step='preview', batch=batch, result=result, error='Contacts changed since your preview. Review the refreshed results and confirm again.')
+    suggestions = payload.get('esri_suggestions', {})
     try:
         for row in result['rows']:
+            suggestion = suggestions.get(str(row['row']), {})
+            # Only fill a missing county, never overwrite the imported value.
+            if (row['action'] in ('create', 'update')
+                    and not row['data'].get('county')
+                    and suggestion.get('status') == 'verified'
+                    and suggestion.get('county')):
+                row['data']['county'] = suggestion['county']
             if row['action'] == 'create':
                 db.add(Lead(**hydrate(row['data'])))
             elif row['action'] == 'update':
