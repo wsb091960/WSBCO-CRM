@@ -2,27 +2,17 @@
 {% block title %}{{ lead.first_name }} {{ lead.last_name }} | Contact Console{% endblock %}
 {% block content %}
 
-<style>
-/* Larger phone numbers for manual dialing */
-.console .panel.left .field:nth-of-type(1) b,
-.console .panel.left .field:nth-of-type(2) b,
-.console .panel.right .person span {
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-    line-height: 1.4;
-    overflow-wrap: anywhere;
-    font-variant-numeric: tabular-nums;
-}
-</style>
 
-<link rel="stylesheet" href="/static/css/contact_console_v31.css?v=31">
+
+<link rel="stylesheet" href="/static/css/contact_console_v31.css?v=manual10">
 <link rel="stylesheet" href="/static/css/activity_v33.css?v=33">
 {% set nm=((lead.first_name or '') ~ ' ' ~ (lead.last_name or ''))|trim %}
-{% set ph=lead.mobile or lead.phone %}
+{% set ph=manual_phone %}
+{% set manual_data=manual_data|default({}) %}
 <div class="console">
 <header class="contact-head"><div><small>CONTACT CONSOLE · #{{ lead.id }}</small><h1>{{ nm }}</h1><p><b>{{ lead.status or 'New' }}</b> · {{ lead.priority or 'Normal' }} priority · {{ lead.call_attempts or 0 }} call attempts</p></div>
-<div class="actions"><a href="/leads/{{lead.id}}/compare" onclick="window.open(this.href, 'wsbco_plan_compare_{{lead.id}}', 'width=1180,height=850,resizable=yes,scrollbars=yes'); return false;">Compare Plans</a><a href="/leads">Contacts</a><a href="/leads/{{lead.id}}/edit">Edit</a><form method="post" action="/leads/{{lead.id}}/call"><button {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ Call {{ ph or '' }}</button></form></div></header>
+<div class="actions"><a href="/leads/{{lead.id}}/compare" onclick="window.open(this.href, 'wsbco_plan_compare_{{lead.id}}', 'width=1180,height=850,resizable=yes,scrollbars=yes'); return false;">Compare Plans</a><a href="/leads">Contacts</a><a href="/leads/{{lead.id}}/edit">Edit</a><form method="post" action="/leads/{{lead.id}}/call"><button title="Optional agent-first automated call" {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ Auto call</button></form></div></header>
+{% if request.query_params.get('recorded') %}<div class="notice" role="status">Call result saved. Call history and saved-list progress updated.</div>{% endif %}
 {% if calling %}<div class="notice">Calling your agent phone first. Answer to connect with {{lead.first_name}}.</div>{% endif %}
 {% if call_error %}<div class="notice err">{{call_error}}</div>{% endif %}
 <div class="columns">
@@ -58,9 +48,26 @@
 </div>
 <div id="follow" class="tab"><div class="sectionhead"><div><small>NEXT ACTION</small><h2>Follow-up</h2></div></div><div class="follow"><label>NEXT FOLLOW-UP</label><b>{{lead.next_follow_up or 'Not scheduled'}}</b><span>{{lead.follow_up_type or 'No follow-up type selected'}}</span></div></div>
 </section>
-<aside class="panel right"><h3>CALL WORKSPACE <em>● Ready</em></h3><div class="person"><strong>{{nm}}</strong><span>{{ph or 'No phone number'}}</span></div><form method="post" action="/leads/{{lead.id}}/call"><button class="call" {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ <b>CALL CONTACT</b><small>Agent-first Twilio call</small></button></form>
-<div class="callfacts"><p><span>Status</span><b>{{lead.status or 'New'}}</b></p><p><span>Attempts</span><b>{{lead.call_attempts or 0}}</b></p><p><span>Next follow-up</span><b>{{lead.next_follow_up or '—'}}</b></p></div><h3>DISPOSITION</h3>
-{% if call_id %}<form method="post" action="/calls/{{call_id}}/disposition"><input type="hidden" name="disposition" id="disp"><div class="disps">{% for x in ['Interested','Appointment Set','Callback','Voicemail','No Answer','Not Interested','Do Not Call','Sold'] %}<button type="button" data-value="{{x}}">{{x}}</button>{% endfor %}</div><label>FOLLOW-UP DATE</label><input type="date" name="next_follow_up"><label>CALL NOTE</label><textarea name="notes" rows="3"></textarea><button id="save" class="save" disabled>Save Call Result</button></form>{% else %}<div class="locked">☎<b>Start a call to record an outcome</b><span>Disposition controls appear after the call begins.</span></div>{% endif %}
-</aside></div></div><script src="/static/js/contact_console_v31.js?v=31"></script>
+<aside class="panel right"><h3>MANUAL CALLING <em>● Ready</em></h3>
+<div class="person"><strong>{{nm}}</strong><span>{{ph or 'No usable phone number'}}</span></div>
+<p class="manual-help">Dial on your phone, then record the result below.</p>
+{% if list_item %}<p class="manual-help"><a href="/call-list">Return to your saved 10-call list</a></p>{% endif %}
+<div class="callfacts"><p><span>Status</span><b>{{lead.status or 'New'}}</b></p><p><span>Attempts</span><b>{{lead.call_attempts or 0}}</b></p><p><span>Next follow-up</span><b>{{lead.next_follow_up or '—'}}</b></p></div>
+{% if (lead.status or '')|trim|lower == 'do not call' %}<div class="notice err">Do Not Call — calling and call logging are disabled.</div>
+{% elif not ph %}<div class="notice err">Add a usable phone number to record a call.</div>
+{% else %}
+<form method="post" action="/leads/{{lead.id}}/manual-call" id="manual-call-form">
+<input type="hidden" name="submission_token" value="{{submission_token}}">
+{% if list_item %}<input type="hidden" name="batch_item_id" value="{{list_item.id}}">{% endif %}
+<label for="manual-outcome">CALL DISPOSITION</label>
+<select id="manual-outcome" name="outcome" required><option value="">Select disposition…</option>{% for outcome in manual_outcomes %}<option value="{{outcome}}" {% if manual_data.get('outcome') == outcome %}selected{% endif %}>{{outcome}}</option>{% endfor %}</select>
+<label for="manual-followup">FOLLOW-UP DATE (OPTIONAL)</label><input id="manual-followup" type="date" name="next_follow_up" value="{{manual_data.get('next_follow_up', '')}}">
+<label for="manual-notes">CALL NOTES</label><textarea id="manual-notes" name="notes" rows="4" maxlength="2000">{{manual_data.get('notes', '')}}</textarea>
+<button class="save" name="after_save" value="stay">Save Call Result</button>
+{% if list_item %}<button class="save secondary" name="after_save" value="next">Save &amp; Next Contact</button>{% endif %}
+</form>
+{% endif %}
+{% if call_id %}<details class="auto-result" open><summary>Automated call result</summary><form method="post" action="/calls/{{call_id}}/disposition"><input type="hidden" name="disposition" id="disp"><div class="disps">{% for x in ['Interested','Appointment Set','Callback','Voicemail','No Answer','Not Interested','Do Not Call','Sold'] %}<button type="button" data-value="{{x}}">{{x}}</button>{% endfor %}</div><label>FOLLOW-UP DATE</label><input type="date" name="next_follow_up"><label>CALL NOTE</label><textarea name="notes" rows="3"></textarea><button id="save" class="save" disabled>Save Automated Call Result</button></form></details>{% endif %}
+</aside></div></div><script src="/static/js/contact_console_v31.js?v=manual10"></script>
 <script src="/static/js/activity_v33.js?v=33"></script>
 {% endblock %}

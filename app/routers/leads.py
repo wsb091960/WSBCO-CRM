@@ -1,5 +1,7 @@
 from datetime import date, datetime, timedelta, timezone
 from typing import Annotated
+from uuid import uuid4
+from app.services.manual_calls import OUTCOMES, pending_item, save_manual_call, usable_phone
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
@@ -203,6 +205,10 @@ def lead_detail(
             "calling": bool(calling),
             "call_id": call_id,
             "call_error": call_error,
+            "manual_outcomes": OUTCOMES,
+            "submission_token": str(uuid4()),
+            "list_item": pending_item(db, lead_id),
+            "manual_phone": usable_phone(lead),
         },
     )
 
@@ -273,3 +279,39 @@ def delete_lead(
     db.delete(lead)
     db.commit()
     return RedirectResponse(url="/leads", status_code=303)
+
+
+@router.post("/leads/{lead_id}/manual-call")
+async def log_manual_call(lead_id: int, request: Request, db: Session = Depends(get_db)):
+    from app.call_list_v1 import ManualCallItem
+    lead = db.get(Lead, lead_id)
+    if not lead:
+        raise HTTPException(404, 'Contact not found')
+    form = await request.form()
+    item = pending_item(db, lead_id)
+    explicit_item = str(form.get('batch_item_id', '')).strip()
+    if explicit_item:
+        try:
+            item = db.get(ManualCallItem, int(explicit_item))
+        except ValueError:
+            raise HTTPException(400, 'Invalid call-list entry')
+        if not item or item.lead_id != lead_id:
+            raise HTTPException(409, 'Call-list entry does not match this contact')
+    try:
+        save_manual_call(db, lead, form, item=item)
+    except HTTPException as exc:
+        response = lead_detail(lead_id, request, saved=0, calling=0, call_id=0,
+                               call_error=str(exc.detail), db=db)
+        context = dict(response.context)
+        context['manual_data'] = dict(form)
+        context['submission_token'] = str(form.get('submission_token', ''))
+        return templates.TemplateResponse(request=request, name='lead_detail.html',
+                                           context=context, status_code=exc.status_code)
+    if form.get('after_save') == 'next' and item:
+        next_item = db.scalar(select(ManualCallItem).where(
+            ManualCallItem.batch_id == item.batch_id,
+            ManualCallItem.completed_at.is_(None)).order_by(ManualCallItem.id).limit(1))
+        url = f'/leads/{next_item.lead_id}?recorded=1' if next_item else '/call-list?recorded=1'
+    else:
+        url = f'/leads/{lead_id}?recorded=1'
+    return RedirectResponse(url, status_code=303)

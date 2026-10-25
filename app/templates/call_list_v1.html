@@ -33,10 +33,11 @@
   </div>
   <div class="card p-3 mb-3">
     {% if batch %}
-      <h2 class="h5">Current list · {{done}} of {{rows|length}} completed</h2>
-      <div class="progress mb-2"><div class="progress-bar bg-success" role="progressbar" style="width:{{(100 * done / rows|length)|round}}%" aria-valuenow="{{done}}" aria-valuemin="0" aria-valuemax="{{rows|length}}"></div></div>
-      <p class="text-muted mb-0">Saved selection: {{batch_geo_label}}. Finish this list before generating another. Searching previews another area without changing these calls. Completed calls remain visible below.</p>
-    {% else %}
+      <h2 class="h5">{{'Current' if not batch.completed_at else 'Completed'}} list · {{done}} calls logged{% if skipped %} · {{skipped}} skipped{% endif %}</h2>
+      <div class="progress mb-2"><div class="progress-bar bg-success" role="progressbar" style="width:{{(100 * (done + skipped) / rows|length)|round}}%" aria-valuenow="{{done + skipped}}" aria-valuemin="0" aria-valuemax="{{rows|length}}"></div></div>
+      <p class="text-muted mb-0">Saved selection: {{batch_geo_label}}. {% if not batch.completed_at %}Finish or skip the pending contacts before generating another.{% else %}This list is finished. Generate a new list when you are ready.{% endif %} Searching previews another area without changing these calls. Completed calls remain visible below.</p>
+    {% endif %}
+    {% if not batch or batch.completed_at %}
       <p>{{available}} eligible contacts available.</p>
       <form method="post" action="/call-list/generate">
         {% for key, value in filters.items() %}{% if key != "geo_mode" %}<input type="hidden" name="{{key}}" value="{{value}}">{% endif %}{% endfor %}
@@ -73,14 +74,15 @@
     <tbody>
     {% for row in rows %}{% set c=row.lead %}{% set item=row.item %}
     <tr><td>{{loop.index}}</td><td>{% if c %}<a href="/leads/{{c.id}}">{{c.first_name}} {{c.last_name}}</a><small class="d-block text-muted">{{c.status}}</small><small class="d-block">{{c.city}}{% if c.county %} · {{c.county}} County{% endif %} · {{c.state}} {{c.zip_code}}</small>{% else %}Contact unavailable{% endif %}</td>
-    <td>{% if c %}<strong class="geo-phone">{{c.phone or c.mobile}}</strong>{% endif %}</td>
-    <td>{% if c %}{{c.priority or 'Normal'}}<small class="d-block">{{c.next_follow_up or ''}}</small>{% endif %}</td>
-    <td>{% if item.completed_at %}<span class="badge bg-success">Completed · {{item.outcome}}</span>
+    <td>{% if c %}<strong class="geo-phone">{{usable_phone(c)}}</strong>{% endif %}</td>
+    <td>{% if c %}{{c.priority or 'Normal'}}<small class="d-block">{{row.reason}}</small><small class="d-block">Due: {{c.next_follow_up or 'Not scheduled'}}</small><small class="d-block">Last call: {{c.last_contact.strftime('%Y-%m-%d') if c.last_contact else 'Never'}}</small>{% endif %}</td>
+    <td>{% if item.completed_at %}<span class="badge bg-success">{{'Skipped — no call logged' if item.outcome == 'Skipped' else 'Completed · ' ~ item.outcome}}</span>
       <small class="d-block text-muted">{{item.completed_at.strftime('%Y-%m-%d %H:%M')}} UTC</small>
       {% if row.log and row.log.notes %}<p class="geo-call-notes mb-0 mt-1">{{row.log.notes}}</p>{% endif %}
       {% elif c %}
-      {% if (c.status or '')|trim|lower == 'do not call' %}<span class="badge bg-warning text-dark">Do Not Call — cannot call</span>{% else %}
+      {% if (c.status or '')|trim|lower == 'do not call' or not usable_phone(c) %}<span class="badge bg-warning text-dark">Unavailable — Do Not Call or missing phone</span>{% else %}
       <form method="post" action="/call-list/{{c.id}}/disposition" class="geo-disposition-form">
+        <input type="hidden" name="batch_item_id" value="{{item.id}}">
         <label for="disposition-{{item.id}}" class="form-label mb-0">Disposition</label>
         <select id="disposition-{{item.id}}" class="form-select form-select-sm" name="outcome" required><option value="">Select disposition…</option>{% for outcome in outcomes %}<option value="{{outcome}}">{{outcome}}</option>{% endfor %}</select>
         <div class="geo-disposition-details">
@@ -90,7 +92,8 @@
             <textarea id="notes-{{item.id}}" class="form-control form-control-sm" name="notes" rows="2" maxlength="2000" placeholder="What happened on this call?"></textarea></label>
         </div>
         <button class="btn btn-success btn-sm" type="submit">Save Disposition</button>
-      </form>{% endif %}{% endif %}</td></tr>
+      </form>{% endif %}{% endif %}
+      {% if not item.completed_at %}<form method="post" action="/call-list/items/{{item.id}}/skip" class="mt-2"><button type="submit" class="btn btn-outline-secondary btn-sm">Skip — no call made</button></form>{% endif %}</td></tr>
     {% endfor %}
     </tbody></table></div>
   {% elif not batch %}<p class="text-muted">Generate a list to begin manual calling.</p>{% endif %}

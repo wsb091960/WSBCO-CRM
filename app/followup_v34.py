@@ -2,25 +2,16 @@ from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
+from app.database import DATA_DIR
 import sqlite3
 from datetime import date, datetime, timedelta
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
-DB_CANDIDATES = [
-    Path("data/golf_coach.db"), Path("data/crm.db"), Path("data/wsbco_crm.db"),
-    Path("data/insurance_crm.db"), Path("data/app.db")
-]
-
 def find_db():
-    for p in DB_CANDIDATES:
-        if p.exists(): return p
-    dbs=list(Path("data").glob("*.db"))
-    if not dbs: raise RuntimeError("No CRM SQLite database found in data/")
-    # Avoid selecting the separate V3.3 activity DB as the CRM database.
-    for p in dbs:
-        if p.name != "wsbco_activity.db": return p
-    raise RuntimeError("CRM database not found")
+    # Share the configured persistent CRM database with contact/call saves.
+    return DATA_DIR / 'insurance_crm.db'
+
 
 def rows():
     db=find_db()

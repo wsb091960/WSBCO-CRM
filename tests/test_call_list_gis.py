@@ -111,7 +111,7 @@ def test_outcomes_complete_saved_list_without_geography_loss(setup):
     client.post('/call-list/generate', data={'states': 'OR'})
     batch_id = items(db)[0].batch_id
     response = client.post(f'/call-list/{first.id}/outcome', data={'outcome': 'Callback', 'notes': 'Tomorrow', 'next_follow_up': str(date.today()+timedelta(days=1))})
-    assert response.status_code == 200 and '1 of 2 completed' in response.text
+    assert response.status_code == 200 and '1 calls logged' in response.text
     assert 'Saved selection: State: OR' in response.text
     assert db.get(Lead, first.id).call_attempts == 1
     assert client.post(f'/call-list/{first.id}/outcome', data={'outcome': 'Callback'}).status_code == 409
@@ -173,7 +173,7 @@ def test_manual_disposition_logs_and_updates_contact(setup, disposition, status)
     log = db.scalar(select(CallLog).where(CallLog.lead_id == contact.id))
     assert log.direction == 'manual' and log.disposition == disposition
     assert log.notes == 'Manually dialed; requested information.'
-    assert contact.status == status and contact.call_attempts == 1
+    assert contact.status == ('New' if disposition in {'No Answer', 'Busy', 'Left Message', 'Live Voicemail'} else status) and contact.call_attempts == 1
     assert contact.next_follow_up == followup
     assert items(db)[0].outcome == disposition and items(db)[0].completed_at
     assert 'Manually dialed; requested information.' in response.text
