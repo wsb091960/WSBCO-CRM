@@ -60,7 +60,7 @@
       $('largest').textContent = top ? top.zip + ' (' + top.count + ')' : '—';
       const bounds = [];
       const pointResponse = await fetch('/gis/points?' + qs.toString(), {credentials:'same-origin'});
-      if (!pointResponse.ok) throw Error('Owner sign-in required for individual address pins (' + pointResponse.status + ')');
+      if (!pointResponse.ok) throw Error('Unable to load individual address pins (' + pointResponse.status + ')');
       const individual = await pointResponse.json();
       const byLocation = new Map();
       individual.points.forEach(point => {
@@ -75,9 +75,9 @@
         entries.forEach((point, index) => {
           if (index) popup.append(document.createElement('hr'));
           const title = document.createElement('strong');
-          title.textContent = point.name || 'Contact';
+          title.textContent = 'Contact ' + (index + 1);
           const details = document.createElement('p');
-          details.textContent = point.address + ' · ' + point.status;
+          details.textContent = point.status || 'Status not specified';
           popup.append(title, details);
         });
         marker.bindPopup(popup);
