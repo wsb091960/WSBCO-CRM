@@ -1,3 +1,4 @@
+from app.gis_individual import router as gis_individual_router
 from app.gis_map import router as gis_router
 from app.call_list_v1 import router as call_list_router
 from app.website_leads import router as website_leads_router
@@ -55,3 +56,5 @@ app.include_router(website_leads_router)
 
 app.include_router(call_list_router)
 app.include_router(gis_router)
+
+app.include_router(gis_individual_router)
