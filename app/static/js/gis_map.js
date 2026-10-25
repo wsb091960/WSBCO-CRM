@@ -47,6 +47,7 @@
       const val = $(id).value.trim();
       if (val) qs.set(id, val);
     });
+    $('gis-call-list-link').href = '/call-list?' + qs.toString();
     try {
       const response = await fetch('/gis/summary?' + qs.toString(), {credentials:'same-origin'});
       if (!response.ok) throw Error('Server returned ' + response.status);
