@@ -1,8 +1,8 @@
 /* ZIP-only aggregate map: never send personal contact details to a third party. */
 (() => {
   const map = L.map('gis-map').setView([43.5, -123.5], 7);
-  L.tileLayer('https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 18, attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+  L.tileLayer('https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    maxZoom: 18, attribution: '&copy; OpenStreetMap contributors, HOT'
   }).addTo(map);
   const layer = L.layerGroup().addTo(map);
   const cache = new Map();
