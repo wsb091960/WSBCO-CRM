@@ -158,7 +158,7 @@ def individual_points(
             "unmapped": len(leads) - len(points)}
 
 @router.post("/geocode-batch")
-def geocode_batch(db: Session = Depends(get_db), _: bool = Depends(owner)):
+def geocode_batch(db: Session = Depends(get_db)):
     token = os.getenv("ARCGIS_API_KEY", "")
     if not token:
         raise HTTPException(503, "ARCGIS_API_KEY is not configured")
