@@ -86,3 +86,18 @@ def enrich_preview(result, limit=10, lookup=suggest_county):
         checked += 1
         suggestions[str(row["row"])] = lookup(row["data"])
     return suggestions
+
+
+def eligible_rows(result):
+    """Only actionable rows with missing county need Esri checks."""
+    return [row for row in result["rows"]
+            if row["action"] in ("create", "update") and not row["data"].get("county")]
+
+
+def enrich_next_batch(result, previous=None, limit=10, lookup=suggest_county):
+    """Resume after previous results; never repeat already checked rows."""
+    suggestions = dict(previous or {})
+    pending = [row for row in eligible_rows(result) if str(row["row"]) not in suggestions]
+    for row in pending[:limit]:
+        suggestions[str(row["row"])] = lookup(row["data"])
+    return suggestions
