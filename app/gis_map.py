@@ -2,7 +2,7 @@
 from collections import defaultdict
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import select
+from sqlalchemy import inspect, select
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Lead
@@ -120,6 +120,7 @@ def individual_points(
     leads = _matching_leads(db, geo)
     saved = {r[0]: r for r in db.execute(text(
         "SELECT lead_id, address_hash, latitude, longitude, result FROM gis_address_points")).all()}
+    precision = dict(db.execute(text('SELECT lead_id, precision FROM gis_coordinate_sources')).all()) if inspect(db.get_bind()).has_table('gis_coordinate_sources') else {}
     points = []
     pending = 0
     for lead in leads:
@@ -133,6 +134,7 @@ def individual_points(
             continue
         points.append({"id": lead.id, "lat": row[2], "lon": row[3],
                        "status": lead.status or "",
+                       "precision": precision.get(lead.id, ''),
                        "name": ' '.join(v for v in (lead.first_name, lead.last_name) if v).strip(),
                        "address": _address(lead), "url": f'/leads/{lead.id}'})
     return {"points": points, "pending": pending, "total": len(leads),
@@ -175,3 +177,25 @@ def geocode_batch(geo: GeoFilter = Depends(geography), db: Session = Depends(get
     db.commit()
     return {"processed": processed, "matched": matched,
             "notice": "Only street addresses were sent to Esri. CRM contacts were not modified."}
+
+
+@router.post('/coordinates/restore')
+async def restore_coordinates(request: Request, db: Session = Depends(get_db)):
+    """Two-step restoration through the existing browser-bound import protection."""
+    from app.imports_v35 import require_form
+    from app.services.gis_coordinates import MAX_BYTES, prepare, restore
+    form = await request.form(max_files=1, max_fields=5)
+    require_form(request, form)
+    upload = form.get('file')
+    if not hasattr(upload, 'read'):
+        raise HTTPException(400, 'Choose the verified GIS results CSV.')
+    content = await upload.read(MAX_BYTES + 1)
+    await upload.close()
+    plan, counts, signature = prepare(content, db, _fingerprint)
+    if str(form.get('commit','')) != '1':
+        return {**counts,'signature':signature,'mode':'preview'}
+    import secrets
+    if not secrets.compare_digest(str(form.get('signature','')),signature):
+        raise HTTPException(409,'Contacts or source changed. Preview the coordinate restoration again.')
+    _cache(db)
+    return {**counts,**restore(plan,db),'mode':'restored'}

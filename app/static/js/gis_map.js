@@ -62,10 +62,14 @@
         address.textContent = point.address || 'Address unavailable';
         const status = document.createElement('p');
         status.textContent = point.status || 'Status not specified';
+        const precision = document.createElement('small');
+        precision.textContent = point.precision || '';
         const link = document.createElement('a');
         link.href = '/leads/' + encodeURIComponent(point.id);
         link.textContent = 'Open contact';
-        popup.append(title, address, status, link);
+        popup.append(title, address, status);
+        if (point.precision) popup.append(precision, document.createElement('br'));
+        popup.append(link);
       }
       L.marker([first.lat, first.lon]).bindPopup(popup).addTo(addressLayer);
       bounds.push([first.lat, first.lon]);
