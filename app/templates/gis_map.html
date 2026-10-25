@@ -27,9 +27,9 @@
 <div class="d-flex flex-wrap align-items-center gap-2 mb-2"><label class="fw-semibold" for="basemap-style">Map layer</label><select id="basemap-style" class="form-select w-auto" aria-label="Choose Esri map layer"><option value="streets">Streets</option><option value="navigation">Navigation / roads</option><option value="light">Light Gray</option><option value="satellite">Satellite</option></select></div>
 <div class="mb-2"><button id="geocode-next" type="button" class="btn btn-outline-success">Geocode next 20 addresses</button> <small class="text-muted">Esri usage may incur charges.</small></div>
 <div id="gis-map" role="region" aria-label="Individual contact address map"></div>
-<p class="gis-legend mt-2">Each pin represents a geocoded street location. Individual contact identities and street addresses are not exposed through the map API. Contacts at the same coordinates are listed separately in the pin popup. Unmatched or missing addresses are not approximated.</p>
+<p class="gis-legend mt-2">Each pin represents a geocoded street location. Contact names, addresses and phone numbers are available only to signed-in CRM users. They are never sent to Esri. Contacts at the same coordinates are listed separately in the pin popup. Unmatched or missing addresses are not approximated.</p>
 <p id="gis-message" class="text-muted" role="status"></p>
 </section>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/js/gis_map.js?v=7"></script>
+<script src="/static/js/gis_map.js?v=8"></script>
 {% endblock %}
