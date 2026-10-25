@@ -11,25 +11,26 @@
 </style>
 <section class="container-fluid">
 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-<div><p class="text-uppercase text-success fw-bold mb-1">Territory intelligence</p><h1>CRM GIS Map</h1><p class="text-muted">View individual street-address pins with state, county, ZIP and status filters. Street addresses are sent to Esri only when you start geocoding; no names, phone numbers or Medicare details are sent.</p></div>
-<a class="btn btn-outline-success" href="/call-list">Open 10-Call List</a>
+<div><p class="text-uppercase text-success fw-bold mb-1">Territory intelligence</p><h1>CRM GIS Map</h1><p class="text-muted">Find contacts by location, review the map, and open a call list for that area.</p></div>
+<a id="gis-call-list" class="btn btn-outline-success" href="/call-list">Open 10-Call List</a>
 </div>
 <form id="gis-form" class="card p-3 mb-3">
 <div class="gis-controls">
-<label class="form-label">State <input id="state" class="form-control" maxlength="2" placeholder="OR" value="OR"></label>
-<label class="form-label">County <input id="county" class="form-control" placeholder="e.g. Douglas"></label>
-<label class="form-label">ZIP code <input id="zip_code" class="form-control" maxlength="10" placeholder="e.g. 97467"></label>
-<label class="form-label">Combine filters <select id="mode" class="form-select"><option value="and">AND — all conditions</option><option value="or">OR — any condition</option></select></label>
-<label class="form-label">Contact status <input id="status" class="form-control" placeholder="Optional"></label>
-<button class="btn btn-success" type="submit">Update Map</button>
-</div></form>
-<div class="row g-3 mb-3"><div class="col-sm-4"><div class="gis-stat"><small>Mapped contacts</small><div><strong id="total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>ZIP areas</small><div><strong id="zip-total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>Largest ZIP area</small><div><strong id="largest">—</strong></div></div></div></div>
+<label class="form-label" for="state">State <input id="state" name="state" class="form-control" maxlength="80" placeholder="e.g. OR" list="gis-state-options" value="{{request.query_params.get('state', '')}}" autocomplete="address-level1"></label>
+<datalist id="gis-state-options">{% for code, name in state_names.items() %}<option value="{{code}}">{{name}}</option>{% endfor %}</datalist>
+<label class="form-label" for="county">County <input id="county" name="county" class="form-control" maxlength="100" placeholder="e.g. Douglas" value="{{request.query_params.get('county', '')}}"></label>
+<label class="form-label" for="city">City <input id="city" name="city" class="form-control" maxlength="100" placeholder="e.g. Reedsport" value="{{request.query_params.get('city', '')}}" autocomplete="address-level2"></label>
+<label class="form-label" for="zip_code">ZIP <input id="zip_code" name="zip_code" class="form-control" maxlength="10" placeholder="e.g. 97467" value="{{request.query_params.get('zip_code', '')}}" inputmode="numeric" autocomplete="postal-code"></label>
+<button class="btn btn-success" type="submit">Search</button>
+<button id="gis-clear" class="btn btn-outline-secondary" type="button">Clear</button>
+</div><small class="text-muted mt-2">Fill in any fields to narrow your search. Leave fields blank to include all locations.</small></form>
+<div class="row g-3 mb-3"><div class="col-sm-4"><div class="gis-stat"><small>Matching contacts</small><div><strong id="total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>ZIP areas</small><div><strong id="zip-total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>Largest ZIP area</small><div><strong id="largest">—</strong></div></div></div></div>
 <div class="d-flex flex-wrap align-items-center gap-2 mb-2"><label class="fw-semibold" for="basemap-style">Map layer</label><select id="basemap-style" class="form-select w-auto" aria-label="Choose Esri map layer"><option value="streets">Streets</option><option value="navigation">Navigation / roads</option><option value="light">Light Gray</option><option value="satellite">Satellite</option></select></div>
-<div class="mb-2"><button id="geocode-next" type="button" class="btn btn-outline-success">Geocode next 20 addresses</button> <small class="text-muted">Esri usage may incur charges.</small></div>
+<div class="mb-2"><button id="geocode-next" type="button" class="btn btn-outline-success">Geocode next 20 matching addresses</button> <small class="text-muted">Esri usage may incur charges. Only street addresses are sent for matching.</small></div>
 <div id="gis-map" role="region" aria-label="Individual contact address map"></div>
-<p class="gis-legend mt-2">Each pin represents a geocoded street location. Individual contact identities and street addresses are not exposed through the map API. Contacts at the same coordinates are listed separately in the pin popup. Unmatched or missing addresses are not approximated.</p>
+<p class="gis-legend mt-2">Each pin represents a geocoded street location. Open a pin to view the contact and their CRM record. Contacts at the same location appear together. Unmatched or missing addresses remain in your contact results.</p>
 <p id="gis-message" class="text-muted" role="status"></p>
 </section>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/js/gis_map.js?v=7"></script>
+<script src="/static/js/gis_map.js?v=8"></script>
 {% endblock %}

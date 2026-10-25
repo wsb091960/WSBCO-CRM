@@ -1,134 +1,137 @@
-/* ZIP-only aggregate map: never send personal contact details to a third party. */
+/* Same geographic selection for the territory map and manual call list. */
 (() => {
-  const map = L.map('gis-map').setView([43.5, -123.5], 7);
-  // Public Esri raster services. No credential is embedded in client-side code.
-  // These provide a usable selector until authenticated Basemap Styles is configured.
-  const esri = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
-  const layers = {
-    streets: L.tileLayer(esri + 'World_Street_Map/MapServer/tile/{z}/{y}/{x}', {maxZoom: 18, attribution: 'Tiles &copy; Esri'}),
-    navigation: L.tileLayer(esri + 'World_Transportation/MapServer/tile/{z}/{y}/{x}', {maxZoom: 18, attribution: 'Tiles &copy; Esri'}),
-    light: L.tileLayer(esri + 'Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {maxZoom: 16, attribution: 'Tiles &copy; Esri'}),
-    satellite: L.tileLayer(esri + 'World_Imagery/MapServer/tile/{z}/{y}/{x}', {maxZoom: 18, attribution: 'Imagery &copy; Esri'})
-  };
-  let activeBasemap = layers.streets.addTo(map);
-  const layerSelect = document.getElementById('basemap-style');
-  layerSelect.addEventListener('change', () => {
-    const next = layers[layerSelect.value];
-    if (!next || next === activeBasemap) return;
-    map.removeLayer(activeBasemap);
-    activeBasemap = next.addTo(map);
-  });
-  const layer = L.layerGroup().addTo(map);
-  const addressLayer = L.layerGroup().addTo(map);
-  const cache = new Map();
+  'use strict';
   const $ = id => document.getElementById(id);
+  const fields = ['state', 'county', 'city', 'zip_code'];
   const message = $('gis-message');
-  async function locate(zip, state) {
-    const key = zip + ':' + state;
-    if (cache.has(key)) return cache.get(key);
-    try {
-      const response = await fetch('https://api.zippopotam.us/us/' + encodeURIComponent(zip));
-      if (!response.ok) return null;
-      const data = await response.json();
-      const places = data.places || [];
-      const place = places.find(p => (p['state abbreviation'] || '').toUpperCase() === state) || places[0];
-      if (!place) return null;
-      const coords = [Number(place.latitude), Number(place.longitude)];
-      if (!coords.every(Number.isFinite)) return null;
-      cache.set(key, coords);
-      return coords;
-    } catch (_) { return null; }
-  }
-  async function refresh(e) {
-    if (e) e.preventDefault();
-    layer.clearLayers();
-    addressLayer.clearLayers();
-    message.textContent = 'Loading ZIP-level contact counts…';
-    const qs = new URLSearchParams();
-    ['state','county','zip_code','mode','status'].forEach(id => {
-      const val = $(id).value.trim();
-      if (val) qs.set(id, val);
+  let map, addressLayer, activeBasemap, lastQuery = '', loadNumber = 0, controller;
+  const layers = {};
+
+  if (window.L) {
+    map = L.map('gis-map').setView([43.5, -123.5], 7);
+    const esri = 'https://server.arcgisonline.com/ArcGIS/rest/services/';
+    for (const [name, path, maxZoom] of [
+      ['streets', 'World_Street_Map', 18], ['navigation', 'World_Transportation', 18],
+      ['light', 'Canvas/World_Light_Gray_Base', 16], ['satellite', 'World_Imagery', 18]
+    ]) {
+      layers[name] = L.tileLayer(esri + path + '/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom, attribution: 'Tiles &copy; Esri'
+      });
+    }
+    activeBasemap = layers.streets.addTo(map);
+    addressLayer = L.layerGroup().addTo(map);
+    $('basemap-style').addEventListener('change', () => {
+      const next = layers[$('basemap-style').value];
+      if (!next || next === activeBasemap) return;
+      map.removeLayer(activeBasemap);
+      activeBasemap = next.addTo(map);
     });
+  } else {
+    $('gis-map').textContent = 'Map unavailable. Search and the 10-call list still work.';
+    $('basemap-style').disabled = true;
+  }
+
+  function query() {
+    return new URLSearchParams(fields.map(id => [id, $(id).value.trim()]));
+  }
+
+  function callListLink(qs) {
+    $('gis-call-list').href = '/call-list?' + new URLSearchParams({
+      states: qs.get('state'), counties: qs.get('county'),
+      cities: qs.get('city'), zips: qs.get('zip_code')
+    });
+  }
+
+  function draw(points) {
+    if (!map) return;
+    const groups = new Map();
+    for (const point of points) {
+      if (!Number.isFinite(point.lat) || !Number.isFinite(point.lon)) continue;
+      const key = point.lat.toFixed(7) + ',' + point.lon.toFixed(7);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(point);
+    }
+    const bounds = [];
+    for (const entries of groups.values()) {
+      const first = entries[0], popup = document.createElement('div');
+      for (const [index, point] of entries.entries()) {
+        if (index) popup.append(document.createElement('hr'));
+        const title = document.createElement('strong');
+        title.textContent = point.name || 'Contact ' + point.id;
+        const address = document.createElement('p');
+        address.textContent = point.address || 'Address unavailable';
+        const status = document.createElement('p');
+        status.textContent = point.status || 'Status not specified';
+        const link = document.createElement('a');
+        link.href = '/leads/' + encodeURIComponent(point.id);
+        link.textContent = 'Open contact';
+        popup.append(title, address, status, link);
+      }
+      L.marker([first.lat, first.lon]).bindPopup(popup).addTo(addressLayer);
+      bounds.push([first.lat, first.lon]);
+    }
+    if (bounds.length) map.fitBounds(bounds, {padding: [35, 35], maxZoom: 16});
+  }
+
+  async function refresh(event) {
+    if (event) event.preventDefault();
+    const current = ++loadNumber;
+    if (controller) controller.abort();
+    controller = new AbortController();
+    const qs = query();
+    lastQuery = qs.toString();
+    callListLink(qs);
+    window.history.replaceState(null, '', '/gis?' + lastQuery);
+    if (addressLayer) addressLayer.clearLayers();
+    for (const id of ['total', 'zip-total', 'largest']) $(id).textContent = '—';
+    message.textContent = 'Loading matching contacts…';
+    $('geocode-next').disabled = true;
     try {
-      const response = await fetch('/gis/summary?' + qs.toString(), {credentials:'same-origin'});
-      if (!response.ok) throw Error('Server returned ' + response.status);
-      const data = await response.json();
+      const responses = await Promise.all(['/gis/summary?', '/gis/points?'].map(path =>
+        fetch(path + lastQuery, {credentials: 'same-origin', signal: controller.signal, cache: 'no-store'})));
+      for (const response of responses) {
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw Error(typeof error.detail === 'string' ? error.detail : 'Unable to load contacts (' + response.status + ')');
+        }
+      }
+      const [data, individual] = await Promise.all(responses.map(response => response.json()));
+      if (current !== loadNumber) return;
       $('total').textContent = data.total.toLocaleString();
       $('zip-total').textContent = data.zip_count.toLocaleString();
-      const max = Math.max(0, ...data.locations.map(x => x.count));
-      const top = data.locations.find(x => x.count === max);
+      const top = data.locations.reduce((best, item) => !best || item.count > best.count ? item : best, null);
       $('largest').textContent = top ? top.zip + ' (' + top.count + ')' : '—';
-      const bounds = [];
-      const pointResponse = await fetch('/gis/points?' + qs.toString(), {credentials:'same-origin'});
-      if (!pointResponse.ok) throw Error('Unable to load individual address pins (' + pointResponse.status + ')');
-      const individual = await pointResponse.json();
-      const byLocation = new Map();
-      individual.points.forEach(point => {
-        const key = point.lat.toFixed(7) + ',' + point.lon.toFixed(7);
-        if (!byLocation.has(key)) byLocation.set(key, []);
-        byLocation.get(key).push(point);
-      });
-      for (const entries of byLocation.values()) {
-        const first = entries[0];
-        const marker = L.marker([first.lat, first.lon]).addTo(addressLayer);
-        const popup = document.createElement('div');
-        entries.forEach((point, index) => {
-          if (index) popup.append(document.createElement('hr'));
-          const title = document.createElement('strong');
-          title.textContent = 'Contact ' + (index + 1);
-          const details = document.createElement('p');
-          details.textContent = point.status || 'Status not specified';
-          popup.append(title, details);
-        });
-        marker.bindPopup(popup);
-        bounds.push([first.lat, first.lon]);
-      }
-      if (bounds.length) map.fitBounds(bounds, {padding:[35,35],maxZoom:16});
-      message.textContent = individual.points.length + ' individual contact pins loaded; ' + individual.unmapped + ' not yet mapped. Use Geocode next 20 addresses to add more.';
-      return;
-      /* Legacy ZIP markers retained below for reference but no longer displayed. */
-      let mapped = 0;
-      // Avoid overloading the public ZIP lookup API.
-      for (const item of data.locations.slice(0, 120)) {
-        const coords = await locate(item.zip, item.state);
-        if (!coords) continue;
-        const marker = L.circleMarker(coords, {
-          radius: Math.min(29, 6 + Math.sqrt(item.count) * 3),
-          color:'#b78a2d', weight:2, fillColor:'#185b42', fillOpacity:.68
-        }).addTo(layer);
-        const popup = document.createElement('div');
-        const heading = document.createElement('strong');
-        heading.textContent = item.zip + ', ' + item.state;
-        const info = document.createElement('p');
-        info.textContent = item.count + ' contacts · ' + (item.counties.join(', ') || 'County not specified');
-        popup.append(heading, info);
-        marker.bindPopup(popup);
-        bounds.push(coords); mapped++;
-      }
-      if (bounds.length) map.fitBounds(bounds, {padding:[35,35],maxZoom:10});
-      message.textContent = data.total
-        ? mapped + ' of ' + data.zip_count + ' ZIP areas plotted. ' + (data.zip_count > 120 ? 'Showing first 120 ZIP areas.' : '')
-        : 'No contacts match these filters.';
-    } catch (err) { message.textContent = 'Unable to load GIS data: ' + err.message; }
+      draw(individual.points);
+      message.textContent = !data.total ? 'No contacts match. Change a field or click Clear.' :
+        data.total + ' matching contacts; ' + individual.points.length + ' mapped; ' + individual.unmapped + ' not yet mapped.' +
+        (map ? '' : ' Map unavailable; search and calling still work.');
+      $('geocode-next').disabled = !map || !individual.pending;
+    } catch (error) {
+      if (current !== loadNumber || error.name === 'AbortError') return;
+      message.textContent = 'Unable to search: ' + error.message;
+    }
   }
+
   $('geocode-next').addEventListener('click', async () => {
-    const button = $('geocode-next');
+    const button = $('geocode-next'), selectedQuery = lastQuery;
     button.disabled = true;
-    message.textContent = 'Geocoding up to 20 street addresses…';
+    message.textContent = 'Matching up to 20 addresses in this search…';
     try {
-      const response = await fetch('/gis/geocode-batch', {
-        method: 'POST', credentials: 'same-origin'
-      });
-      if (!response.ok) throw Error('Server returned ' + response.status);
+      const response = await fetch('/gis/geocode-batch?' + selectedQuery, {method: 'POST', credentials: 'same-origin'});
+      if (!response.ok) throw Error('Unable to match addresses (' + response.status + ')');
       const result = await response.json();
       await refresh();
-      if (!result.processed) message.textContent += ' No additional addresses to process.';
+      if (selectedQuery === lastQuery && !result.processed) message.textContent += ' No additional addresses to process.';
     } catch (error) {
-      message.textContent = 'Unable to geocode: ' + error.message;
-    } finally {
+      if (selectedQuery === lastQuery) message.textContent = error.message;
       button.disabled = false;
     }
   });
+  $('gis-clear').addEventListener('click', () => {
+    fields.forEach(id => {$(id).value = '';});
+    refresh();
+  });
   $('gis-form').addEventListener('submit', refresh);
+  fields.forEach(id => $(id).addEventListener('input', () => callListLink(query())));
   refresh();
 })();

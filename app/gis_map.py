@@ -1,4 +1,4 @@
-"""Aggregate-only GIS map. Never expose contact names, addresses or phones."""
+"""Territory map and call selection share the same geographic matching rules."""
 from collections import defaultdict
 from fastapi import APIRouter, Depends, Query, Request
 from fastapi.templating import Jinja2Templates
@@ -6,50 +6,43 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Lead
+from app.call_list_gis import GeoFilter, STATE_NAMES, state_code, zip5
 
 router = APIRouter(prefix="/gis", tags=["GIS"])
 templates = Jinja2Templates(directory="app/templates")
 
 @router.get("")
 def gis_page(request: Request):
-    return templates.TemplateResponse(request=request, name="gis_map.html", context={})
+    return templates.TemplateResponse(request=request, name="gis_map.html", context={"state_names": STATE_NAMES})
+
+def geography(
+    state: str = Query("", max_length=80),
+    county: str = Query("", max_length=100),
+    city: str = Query("", max_length=100),
+    zip_code: str = Query("", max_length=10),
+):
+    return GeoFilter.search({'state': state, 'county': county, 'city': city, 'zip_code': zip_code})
 
 @router.get("/summary")
 def gis_summary(
-    state: str = Query("", max_length=2),
-    county: str = Query("", max_length=100),
-    zip_code: str = Query("", max_length=10),
-    mode: str = Query("and", pattern="^(and|or)$"),
-    status: str = Query("", max_length=50),
+    geo: GeoFilter = Depends(geography),
     db: Session = Depends(get_db),
 ):
-    filters = []
-    if state.strip():
-        filters.append(Lead.state.ilike(state.strip()))
-    if county.strip():
-        filters.append(Lead.county.ilike(county.strip()))
-    if zip_code.strip():
-        filters.append(Lead.zip_code.like(zip_code.strip() + "%"))
-    stmt = select(Lead.zip_code, Lead.state, Lead.county, Lead.status)
-    if filters:
-        from sqlalchemy import and_, or_
-        stmt = stmt.where((and_ if mode == "and" else or_)(*filters))
-    if status.strip():
-        stmt = stmt.where(Lead.status.ilike(status.strip()))
-    rows = db.execute(stmt).all()
+    leads = _matching_leads(db, geo)
     groups = defaultdict(lambda: {"count": 0, "counties": set(), "statuses": defaultdict(int)})
-    for zipcode, state_value, county_value, status_value in rows:
-        zip5 = (zipcode or "").strip()[:5]
-        if len(zip5) != 5 or not zip5.isdigit():
+    for lead in leads:
+        zipcode = zip5(lead.zip_code)
+        if not zipcode:
             continue
-        key = ((state_value or "").strip().upper(), zip5)
+        key = (state_code(lead.state), zipcode)
         item = groups[key]
         item["count"] += 1
-        if county_value:
-            item["counties"].add(county_value.strip())
-        item["statuses"][status_value or "Unknown"] += 1
+        if lead.county:
+            item["counties"].add(lead.county.strip())
+        item["statuses"][lead.status or "Unknown"] += 1
     return {
-        "total": sum(x["count"] for x in groups.values()),
+        "total": len(leads),
+        "missing_zip": len(leads) - sum(x["count"] for x in groups.values()),
         "zip_count": len(groups),
         "locations": [
             {"state": s, "zip": z, "count": v["count"],
@@ -63,6 +56,7 @@ def gis_summary(
 # Coordinates are kept in a separate cache; the Lead schema and dispositions stay untouched.
 import hashlib
 import json
+import math
 import os
 import re
 from urllib.parse import urlencode
@@ -84,21 +78,8 @@ def _address(lead):
 def _fingerprint(lead):
     return hashlib.sha256(_address(lead).lower().encode("utf-8")).hexdigest()
 
-def _matching_leads(db, state, county, zip_code, mode, status):
-    filters = []
-    if state.strip():
-        filters.append(Lead.state.ilike(state.strip()))
-    if county.strip():
-        filters.append(Lead.county.ilike(county.strip()))
-    if zip_code.strip():
-        filters.append(Lead.zip_code.like(zip_code.strip() + "%"))
-    stmt = select(Lead)
-    if filters:
-        from sqlalchemy import and_, or_
-        stmt = stmt.where((and_ if mode == "and" else or_)(*filters))
-    if status.strip():
-        stmt = stmt.where(Lead.status.ilike(status.strip()))
-    return db.scalars(stmt.order_by(Lead.id)).all()
+def _matching_leads(db, geo):
+    return [lead for lead in db.scalars(select(Lead).order_by(Lead.id)).all() if geo.matches(lead)]
 
 def _geocode(lead, token):
     payload = urlencode({"SingleLine": _address(lead),
@@ -115,30 +96,28 @@ def _geocode(lead, token):
         return None
     attr = candidate.get("attributes") or {}
     score = float(candidate.get("score") or 0)
-    region = str(attr.get("Region") or "").upper()
+    region = state_code(attr.get("Region"))
     postal = str(attr.get("Postal") or "")[:5]
     expected_zip = str(lead.zip_code or "")[:5]
     match_type = str(attr.get("Addr_type") or "")
     location = candidate.get("location") or {}
     lat, lon = location.get("y"), location.get("x")
     if (score < 95 or match_type not in ("PointAddress", "StreetAddress")
-            or (lead.state and region not in ({str(lead.state).strip().upper()} | {"OREGON" if str(lead.state).strip().upper() == "OR" else str(lead.state).strip().upper()}))
+            or (lead.state and region != state_code(lead.state))
             or (expected_zip and postal != expected_zip)
-            or not isinstance(lat, (float, int)) or not isinstance(lon, (float, int))):
+            or not isinstance(lat, (float, int)) or not isinstance(lon, (float, int))
+            or not math.isfinite(lat) or not math.isfinite(lon)
+            or not -90 <= lat <= 90 or not -180 <= lon <= 180):
         return None
     return (float(lat), float(lon), score, match_type)
 
 @router.get("/points")
 def individual_points(
-    state: str = Query("", max_length=2),
-    county: str = Query("", max_length=100),
-    zip_code: str = Query("", max_length=10),
-    mode: str = Query("and", pattern="^(and|or)$"),
-    status: str = Query("", max_length=50),
+    geo: GeoFilter = Depends(geography),
     db: Session = Depends(get_db),
 ):
     _cache(db)
-    leads = _matching_leads(db, state, county, zip_code, mode, status)
+    leads = _matching_leads(db, geo)
     saved = {r[0]: r for r in db.execute(text(
         "SELECT lead_id, address_hash, latitude, longitude, result FROM gis_address_points")).all()}
     points = []
@@ -153,12 +132,14 @@ def individual_points(
         if row[4] != "matched":
             continue
         points.append({"id": lead.id, "lat": row[2], "lon": row[3],
-                       "status": lead.status or ""})
+                       "status": lead.status or "",
+                       "name": ' '.join(v for v in (lead.first_name, lead.last_name) if v).strip(),
+                       "address": _address(lead), "url": f'/leads/{lead.id}'})
     return {"points": points, "pending": pending, "total": len(leads),
             "unmapped": len(leads) - len(points)}
 
 @router.post("/geocode-batch")
-def geocode_batch(db: Session = Depends(get_db)):
+def geocode_batch(geo: GeoFilter = Depends(geography), db: Session = Depends(get_db)):
     token = os.getenv("ARCGIS_API_KEY", "")
     if not token:
         raise HTTPException(503, "ARCGIS_API_KEY is not configured")
@@ -166,7 +147,7 @@ def geocode_batch(db: Session = Depends(get_db)):
     saved = {r[0]: r[1] for r in db.execute(text(
         "SELECT lead_id, address_hash FROM gis_address_points")).all()}
     processed = matched = 0
-    for lead in db.scalars(select(Lead).order_by(Lead.id)).all():
+    for lead in _matching_leads(db, geo):
         if processed >= 20:
             break
         if not (lead.address and lead.city and lead.state):
