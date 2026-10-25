@@ -130,6 +130,11 @@ def show(request: Request, batch_id: str, db: Session = Depends(get_db)):
     if batch.state == 'done':
         return page(request, step='done', batch=batch, summary=payload['summary'])
     table = payload['table']
+    if batch.state == 'preview' and payload.get('preview'):
+        result = payload['preview']
+        return page(request, step='preview', batch=batch, result=result,
+                    esri_suggestions=payload.get('esri_suggestions', {}),
+                    esri_eligible_count=len(eligible_rows(result)))
     return page(request, step='mapping', batch=batch, table=table, mapping=payload.get('mapping', suggested_mapping(table['headers'])), mode=payload.get('mode', 'skip'))
 
 
@@ -155,7 +160,8 @@ async def preview(request: Request, batch_id: str, db: Session = Depends(get_db)
         db.rollback()
         return RedirectResponse('/imports/' + batch.id, status_code=303)
     db.commit()
-    return page(request, step='preview', batch=batch, result=result)
+    return page(request, step='preview', batch=batch, result=result,
+                esri_suggestions={}, esri_eligible_count=len(eligible_rows(result)))
 
 
 @router.post('/{batch_id}/esri-preview')
