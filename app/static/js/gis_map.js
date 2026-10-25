@@ -30,7 +30,9 @@
       if (!response.ok) return null;
       const data = await response.json();
       const places = data.places || [];
-      const place = places.find(p => (p['state abbreviation'] || '').toUpperCase() === state) || places[0];
+      const place = places.find(p => (p['state abbreviation'] || '').toUpperCase() === state);
+      // Never place an Oregon CRM record in another state based on a mismatched ZIP.
+      if (!place) return null;
       if (!place) return null;
       const coords = [Number(place.latitude), Number(place.longitude)];
       if (!coords.every(Number.isFinite)) return null;
@@ -82,5 +84,7 @@
     } catch (err) { message.textContent = 'Unable to load GIS data: ' + err.message; }
   }
   $('gis-form').addEventListener('submit', refresh);
+  $('gis-clear').addEventListener('click', () => { $('gis-form').reset(); refresh(); });
+  $('state').addEventListener('change', refresh);
   refresh();
 })();

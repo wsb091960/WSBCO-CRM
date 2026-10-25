@@ -16,12 +16,12 @@
 </div>
 <form id="gis-form" class="card p-3 mb-3">
 <div class="gis-controls">
-<label class="form-label">State <input id="state" class="form-control" maxlength="2" placeholder="OR" value="OR"></label>
+<label class="form-label">State <select id="state" class="form-select"><option value="">All states</option><option value="OR">Oregon (OR)</option><option value="WV">West Virginia (WV)</option><option value="CA">California (CA)</option><option value="TX">Texas (TX)</option><option value="WA">Washington (WA)</option></select></label>
 <label class="form-label">County <input id="county" class="form-control" placeholder="e.g. Douglas"></label>
 <label class="form-label">ZIP code <input id="zip_code" class="form-control" maxlength="10" placeholder="e.g. 97467"></label>
 <label class="form-label">Combine filters <select id="mode" class="form-select"><option value="and">AND — all conditions</option><option value="or">OR — any condition</option></select></label>
 <label class="form-label">Contact status <input id="status" class="form-control" placeholder="Optional"></label>
-<button class="btn btn-success" type="submit">Update Map</button>
+<button class="btn btn-success" type="submit">Update Map</button><button class="btn btn-outline-secondary" type="button" id="gis-clear">Clear filters</button>
 </div></form>
 <div class="row g-3 mb-3"><div class="col-sm-4"><div class="gis-stat"><small>Mapped contacts</small><div><strong id="total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>ZIP areas</small><div><strong id="zip-total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>Largest ZIP cluster</small><div><strong id="largest">—</strong></div></div></div></div>
 <div class="d-flex flex-wrap align-items-center gap-2 mb-2"><label class="fw-semibold" for="basemap-style">Map layer</label><select id="basemap-style" class="form-select w-auto" aria-label="Choose Esri map layer"><option value="streets">Streets</option><option value="navigation">Navigation / roads</option><option value="light">Light Gray</option><option value="satellite">Satellite</option></select></div>
@@ -30,5 +30,5 @@
 <p id="gis-message" class="text-muted" role="status"></p>
 </section>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/js/gis_map.js?v=5"></script>
+<script src="/static/js/gis_map.js?v=7"></script>
 {% endblock %}
