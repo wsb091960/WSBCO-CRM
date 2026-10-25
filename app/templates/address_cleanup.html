@@ -3,11 +3,11 @@
 {% block content %}
 <section class="container-fluid">
 <h1>Address Data Quality</h1>
-<p>Audit ZIP codes and counties, then preview Esri suggestions for up to 10 contacts. <strong>No contact data is changed.</strong></p>
+<p>Audit ZIP codes and counties, then preview Esri suggestions for up to 10 contacts. <strong>Preview does not change contact data. Approved county updates require a separate confirmation.</strong></p>
 <div class="row g-3 mb-3" id="stats"><div class="col">Loading audit…</div></div>
 <button class="btn btn-success" id="preview" type="button">Preview first 10 with Esri</button>
 <p class="text-muted mt-2">Each preview makes up to 10 geocoding requests and may incur Esri credits. High-confidence results still require review before a future write-back phase.</p>
-<p id="status" role="status"></p>
+<div class="mt-3 mb-3"><button class="btn btn-outline-warning" id="apply" type="button">Back up and update up to 10 missing counties</button><p class="text-muted">Only verified street-level Esri matches with matching state and ZIP will be applied. Existing counties are preserved. The server saves a SQLite backup first.</p></div><p id="status" role="status"></p>
 <div class="table-responsive"><table class="table table-striped"><thead><tr><th>Contact</th><th>Current state / ZIP / county</th><th>Esri state / ZIP / county</th><th>Score / type</th><th>Review</th></tr></thead><tbody id="results"></tbody></table></div>
 </section>
 <script>
@@ -16,6 +16,17 @@ const status=document.getElementById('status'), results=document.getElementById(
 const audit=await fetch('/address-cleanup/audit');
 if(audit.ok){const a=await audit.json();document.getElementById('stats').textContent='Total: '+a.total+' · Missing/invalid ZIP: '+a.missing_zip+' · Missing county: '+a.missing_county+' · Missing street: '+a.missing_street+' · Ready for geocoding: '+a.ready_for_geocoding;}
 else status.textContent='Audit unavailable: '+audit.status;
+document.getElementById('apply').onclick=async()=>{
+if(!confirm('Create a database backup, call Esri for up to 10 missing-county contacts, and save verified county values?'))return;
+status.textContent='Backing up database and checking Esri matches…';
+try {
+const r=await fetch('/address-cleanup/apply-first-10',{method:'POST'}),d=await r.json();
+if(!r.ok)throw Error(d.detail||r.status);
+status.textContent='Checked '+d.checked+'; updated '+d.updated.length+'; skipped '+d.skipped.length+'. Backup: '+d.backup_file;
+const a=await fetch('/address-cleanup/audit').then(r=>r.json());
+document.getElementById('stats').textContent='Total: '+a.total+' · Missing/invalid ZIP: '+a.missing_zip+' · Missing county: '+a.missing_county+' · Missing street: '+a.missing_street+' · Ready for geocoding: '+a.ready_for_geocoding;
+}catch(e){status.textContent='Update stopped: '+e.message;}
+};
 document.getElementById('preview').onclick=async()=>{
 status.textContent='Requesting up to 10 Esri matches…';results.replaceChildren();
 try{
