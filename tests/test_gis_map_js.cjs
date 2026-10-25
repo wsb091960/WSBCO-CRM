@@ -11,7 +11,7 @@ function run(provider, {leaflet=true}={}) {
   function node() {return {value:'',textContent:'',children:[],events:{},disabled:false,
     append(...items){this.children.push(...items);},addEventListener(name,fn){this.events[name]=fn;}};}
   for(const id of ['state','county','city','zip_code','gis-message','gis-map','gis-form','gis-clear',
-    'gis-call-list','total','zip-total','largest','geocode-next','basemap-style']) nodes.set(id,node());
+    'gis-call-list','total','zip-total','largest','basemap-style']) nodes.set(id,node());
   const map={setView(){return this;},fitBounds(){},removeLayer(){}};
   const L={map:()=>map,tileLayer:()=>({addTo(){return this;}}),
     layerGroup:()=>({addTo(){return this;},clearLayers(){markers.length=0;}}),
@@ -56,7 +56,6 @@ test('search and call links remain usable without Leaflet',async()=>{
   const r=run(provider,{leaflet:false});await tick();
   assert.equal(r.nodes.get('total').textContent,'2');
   assert.match(r.nodes.get('gis-message').textContent,/Map unavailable/);
-  assert.equal(r.nodes.get('geocode-next').disabled,true);
   r.nodes.get('city').value='Boston';r.nodes.get('city').events.input();
   assert.match(r.nodes.get('gis-call-list').href,/cities=Boston/);
 });
@@ -70,12 +69,4 @@ test('a slower previous search cannot replace the newest result',async()=>{
   resolvers[0](response(dataset()));resolvers[1](response(pins()));await tick();
   assert.equal(r.nodes.get('total').textContent,'0');
   assert.match(r.nodes.get('gis-message').textContent,/No contacts match/);
-});
-
-test('geocoding is scoped to the displayed search',async()=>{
-  const r=run(url=>response(url.startsWith('/gis/geocode-batch')?{processed:1,matched:1}:url.startsWith('/gis/summary')?dataset():pins()));
-  await tick();r.nodes.get('city').value='Reedsport';await r.submit();
-  await r.nodes.get('geocode-next').events.click();await tick();
-  const request=r.requests.find(x=>x.url.startsWith('/gis/geocode-batch'));
-  assert.equal(request.options.method,'POST');assert.match(request.url,/city=Reedsport/);
 });

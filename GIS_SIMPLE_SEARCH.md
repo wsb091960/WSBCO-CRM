@@ -15,7 +15,7 @@ Existing unfinished lists remain saved. Searching or clearing previews another a
 
 ## Maps and contact records
 
-The territory map retains the existing Esri street-address pins and map layers. Contact popups show name, address, status and an **Open contact** link within the CRM. Multiple contacts at the same location appear together. Geocoding processes up to 20 unmatched addresses in the selected area per click; it uses the existing server-side Esri configuration.
+The territory map retains the existing Esri street-address pins and map layers. Contact popups show name, address, status and an **Open contact** link within the CRM. Multiple contacts at the same location appear together. The page uses existing geocoded locations. The manual batch-geocoding button has been removed at William’s request.
 
 The call-list preview shows approximate ZIP centers and contact counts. It does not represent individual street locations. Contacts without a usable map location remain available for calling when otherwise eligible. Search, saved lists and call dispositions remain usable if map resources cannot load.
 

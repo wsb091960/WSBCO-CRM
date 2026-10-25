@@ -85,7 +85,6 @@
     if (addressLayer) addressLayer.clearLayers();
     for (const id of ['total', 'zip-total', 'largest']) $(id).textContent = '—';
     message.textContent = 'Loading matching contacts…';
-    $('geocode-next').disabled = true;
     try {
       const responses = await Promise.all(['/gis/summary?', '/gis/points?'].map(path =>
         fetch(path + lastQuery, {credentials: 'same-origin', signal: controller.signal, cache: 'no-store'})));
@@ -105,28 +104,12 @@
       message.textContent = !data.total ? 'No contacts match. Change a field or click Clear.' :
         data.total + ' matching contacts; ' + individual.points.length + ' mapped; ' + individual.unmapped + ' not yet mapped.' +
         (map ? '' : ' Map unavailable; search and calling still work.');
-      $('geocode-next').disabled = !map || !individual.pending;
     } catch (error) {
       if (current !== loadNumber || error.name === 'AbortError') return;
       message.textContent = 'Unable to search: ' + error.message;
     }
   }
 
-  $('geocode-next').addEventListener('click', async () => {
-    const button = $('geocode-next'), selectedQuery = lastQuery;
-    button.disabled = true;
-    message.textContent = 'Matching up to 20 addresses in this search…';
-    try {
-      const response = await fetch('/gis/geocode-batch?' + selectedQuery, {method: 'POST', credentials: 'same-origin'});
-      if (!response.ok) throw Error('Unable to match addresses (' + response.status + ')');
-      const result = await response.json();
-      await refresh();
-      if (selectedQuery === lastQuery && !result.processed) message.textContent += ' No additional addresses to process.';
-    } catch (error) {
-      if (selectedQuery === lastQuery) message.textContent = error.message;
-      button.disabled = false;
-    }
-  });
   $('gis-clear').addEventListener('click', () => {
     fields.forEach(id => {$(id).value = '';});
     refresh();

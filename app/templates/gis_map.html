@@ -26,11 +26,10 @@
 </div><small class="text-muted mt-2">Fill in any fields to narrow your search. Leave fields blank to include all locations.</small></form>
 <div class="row g-3 mb-3"><div class="col-sm-4"><div class="gis-stat"><small>Matching contacts</small><div><strong id="total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>ZIP areas</small><div><strong id="zip-total">—</strong></div></div></div><div class="col-sm-4"><div class="gis-stat"><small>Largest ZIP area</small><div><strong id="largest">—</strong></div></div></div></div>
 <div class="d-flex flex-wrap align-items-center gap-2 mb-2"><label class="fw-semibold" for="basemap-style">Map layer</label><select id="basemap-style" class="form-select w-auto" aria-label="Choose Esri map layer"><option value="streets">Streets</option><option value="navigation">Navigation / roads</option><option value="light">Light Gray</option><option value="satellite">Satellite</option></select></div>
-<div class="mb-2"><button id="geocode-next" type="button" class="btn btn-outline-success">Geocode next 20 matching addresses</button> <small class="text-muted">Esri usage may incur charges. Only street addresses are sent for matching.</small></div>
 <div id="gis-map" role="region" aria-label="Individual contact address map"></div>
 <p class="gis-legend mt-2">Each pin represents a geocoded street location. Open a pin to view the contact and their CRM record. Contacts at the same location appear together. Unmatched or missing addresses remain in your contact results.</p>
 <p id="gis-message" class="text-muted" role="status"></p>
 </section>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="/static/js/gis_map.js?v=8"></script>
+<script src="/static/js/gis_map.js?v=9"></script>
 {% endblock %}
