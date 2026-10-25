@@ -1,7 +1,7 @@
 """Tests for conservative Esri county verification; no external calls."""
 from urllib.parse import parse_qs
 
-from app.services.esri_import import enrich_preview, suggest_county
+from app.services.esri_import import enrich_preview, enrich_next_batch, eligible_rows, suggest_county
 
 
 def test_verified_county_when_street_state_and_zip_agree(monkeypatch):
@@ -79,3 +79,30 @@ def test_esri_different_full_state_name_is_rejected(monkeypatch):
     result = suggest_county(data, fake)
     assert result["status"] == "review"
     assert "state_mismatch" in result["reasons"]
+
+
+def test_resumable_batches_do_not_repeat_calls():
+    result = {"rows": [
+        {"row": i, "action": "create", "data": {"county": ""}}
+        for i in range(2, 27)
+    ]}
+    calls = []
+    def fake(data):
+        calls.append(1)
+        return {"status": "review", "county": ""}
+    first = enrich_next_batch(result, limit=10, lookup=fake)
+    second = enrich_next_batch(result, previous=first, limit=10, lookup=fake)
+    third = enrich_next_batch(result, previous=second, limit=10, lookup=fake)
+    fourth = enrich_next_batch(result, previous=third, limit=10, lookup=fake)
+    assert [len(first), len(second), len(third), len(fourth)] == [10, 20, 25, 25]
+    assert len(calls) == 25
+    assert len(eligible_rows(result)) == 25
+
+
+def test_batch_skips_existing_county_and_non_import_rows():
+    result = {"rows": [
+        {"row": 2, "action": "create", "data": {"county": "Lane"}},
+        {"row": 3, "action": "skip", "data": {"county": ""}},
+        {"row": 4, "action": "create", "data": {"county": ""}},
+    ]}
+    assert [row["row"] for row in eligible_rows(result)] == [4]
