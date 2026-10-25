@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Address Data Quality | WSBCO{% endblock %}
+{% block content %}
+<section class="container-fluid">
+<h1>Address Data Quality</h1>
+<p>Audit ZIP codes and counties, then preview Esri suggestions for up to 10 contacts. <strong>No contact data is changed.</strong></p>
+<div class="row g-3 mb-3" id="stats"><div class="col">Loading audit…</div></div>
+<button class="btn btn-success" id="preview" type="button">Preview first 10 with Esri</button>
+<p class="text-muted mt-2">Each preview makes up to 10 geocoding requests and may incur Esri credits. High-confidence results still require review before a future write-back phase.</p>
+<p id="status" role="status"></p>
+<div class="table-responsive"><table class="table table-striped"><thead><tr><th>Contact</th><th>Current state / ZIP / county</th><th>Esri state / ZIP / county</th><th>Score / type</th><th>Review</th></tr></thead><tbody id="results"></tbody></table></div>
+</section>
+<script>
+(async()=>{
+const status=document.getElementById('status'), results=document.getElementById('results');
+const audit=await fetch('/address-cleanup/audit');
+if(audit.ok){const a=await audit.json();document.getElementById('stats').textContent='Total: '+a.total+' · Missing/invalid ZIP: '+a.missing_zip+' · Missing county: '+a.missing_county+' · Missing street: '+a.missing_street+' · Ready for geocoding: '+a.ready_for_geocoding;}
+else status.textContent='Audit unavailable: '+audit.status;
+document.getElementById('preview').onclick=async()=>{
+status.textContent='Requesting up to 10 Esri matches…';results.replaceChildren();
+try{
+const r=await fetch('/address-cleanup/preview',{method:'POST'}), data=await r.json();
+if(!r.ok)throw Error(data.detail||r.status);
+for(const item of data.results){
+const tr=document.createElement('tr');
+const fields=[(item.name||'Contact')+' (#'+item.id+')',
+[item.existing.state,item.existing.zip,item.existing.county].join(' / '),
+[item.suggested.state,item.suggested.zip,item.suggested.county].join(' / '),
+item.score+' / '+item.match_type,item.error||item.review];
+for(const field of fields){const td=document.createElement('td');td.textContent=field;tr.append(td);}results.append(tr);
+}
+status.textContent=data.results.length+' contacts checked. No CRM records changed.';
+}catch(e){status.textContent='Preview error: '+e.message;}
+};
+})();
+</script>
+{% endblock %}
