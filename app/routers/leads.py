@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
@@ -8,7 +8,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import Lead
+from app.models import Lead, CallLog
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -72,7 +72,15 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
     leads = db.scalars(select(Lead)).all()
     total = len(leads)
     new_count = sum(1 for lead in leads if lead.status == "New")
-    follow_up_count = sum(1 for lead in leads if lead.next_follow_up is not None)
+    today = datetime.now().astimezone().date()
+    follow_up_count = sum(1 for lead in leads if lead.next_follow_up is not None and lead.next_follow_up <= today and lead.status not in ('Do Not Call', 'Not Interested', 'Sold', 'Wrong Number'))
+    # Calls are counted from saved call logs, never from contact import timestamps.
+    # Call timestamps are stored in UTC; local reporting day is based on server timezone.
+    local_now = datetime.now().astimezone()
+    start_local = datetime.combine(today, datetime.min.time(), tzinfo=local_now.tzinfo)
+    start_utc = start_local.astimezone(timezone.utc).replace(tzinfo=None)
+    end_utc = (start_local + timedelta(days=1)).astimezone(timezone.utc).replace(tzinfo=None)
+    calls_today = sum(1 for call in db.scalars(select(CallLog).where(CallLog.started_at >= start_utc, CallLog.started_at < end_utc)).all() if call.disposition or call.status not in ('creating', 'failed', 'canceled'))
     high_priority_count = sum(1 for lead in leads if lead.priority == "High")
 
     recent = db.scalars(
@@ -86,6 +94,7 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
             "total": total,
             "new_count": new_count,
             "follow_up_count": follow_up_count,
+            "calls_today": calls_today,
             "high_priority_count": high_priority_count,
             "recent": recent,
         },
