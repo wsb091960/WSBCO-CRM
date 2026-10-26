@@ -27,7 +27,7 @@ ELIGIBLE_STATUSES = ("New", "Attempt Again", "Callback", "Interested")
 async def _validate_twilio_request(request: Request) -> None:
     settings = get_settings()
     if not settings.validate_signatures:
-        return
+        raise HTTPException(status_code=503, detail="Signed callbacks must be enabled")
 
     signature = request.headers.get("X-Twilio-Signature", "")
     form = await request.form()

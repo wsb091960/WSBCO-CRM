@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#143b2e">
+  <title>Medicare Made Easy · William Burton</title>
+  <link rel="preload" as="image" href="/static/images/coastal-golf-entry.webp">
+  <link rel="stylesheet" href="/static/css/scenic_entry.css?v=1">
+</head>
+<body>
+  <main class="entry">
+    <div class="scenery" role="img" aria-label="A lush coastal golf course with evergreen trees, ocean views and a golf bag in the warm morning light."></div>
+    <div class="shade"></div>
+    <header class="masthead">
+      <a class="wordmark" href="/" aria-label="William Burton workspace home"><span class="monogram">W<span></span></span><span>WSBCO<small>WILLIAM BURTON</small></span></a>
+      <span class="private-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>PRIVATE WORKSPACE</span>
+    </header>
+    <div class="entry-layout">
+      <section class="welcome" aria-labelledby="welcome-title">
+        <div class="eyebrow"><span></span>RELATIONSHIPS THAT MATTER</div>
+        <h1 id="welcome-title">Medicare<br><em>Made Easy.</em></h1>
+        <p class="intro">Helping people feel confident<br>about the next step.</p>
+        <div class="disciplines"><span>MEDICARE GUIDANCE</span><i></i><span>GOLF INSTRUCTION</span></div>
+      </section>
+      <section class="sign-in" aria-labelledby="sign-in-title">
+        <div class="card-topline"></div>
+        <div class="lock-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z"/><path d="m8.5 11.5 2.5 2.5 4.5-5"/></svg></div>
+        {% if signed_in %}
+          <p class="card-eyebrow">YOUR DAY, MADE EASY</p>
+          <h2 id="sign-in-title">Welcome back,<br>William.</h2>
+          <p class="card-copy">Your contacts, golf inquiries and follow-ups are ready when you are.</p>
+          <a class="primary-button" href="{{ next_path or '/leads' }}">Open my contacts <span aria-hidden="true">→</span></a>
+          <div class="quick-links"><a href="/call-list">10-call list</a><a href="/calendar">Follow-ups</a><a href="/gis">Territory map</a></div>
+          <form method="post" action="/logout" class="signout"><button type="submit">Sign out securely</button></form>
+        {% else %}
+          <p class="card-eyebrow">GOOD TO SEE YOU</p>
+          <h2 id="sign-in-title">A fresh start.<br>A clear path.</h2>
+          <p class="card-copy">Sign in to manage your insurance relationships, golf inquiries and follow-ups.</p>
+          {% if login_error %}<p class="login-error" role="alert">{{ login_error }}</p>{% endif %}
+          <a class="primary-button google-button" href="/auth/google/start?next={{ (next_path or '/leads')|urlencode }}"><span class="google-g" aria-hidden="true">G</span>Continue with Google<span aria-hidden="true">→</span></a>
+          <p class="privacy-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Owner access only. Your workspace stays private.</p>
+        {% endif %}
+        <div class="card-footer"><span class="tiny-line"></span><span>BUILT AROUND PEOPLE.</span></div>
+      </section>
+    </div>
+    <footer class="entry-footer"><span>Turning 65 Medicare Made Easy</span><span>Thoughtful guidance. On and off the course.</span></footer>
+  </main>
+</body>
+</html>
