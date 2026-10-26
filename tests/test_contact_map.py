@@ -38,13 +38,9 @@ def map_link(page):
     match = re.search(r'<a class="contact-map-button" href="([^"]+)"([^>]+)>', page)
     assert match, 'Expected enabled Map It link'
     url = urlparse(unescape(match[1]))
-    assert (url.scheme, url.netloc, url.path) == ('https', 'www.arcgis.com', '/apps/mapviewer/index.html')
+    assert (url.scheme, url.netloc, url.path) == ('https', 'www.google.com', '/maps/search/')
     assert 'target="_blank"' in match[2] and 'rel="noopener noreferrer"' in match[2]
-    assert 'opens Esri ArcGIS Map Viewer in a new tab' in match[2]
-    parameters = parse_qs(url.query)
-    assert parameters.pop('basemapUrl') == ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer']
-    assert parameters.pop('mapOnly') == ['true']
-    return parameters
+    return parse_qs(url.query)
 
 
 def point(db, lead, lat=43.2, lon=-123.3, result='matched', address_hash=None):
@@ -60,7 +56,7 @@ def test_address_fallback_is_read_only_without_creating_cache(setup):
     client, db, lead = setup
     page = client.get(f'/leads/{lead.id}')
     assert page.status_code == 200
-    assert map_link(page.text) == {'find': ['123 Example Street, Roseburg, OR, 97470']}
+    assert map_link(page.text) == {'api': ['1'], 'query': ['123 Example Street, Roseburg, OR, 97470']}
     assert not inspect(db.connection()).has_table('gis_address_points')
     assert lead.notes == 'Keep my notes' and lead.status == 'Interested' and lead.call_attempts == 0
     assert db.scalar(select(CallLog.id)) is None
@@ -71,7 +67,7 @@ def test_matched_current_coordinates_are_preferred_without_contact_identity(setu
     client, db, lead = setup
     point(db, lead)
     query = map_link(client.get(f'/leads/{lead.id}').text)
-    assert query == {'center': ['-123.3,43.2'], 'level': ['16'], 'marker': ['-123.3,43.2,4326']}
+    assert query == {'api': ['1'], 'query': ['43.2,-123.3']}
 
 
 @pytest.mark.parametrize('change', [
@@ -81,7 +77,7 @@ def test_matched_current_coordinates_are_preferred_without_contact_identity(setu
 def test_stale_unmatched_and_invalid_points_fall_back_to_current_address(setup, change):
     client, db, lead = setup
     point(db, lead, **change)
-    assert map_link(client.get(f'/leads/{lead.id}').text)['find'] == ['123 Example Street, Roseburg, OR, 97470']
+    assert map_link(client.get(f'/leads/{lead.id}').text)['query'] == ['123 Example Street, Roseburg, OR, 97470']
 
 
 def test_address_change_cannot_reuse_old_pin(setup):
@@ -89,7 +85,7 @@ def test_address_change_cannot_reuse_old_pin(setup):
     point(db, lead)
     lead.address = '987 Other Street'
     db.commit()
-    assert map_link(client.get(f'/leads/{lead.id}').text)['find'][0].startswith('987 Other Street,')
+    assert map_link(client.get(f'/leads/{lead.id}').text)['query'][0].startswith('987 Other Street,')
 
 
 @pytest.mark.parametrize('address,city,state,zipcode', [
@@ -114,7 +110,7 @@ def test_special_characters_and_street_plus_zip_are_encoded_as_one_query(setup):
     lead.zip_code = '97470-1234'
     db.commit()
     assert map_link(client.get(f'/leads/{lead.id}').text) == {
-        'find': ['123 A&B Street #4?query=elsewhere, 97470-1234']}
+        'api': ['1'], 'query': ['123 A&B Street #4?query=elsewhere, 97470-1234']}
 
 
 def test_invalid_manual_call_preserves_notes_and_map_link(setup):
@@ -122,4 +118,4 @@ def test_invalid_manual_call_preserves_notes_and_map_link(setup):
     page = client.post(f'/leads/{lead.id}/manual-call', data={
         'outcome': 'Invalid', 'submission_token': 'invalid', 'notes': 'Unsaved draft'})
     assert page.status_code == 400 and 'Unsaved draft' in page.text
-    assert map_link(page.text)['find'][0].startswith('123 Example Street,')
+    assert map_link(page.text)['query'][0].startswith('123 Example Street,')

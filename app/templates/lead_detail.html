@@ -20,7 +20,7 @@
 {% for label,val in [('Phone',lead.phone),('Mobile',lead.mobile),('Email',lead.email)] %}<div class="field"><label>{{label}}</label><b>{{val or '—'}}</b></div>{% endfor %}
 <div class="field contact-map-field">
   <div class="contact-map-address"><label>Address</label><b>{{lead.address or '—'}}</b><b>{{lead.city or ''}}{{', ' if lead.city and lead.state else ''}}{{lead.state or ''}}{{' ' if lead.zip_code else ''}}{{lead.zip_code or ''}}</b></div>
-  {% if contact_map_url %}<a class="contact-map-button" href="{{contact_map_url}}" target="_blank" rel="noopener noreferrer" aria-label="Map It — opens Esri ArcGIS Map Viewer in a new tab"><i class="bi bi-geo-alt" aria-hidden="true"></i> Map It <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
+  {% if contact_map_url %}<a class="contact-map-button" href="{{contact_map_url}}" target="_blank" rel="noopener noreferrer" aria-label="Map It — opens Google Maps in a new tab"><i class="bi bi-geo-alt" aria-hidden="true"></i> Map It <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
   {% else %}<button class="contact-map-button" type="button" disabled aria-describedby="contact-map-help">Map It</button><small id="contact-map-help" class="contact-map-help">Add an address to map this contact.</small>{% endif %}
 </div>
 <div class="field"><label>County</label><b>{{lead.county or '—'}}</b></div>
