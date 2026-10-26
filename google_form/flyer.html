@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WSBCO Golf Lesson Flyer</title><style>
+body{font-family:Arial,sans-serif;background:#e9e8df;margin:0;padding:25px;color:#173d2d}
+.flyer{background:#fff;width:8.5in;min-height:11in;margin:auto;box-sizing:border-box;padding:.7in;text-align:center;border:12px solid #173d2d}
+.brand{font-size:18px;letter-spacing:3px;color:#a57c2b;font-weight:bold}.hero{font-size:49px;line-height:1.1;margin:45px 0 12px}
+.gold{color:#ae842d}.sub{font-size:22px;line-height:1.5}.rule{height:5px;background:#d2ab52;margin:30px auto;width:55%}
+#qr{width:250px;height:250px;display:block;margin:25px auto;border:10px solid #fff;box-shadow:0 0 0 2px #173d2d}
+.cta{font-size:25px;font-weight:bold}.footer{margin-top:36px;font-size:18px}.notice{font-size:12px;color:#555}
+@media print{body{padding:0;background:white}.flyer{margin:0;min-height:10.9in}#config{display:none}}
+</style></head><body><div id="config" style="max-width:8.5in;margin:0 auto 15px">Paste your published Google Form URL:
+<input id="formUrl" style="width:65%" placeholder="https://docs.google.com/forms/d/e/.../viewform"><button onclick="makeQR()">Generate QR</button><button onclick="window.print()">Print flyer</button></div>
+<div class="flyer"><div class="brand">WSBCO GOLF INSTRUCTION</div><h1 class="hero">TAKE YOUR GOLF GAME<br><span class="gold">TO THE NEXT LEVEL</span></h1><p class="sub">Personalized golf lessons • Group instruction<br>Clinics • PGA Jr. League</p><div class="rule"></div><p class="cta">SCAN TO REQUEST A GOLF LESSON</p><img id="qr" alt="QR code will appear after entering your Google Form URL"><p class="sub">Tell us what you want to improve.<br>We'll contact you about the next step.</p><div class="footer">All skill levels welcome</div><p class="notice">QR code links to a Google Form. Do not distribute until you have tested it.</p></div>
+<script>
+function makeQR(){const u=document.getElementById('formUrl').value.trim();
+if(!/^https:\/\/docs\.google\.com\/forms\//.test(u)){alert('Enter the published Google Form URL.');return}
+document.getElementById('qr').src='https://quickchart.io/qr?size=500&margin=2&text='+encodeURIComponent(u)}
+</script></body></html>
