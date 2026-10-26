@@ -1,3 +1,4 @@
+from app.golf_integration import router as golf_integration_router
 from app.address_cleanup import router as address_cleanup_router
 from app.gis_map import router as gis_router
 from app.call_list_v1 import router as call_list_router
@@ -58,3 +59,5 @@ app.include_router(call_list_router)
 app.include_router(gis_router)
 
 app.include_router(address_cleanup_router)
+
+app.include_router(golf_integration_router)
