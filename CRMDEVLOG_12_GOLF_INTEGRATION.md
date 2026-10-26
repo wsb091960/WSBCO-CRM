@@ -20,3 +20,12 @@ Connect the existing published Reedsport Golf Course lesson request Form to WSBC
 - 3 script tests: published-field mapping, failed-save retry/no success email, email retry without a second contact.
 - Manual calling and Google Maps regressions: 30 tests passed.
 - Deployment and Google authorization must be verified before marking the live connection complete.
+
+## Live activation — October 25, 2026, 8:17 PM PDT
+- PR #14 merged to main (`ce5fcf9bd163becca37a216e11fdced68edddca2`) and deployed live on Render. `/health` returned 200; intake without the private key returned 403.
+- Google authorization approved; form-submit and five-minute recovery triggers installed successfully.
+- Published Form submission created clearly labeled `CRM Connection Test` contact #736. Optional email was omitted; goals and experience appeared in CRM notes.
+- Detailed success alert delivered to williamsburton@gmail.com, including a direct link to contact #736.
+- The original Google Forms response notification remains enabled. Automatic approval review prevented disabling it, so both the generic Form notification and detailed post-save CRM alert may arrive.
+- Flyer QR replacement and Golf workspace/Coach conversion are separate follow-up work.
+- Manual recovery check completed successfully with no pending deliveries. The synthetic contact is marked Do Not Call to exclude it from calling workflows; no call was placed or logged.
