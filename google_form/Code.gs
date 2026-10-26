@@ -64,7 +64,7 @@ function onGolfFormSubmit(e) {
   // A confirmed CRM creation is the trigger; do not send an alert for failed saves.
   const saved = JSON.parse(result.getContentText());
   if (!saved.crm_contact_id) throw new Error('CRM did not confirm a contact ID');
-  const recipient = props.getProperty('GOLF_ALERT_EMAIL');
+  const recipient = props.getProperty('GOLF_ALERT_EMAIL') || 'williamsburton@gmail.com';
   if (!recipient) {
     console.warn('Lead created, but GOLF_ALERT_EMAIL is not configured.');
     return;
