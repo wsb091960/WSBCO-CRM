@@ -31,10 +31,15 @@ def contact_map_url(db, lead):
                 if (math.isfinite(lat) and math.isfinite(lon)
                         and -90 <= lat <= 90 and -180 <= lon <= 180
                         and (lat != 0 or lon != 0)):
-                    destination = f"{lat},{lon}"
+                    # ArcGIS uses x,y (longitude,latitude), unlike our GIS cache.
+                    destination = f"{lon},{lat}"
             except (TypeError, ValueError):
                 pass
 
+    parameters = {
+        "basemapUrl": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer",
+        "mapOnly": "true",
+    }
     if destination is None:
         street, city, state, zipcode = (
             _part(getattr(lead, name, ""))
@@ -42,6 +47,9 @@ def contact_map_url(db, lead):
         )
         if not street or not ((city and state) or re.fullmatch(r"\d{5}(?:-\d{4})?", zipcode)):
             return None
-        destination = ", ".join(part for part in (street, city, state, zipcode) if part)
+        parameters["find"] = ", ".join(part for part in (street, city, state, zipcode) if part)
+    else:
+        parameters.update({"center": destination, "level": "16",
+                           "marker": destination + ",4326"})
 
-    return "https://www.google.com/maps/search/?" + urlencode({"api": "1", "query": destination})
+    return "https://www.arcgis.com/apps/mapviewer/index.html?" + urlencode(parameters)
