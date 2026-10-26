@@ -71,35 +71,13 @@ def _lead_from_form(form) -> dict:
 
 
 @router.get("/")
-def dashboard(request: Request, db: Session = Depends(get_db)):
-    leads = db.scalars(select(Lead)).all()
-    total = len(leads)
-    new_count = sum(1 for lead in leads if lead.status == "New")
-    today = datetime.now().astimezone().date()
-    follow_up_count = sum(1 for lead in leads if lead.next_follow_up is not None and lead.next_follow_up <= today and lead.status not in ('Do Not Call', 'Not Interested', 'Sold', 'Wrong Number'))
-    # Calls are counted from saved call logs, never from contact import timestamps.
-    # Call timestamps are stored in UTC; local reporting day is based on server timezone.
-    local_now = datetime.now().astimezone()
-    start_local = datetime.combine(today, datetime.min.time(), tzinfo=local_now.tzinfo)
-    start_utc = start_local.astimezone(timezone.utc).replace(tzinfo=None)
-    end_utc = (start_local + timedelta(days=1)).astimezone(timezone.utc).replace(tzinfo=None)
-    calls_today = sum(1 for call in db.scalars(select(CallLog).where(CallLog.started_at >= start_utc, CallLog.started_at < end_utc)).all() if call.disposition or call.status not in ('creating', 'failed', 'canceled'))
-    high_priority_count = sum(1 for lead in leads if lead.priority == "High")
-
-    recent = db.scalars(
-        select(Lead).order_by(Lead.updated.desc()).limit(8)
-    ).all()
-
+def dashboard(request: Request):
     return templates.TemplateResponse(
         request=request,
-        name="dashboard_v2.html",
+        name="scenic_entry.html",
         context={
-            "total": total,
-            "new_count": new_count,
-            "follow_up_count": follow_up_count,
-            "calls_today": calls_today,
-            "high_priority_count": high_priority_count,
-            "recent": recent,
+            "signed_in": bool(getattr(request.state, "crm_owner", None)),
+            "next_path": "/leads", "login_error": "",
         },
     )
 

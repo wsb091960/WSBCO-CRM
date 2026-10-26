@@ -8,6 +8,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from app.auth import router as auth_router, OwnerAuthMiddleware
 
 from app.database import Base, engine
 from app.routers.calls import router as calls_router
@@ -63,3 +64,5 @@ app.include_router(gis_router)
 app.include_router(address_cleanup_router)
 
 app.include_router(golf_integration_router)
+app.include_router(auth_router)
+app.add_middleware(OwnerAuthMiddleware)
