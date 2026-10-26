@@ -183,6 +183,14 @@ def test_authenticated_mutations_require_same_origin(setup):
     assert client.post('/protected-change', headers={'Origin':ORIGIN}).status_code == 200
     for headers in ({}, {'Origin':'https://attacker.example'}, {'Origin':'null'}):
         assert client.post('/protected-change', headers=headers).status_code == 403
+    for origin in ('', 'null'):
+        headers = {'Sec-Fetch-Site':'same-origin'}
+        if origin:
+            headers['Origin'] = origin
+        assert client.post('/protected-change', headers=headers).status_code == 200
+    for site in ('same-site', 'cross-site', 'none'):
+        assert client.post('/protected-change', headers={'Origin':'null','Sec-Fetch-Site':site}).status_code == 403
+    assert client.post('/protected-change', headers={'Origin':'https://attacker.example','Sec-Fetch-Site':'same-origin'}).status_code == 403
 
 
 @pytest.mark.parametrize('value', ['//attacker.example', 'https://attacker.example', '/\\attacker', '/auth/google/start', '/logout', '/login', '/x\n'])

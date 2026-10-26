@@ -106,6 +106,16 @@ def service_endpoint(path, method):
     return False
 
 
+def same_origin_mutation(request):
+    origin = request.headers.get('origin', '')
+    if origin == public_origin():
+        return True
+    # A privacy-preserving Referrer-Policy can suppress Origin on a genuine
+    # same-origin navigation POST. Sec-Fetch-Site is set by the browser and
+    # cannot be supplied by cross-site page scripts. Never accept same-site.
+    return origin in {'', 'null'} and request.headers.get('sec-fetch-site') == 'same-origin'
+
+
 class OwnerAuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         request.state.crm_owner = None
@@ -123,7 +133,7 @@ class OwnerAuthMiddleware(BaseHTTPMiddleware):
             else:
                 response = JSONResponse({'detail': 'Sign in to your private workspace.'}, status_code=401)
         elif (not public and request.method not in {'GET', 'HEAD', 'OPTIONS'}
-              and request.headers.get('origin', '') != public_origin()):
+              and not same_origin_mutation(request)):
             response = JSONResponse({'detail': 'Please submit changes from your CRM workspace.'}, status_code=403)
         else:
             response = await call_next(request)
