@@ -1,7 +1,7 @@
 /**
  * WSBCO Golf Lesson Inquiry: run setupGolfLeadForm() ONCE in script.google.com.
  * The script creates a Google Form and spreadsheet, then installs a submission trigger.
- * Set Script Properties CRM_GOLF_FORM_KEY and CRM_GOLF_ENDPOINT before accepting submissions.
+ * Set Script Properties CRM_GOLF_FORM_KEY, CRM_GOLF_ENDPOINT and GOLF_ALERT_EMAIL.
  * Example endpoint: https://wsbco-crm.onrender.com/golf/inquiries
  */
 function setupGolfLeadForm() {
@@ -60,5 +60,33 @@ function onGolfFormSubmit(e) {
   });
   if (result.getResponseCode() < 200 || result.getResponseCode() >= 300) {
     throw new Error('CRM submission failed: HTTP ' + result.getResponseCode());
+  }
+  // A confirmed CRM creation is the trigger; do not send an alert for failed saves.
+  const saved = JSON.parse(result.getContentText());
+  if (!saved.crm_contact_id) throw new Error('CRM did not confirm a contact ID');
+  const recipient = props.getProperty('GOLF_ALERT_EMAIL');
+  if (!recipient) {
+    console.warn('Lead created, but GOLF_ALERT_EMAIL is not configured.');
+    return;
+  }
+  const name = payload.first_name + ' ' + payload.last_name;
+  const subject = 'New Reedsport Golf Course lesson lead: ' + name;
+  const body = [
+    'A new golf lesson inquiry was saved in WSBCO CRM.',
+    '',
+    'CRM contact ID: ' + saved.crm_contact_id,
+    'Name: ' + name,
+    'Phone: ' + payload.phone,
+    'Email: ' + (payload.email || 'Not provided'),
+    'Program: ' + payload.program,
+    'Golf goal: ' + (payload.goal || 'Not provided'),
+    '',
+    'Open WSBCO CRM to follow up with this golfer.'
+  ].join('\\n');
+  try {
+    MailApp.sendEmail({to: recipient, subject: subject, body: body});
+  } catch (err) {
+    // The lead has already been saved. Log the email failure for review.
+    console.error('CRM lead ' + saved.crm_contact_id + ' saved; email alert failed: ' + err);
   }
 }
