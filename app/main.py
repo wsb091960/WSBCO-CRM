@@ -40,6 +40,8 @@ app.include_router(plan_compare_v36_router)
 
 @app.on_event("startup")
 def create_database_tables() -> None:
+    from app.services.golf_intake_backup import backup_before_golf_intake
+    backup_before_golf_intake(engine)
     Base.metadata.create_all(bind=engine)
 
 

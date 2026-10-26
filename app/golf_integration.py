@@ -2,13 +2,15 @@
 import os
 import secrets
 import json
+import re
 from datetime import datetime
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import Column, DateTime, Integer, String, Text
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import Base, get_db
@@ -29,12 +31,46 @@ class GolfProfile(Base):
 
 
 class Inquiry(BaseModel):
+    submission_id: str = Field(min_length=1, max_length=200)
     first_name: str = Field(min_length=1, max_length=80)
-    last_name: str = Field(min_length=1, max_length=80)
+    last_name: str = Field(default="", max_length=80)
     email: str = Field(default="", max_length=255)
     phone: str = Field(default="", max_length=32)
     program: str = Field(default="Individual lesson", max_length=100)
     goal: str = Field(default="", max_length=2000)
+    experience: str = Field(default="", max_length=100)
+    preferred_contact: str = Field(default="", max_length=100)
+
+    @field_validator("submission_id", "first_name", "last_name", "email", "phone", "program", "goal", "experience", "preferred_contact", mode="before")
+    @classmethod
+    def trim_text(cls, value):
+        return value.strip() if isinstance(value, str) else value
+
+    @field_validator("phone")
+    @classmethod
+    def valid_phone(cls, value):
+        if not 10 <= len(re.sub(r"\D", "", value)) <= 15:
+            raise ValueError("A valid phone number is required")
+        return value
+
+    @field_validator("email")
+    @classmethod
+    def valid_email(cls, value):
+        if value:
+            from email_validator import validate_email, EmailNotValidError
+            try:
+                return validate_email(value, check_deliverability=False).normalized
+            except EmailNotValidError as exc:
+                raise ValueError("Invalid email address") from exc
+        return value
+
+
+class GolfInquiryReceipt(Base):
+    """One immutable receipt per Google Form response, including retry deliveries."""
+    __tablename__ = "golf_inquiry_receipts"
+    submission_id = Column(String(200), primary_key=True)
+    lead_id = Column(Integer, nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 def require_key(value: str | None, expected_env: str):
@@ -48,15 +84,33 @@ def create_inquiry(payload: Inquiry, x_golf_form_key: str | None = Header(defaul
                    db: Session = Depends(get_db)):
     """Server-side Google Apps Script webhook; do not embed secret in public form."""
     require_key(x_golf_form_key, "GOLF_FORM_WEBHOOK_KEY")
+    previous = db.get(GolfInquiryReceipt, payload.submission_id)
+    if previous:
+        return {"crm_contact_id": previous.lead_id, "golf_stage": "Inquiry", "already_saved": True}
+    notes = "\n".join([
+        "Golf lesson inquiry — Reedsport Golf Course",
+        "Program: " + payload.program,
+        "Experience: " + (payload.experience or "Not provided"),
+        "Preferred contact: " + (payload.preferred_contact or "Not provided"),
+        "Golf goals: " + (payload.goal or "Not provided"),
+    ])
     lead = Lead(first_name=payload.first_name.strip(), last_name=payload.last_name.strip(),
                 email=payload.email.strip(), phone=payload.phone.strip(),
-                lead_source="Golf lesson form", status="New", notes="")
+                lead_source="Reedsport Golf lesson form", status="New", notes=notes)
     db.add(lead)
     db.flush()
     db.add(GolfProfile(lead_id=lead.id, program=payload.program.strip(),
                        goal=payload.goal.strip()))
-    db.commit()
-    return {"crm_contact_id": lead.id, "golf_stage": "Inquiry"}
+    db.add(GolfInquiryReceipt(submission_id=payload.submission_id, lead_id=lead.id))
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        previous = db.get(GolfInquiryReceipt, payload.submission_id)
+        if not previous:
+            raise
+        return {"crm_contact_id": previous.lead_id, "golf_stage": "Inquiry", "already_saved": True}
+    return {"crm_contact_id": lead.id, "golf_stage": "Inquiry", "already_saved": False}
 
 
 @router.get("/contacts")

@@ -1,45 +1,22 @@
-# CRMDevLog #12 — Golf CRM integration (development branch)
+# CRMDevLog #12 — Reedsport Golf Form intake
 
-## What is implemented
-- CRM `POST /golf/inquiries`: authenticated server-to-server intake; creates a CRM lead and a separate golf profile.
-- CRM `GET /golf/contacts`: authenticated list of golf-only contacts.
-- CRM `POST /golf/contacts/{lead_id}/convert`: explicit conversion to Golf Coach.
-- Golf Coach `POST /integrations/crm/students`: authenticated, idempotent student creation with persistent CRM contact ID link.
-- No changes to existing Lead or Student table columns; new tables created through existing SQLAlchemy startup.
-- No automatic synchronization of insurance data or lesson/session records.
+## Scope
+Connect the existing published Reedsport Golf Course lesson request Form to WSBCO CRM. Student conversion and Golf Coach changes are outside this release.
 
-## Render environment variables
-CRM:
-- `GOLF_FORM_WEBHOOK_KEY`: random secret for trusted form relay (never put in browser code)
-- `GOLF_ADMIN_API_KEY`: separate random secret for golf contact listing/conversion
-- `GOLF_COACH_API_URL`: HTTPS origin for Golf Coach (example: https://wsbco-golf-coach.onrender.com)
-- `GOLF_COACH_SYNC_KEY`: same strong random secret configured on Golf Coach
+- Form ID: `1cx-a4BpzNNYhpGQMA2TNIaL1NKygHST51UiY9RfAAkw`
+- Apps Script project: `1E1B4Th2nJZJvDtElpphb-lkBqyqvhrrM4Jf0rGD-xsYA7nydn_tRwNSb`
+- Webhook: `POST /golf/inquiries`, authenticated with `X-Golf-Form-Key`.
+- Private configuration: Render `GOLF_FORM_WEBHOOK_KEY` must match Script Property `CRM_GOLF_FORM_KEY`. Never commit either value.
+- `google_form/Code.gs` binds to the existing form. `setupGolfLeadForm()` installs one form-submit trigger and one five-minute recovery trigger.
+- Form answers map to name, phone, optional email, experience, goals and contact preference. Details are visible in CRM contact notes, with lead source `Reedsport Golf lesson form` and a separate `GolfProfile`.
+- One immutable `GolfInquiryReceipt` per response prevents retry deliveries from duplicating contacts. Independent inquiries are never merged by name alone.
+- Response rows remain in the linked Google Sheet. Pending transfers are retried. Email alerts go to williamsburton@gmail.com only after the CRM confirms a contact ID, with a direct contact link.
+- A successful email is marked sent. If an email provider accepts a message but then returns an ambiguous error, a retry could still duplicate that email; contact creation remains idempotent.
+- Before creating the additive schema, an existing SQLite database is backed up under its persistent `backups/` directory. Existing Lead columns are not altered.
+- Existing protected golf listing and explicit conversion endpoints remain disabled unless their separate environment variables are configured.
 
-Golf Coach:
-- `GOLF_COACH_SYNC_KEY`: matching shared secret
-
-**Never commit secret values.** Do not configure these on production until tested on staging.
-
-## Google Form relay
-Create a Google Form with first name, last name, phone, email, lesson program, and golf goal.
-Link responses to a Google Sheet and install a Google Apps Script *installable on-form-submit trigger*.
-The trigger should read the response, then POST JSON to `/golf/inquiries` with the
-`X-Golf-Form-Key` header. Store the secret in Apps Script Properties, not the Form or Sheet.
-Point the QR code at the public Google Form responder URL, not the CRM webhook.
-A form URL is required before the QR code can be generated.
-
-## Review and test before merging
-1. Back up both SQLite databases and verify Render persistent disks.
-2. Start each app on staging; confirm new tables `golf_profiles` and `crm_student_links`.
-3. Verify missing/invalid secrets return HTTP 403.
-4. Submit a test inquiry; confirm a new CRM lead and golf profile.
-5. Convert once; confirm student and link. Convert twice; confirm same student ID.
-6. Confirm insurance contacts are unchanged and Golf Coach sessions remain intact.
-7. Review duplicate-name/email handling (no automatic merging), youth/guardian consent,
-   contact permissions, rate limiting, and logging before opening the public form.
-
-## Current limitations
-- API-first implementation: Golf workspace navigation, buttons, Google Form, flyer and QR code are **not** built yet.
-- No background retries or cross-system transaction guarantees.
-- No automatic matching of existing students; manual reconciliation is needed.
-- No tests executed or production deployment performed.
+## Validation
+- 11 intake/backup tests: authentication, validation, optional email/single name, receipt idempotency, preserving insurance records and database backup.
+- 3 script tests: published-field mapping, failed-save retry/no success email, email retry without a second contact.
+- Manual calling and Google Maps regressions: 30 tests passed.
+- Deployment and Google authorization must be verified before marking the live connection complete.
