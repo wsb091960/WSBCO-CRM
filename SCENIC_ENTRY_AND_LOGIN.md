@@ -23,3 +23,10 @@ Replace the old two-number dashboard with a full-screen coastal golf graphic, Me
 72 Python checks passed, covering access control, forged/expired/replayed assertions and sessions, cookie attributes, CSRF, safe return paths, rate limiting, public Form intake and website preflight, plus existing manual calling, map links, intake idempotency and backups. Six Node checks passed for owner identity, assertion signing/POST transport and the existing Form relay.
 
 Deployment, actual Google sign-in, sign-out and the rendered desktop/mobile presentation must be verified before marking this release complete.
+
+
+## Golf Coach owner sign-in
+- The existing private Google Apps Script bridge now supports `app=golf` while preserving the CRM's default sign-in.
+- Golf Coach uses the same exact verified owner account but a separate private Script Property, `GOLF_GOOGLE_SIGNING_KEY`, and its own audience and HTTPS POST callback at `https://www.busterball.com/auth/google/complete`.
+- Add the same random key to the Golf-Coach Render service as `GOLF_GOOGLE_SIGNING_KEY`; set `GOLF_GOOGLE_LOGIN_URL` to this deployment's `/exec` URL and `GOLF_PUBLIC_URL` to `https://www.busterball.com`.
+- Deploy this Apps Script version after setting the new property. Existing CRM keys and callbacks remain unchanged.
