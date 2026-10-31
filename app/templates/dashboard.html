@@ -59,7 +59,7 @@
             <strong>{{ lead.first_name }} {{ lead.last_name }}</strong>
             <small>{{ lead.city }}{% if lead.state %}, {{ lead.state }}{% endif %}</small>
           </td>
-          <td>{{ lead.phone or lead.mobile or "—" }}</td>
+          <td>{{ phone_display(lead.phone or lead.mobile) or "—" }}</td>
           <td><span class="badge">{{ lead.status }}</span></td>
           <td>{{ lead.priority }}</td>
           <td>{{ lead.next_follow_up or "—" }}</td>

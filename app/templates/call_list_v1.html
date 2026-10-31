@@ -74,7 +74,7 @@
     <tbody>
     {% for row in rows %}{% set c=row.lead %}{% set item=row.item %}
     <tr><td>{{loop.index}}</td><td>{% if c %}<a href="/leads/{{c.id}}">{{c.first_name}} {{c.last_name}}</a><small class="d-block text-muted">{{c.status}}</small><small class="d-block">{{c.city}}{% if c.county %} · {{c.county}} County{% endif %} · {{c.state}} {{c.zip_code}}</small>{% else %}Contact unavailable{% endif %}</td>
-    <td>{% if c %}<strong class="geo-phone">{{usable_phone(c)}}</strong>{% endif %}</td>
+    <td>{% if c %}<strong class="geo-phone">{{phone_display(usable_phone(c))}}</strong>{% endif %}</td>
     <td>{% if c %}{{c.priority or 'Normal'}}<small class="d-block">{{row.reason}}</small><small class="d-block">Due: {{c.next_follow_up or 'Not scheduled'}}</small><small class="d-block">Last call: {{c.last_contact.strftime('%Y-%m-%d') if c.last_contact else 'Never'}}</small>{% endif %}</td>
     <td>{% if item.completed_at %}<span class="badge bg-success">{{'Skipped — no call logged' if item.outcome == 'Skipped' else 'Completed · ' ~ item.outcome}}</span>
       <small class="d-block text-muted">{{item.completed_at.strftime('%Y-%m-%d %H:%M')}} UTC</small>

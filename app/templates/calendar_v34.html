@@ -16,7 +16,7 @@
 {% if items %}
 <div class="table-wrap"><table><thead><tr><th>CONTACT</th><th>FOLLOW-UP</th><th>TYPE</th><th>STATUS</th><th>PRIORITY</th><th>MEDICARE</th><th>ACTIONS</th></tr></thead><tbody>
 {% for x in items %}<tr>
-<td><div class="contact"><div class="avatar">{{(x.first_name or '?')[0]}}{{(x.last_name or '')[0]}}</div><div><b>{{x.first_name}} {{x.last_name}}</b><small>{{x.mobile or x.phone or 'No phone'}}</small></div></div></td>
+<td><div class="contact"><div class="avatar">{{(x.first_name or '?')[0]}}{{(x.last_name or '')[0]}}</div><div><b>{{x.first_name}} {{x.last_name}}</b><small>{{phone_display(x.mobile or x.phone) or 'No phone'}}</small></div></div></td>
 <td><b class="date {{x.bucket}}">{{x.follow_date.strftime('%b %d, %Y')}}</b><small>{% if x.days_delta < 0 %}{{-x.days_delta}} day{% if -x.days_delta != 1 %}s{% endif %} overdue{% elif x.days_delta == 0 %}Due today{% else %}In {{x.days_delta}} day{% if x.days_delta != 1 %}s{% endif %}{% endif %}</small></td>
 <td>{{x.follow_up_type or 'Follow-up'}}</td><td><span class="status">{{x.status or 'New'}}</span></td><td><b>{{x.priority or 'Normal'}}</b></td>
 <td>{{x.medicare_effective_date or '—'}}</td>

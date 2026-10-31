@@ -75,8 +75,8 @@
           <div>
             <a class="person-name" href="/leads/{{ lead.id }}">{{ lead.first_name }} {{ lead.last_name }}</a>
             <div class="secondary">
-              {% if lead.phone %}<i class="bi bi-telephone"></i> {{ lead.phone }}
-              {% elif lead.mobile %}<i class="bi bi-phone"></i> {{ lead.mobile }}
+              {% if lead.phone %}<i class="bi bi-telephone"></i> {{ phone_display(lead.phone) }}
+              {% elif lead.mobile %}<i class="bi bi-phone"></i> {{ phone_display(lead.mobile) }}
               {% else %}No phone{% endif %}
             </div>
             {% if lead.email %}<div class="tertiary">{{ lead.email }}</div>{% endif %}
@@ -127,7 +127,7 @@
       <article class="mobile-card">
         <div class="mobile-top">
           <div class="avatar">{{ initials|upper or "?" }}</div>
-          <div class="mobile-name"><a href="/leads/{{ lead.id }}">{{ lead.first_name }} {{ lead.last_name }}</a><span>{{ lead.phone or lead.mobile or "No phone" }}</span></div>
+          <div class="mobile-name"><a href="/leads/{{ lead.id }}">{{ lead.first_name }} {{ lead.last_name }}</a><span>{{ phone_display(lead.phone or lead.mobile) or "No phone" }}</span></div>
           <span class="status status-{{ status_key }}"><span></span>{{ lead.status or "New" }}</span>
         </div>
         <div class="mobile-grid">

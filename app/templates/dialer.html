@@ -93,7 +93,7 @@
               href="tel:{{ next_lead.phone or next_lead.mobile }}"
             >
               <i class="bi bi-telephone"></i>
-              {{ next_lead.phone or next_lead.mobile or "No phone" }}
+              {{ phone_display(next_lead.phone or next_lead.mobile) or "No phone" }}
             </a>
           </div>
 
@@ -340,7 +340,7 @@
             <a href="/leads/{{ call.lead_id }}">
               {{ lead_names.get(call.lead_id, "Contact") }}
             </a>
-            <span>{{ call.lead_phone }}</span>
+            <span>{{ phone_display(call.lead_phone) }}</span>
           </div>
         </div>
 
@@ -397,7 +397,7 @@
             <a href="/leads/{{ call.lead_id }}">
               {{ lead_names.get(call.lead_id, "Contact") }}
             </a>
-            <span>{{ call.lead_phone }}</span>
+            <span>{{ phone_display(call.lead_phone) }}</span>
           </div>
 
           <span class="call-status status-{{ call_status_key }}">

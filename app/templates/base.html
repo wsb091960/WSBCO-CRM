@@ -1,3 +1,16 @@
+{# Display-only formatting; keep stored numbers and dial links unchanged. #}
+{% macro phone_display(value) -%}
+  {%- set raw = (value or '')|string|trim -%}
+  {%- set digits = raw|replace('+', '')|replace('(', '')|replace(')', '')|replace(' ', '')|replace('-', '')|replace('.', '') -%}
+  {%- if digits|length == 11 and digits.startswith('1') -%}
+    {%- set digits = digits[1:] -%}
+  {%- endif -%}
+  {%- if digits|length == 10 and digits.isascii() and digits.isdigit() -%}
+    {{- digits[:3] ~ '-' ~ digits[3:6] ~ '-' ~ digits[6:] -}}
+  {%- else -%}
+    {{- raw -}}
+  {%- endif -%}
+{%- endmacro %}
 <!DOCTYPE html>
 <html lang="en">
 

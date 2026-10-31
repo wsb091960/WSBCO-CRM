@@ -17,7 +17,7 @@
 {% if call_error %}<div class="notice err">{{call_error}}</div>{% endif %}
 <div class="columns">
 <section class="panel left"><h3>CONTACT</h3>
-{% for label,val in [('Phone',lead.phone),('Mobile',lead.mobile),('Email',lead.email)] %}<div class="field"><label>{{label}}</label><b>{{val or '—'}}</b></div>{% endfor %}
+{% for label,val in [('Phone',lead.phone),('Mobile',lead.mobile),('Email',lead.email)] %}<div class="field"><label>{{label}}</label><b>{{phone_display(val) if label in ['Phone', 'Mobile'] and val else (val or '—')}}</b></div>{% endfor %}
 <div class="field contact-map-field">
   <div class="contact-map-address"><label>Address</label><b>{{lead.address or '—'}}</b><b>{{lead.city or ''}}{{', ' if lead.city and lead.state else ''}}{{lead.state or ''}}{{' ' if lead.zip_code else ''}}{{lead.zip_code or ''}}</b></div>
   {% if contact_map_url %}<a class="contact-map-button" href="{{contact_map_url}}" target="_blank" rel="noopener noreferrer" aria-label="Map It — opens Google Maps in a new tab"><i class="bi bi-geo-alt" aria-hidden="true"></i> Map It <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i></a>
@@ -55,7 +55,7 @@
 <div id="follow" class="tab"><div class="sectionhead"><div><small>NEXT ACTION</small><h2>Follow-up</h2></div></div><div class="follow"><label>NEXT FOLLOW-UP</label><b>{{lead.next_follow_up or 'Not scheduled'}}</b><span>{{lead.follow_up_type or 'No follow-up type selected'}}</span></div></div>
 </section>
 <aside class="panel right"><h3>MANUAL CALLING <em>● Ready</em></h3>
-<div class="person"><strong>{{nm}}</strong><span>{{ph or 'No usable phone number'}}</span></div>
+<div class="person"><strong>{{nm}}</strong><span>{{phone_display(ph) or 'No usable phone number'}}</span></div>
 <p class="manual-help">Dial on your phone, then record the result below.</p>
 {% if list_item %}<p class="manual-help"><a href="/call-list">Return to your saved 10-call list</a></p>{% endif %}
 <div class="callfacts"><p><span>Status</span><b>{{lead.status or 'New'}}</b></p><p><span>Attempts</span><b>{{lead.call_attempts or 0}}</b></p><p><span>Next follow-up</span><b>{{lead.next_follow_up or '—'}}</b></p></div>
