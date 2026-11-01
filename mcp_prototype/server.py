@@ -1,12 +1,19 @@
 """Local-only, read-only MCP prototype. Never mount this in the production app."""
-from mcp.server import MCPServer
+import os
+from mcp.server.fastmcp import FastMCP
+
+# Fail closed: require explicit opt-in and an isolated test database.
+if os.getenv('WSBCO_MCP_DEV_ONLY') != '1':
+    raise RuntimeError('Set WSBCO_MCP_DEV_ONLY=1 for isolated local development')
+if os.getenv('WSBCO_MCP_SYNTHETIC_DATA') != '1':
+    raise RuntimeError('Synthetic-data confirmation required')
 from sqlalchemy import select
 from app.database import SessionLocal
 from app.call_list_v1 import candidates, selection_reason, active_batch
 from app.golf_integration import GolfProfile
 from app.models import Lead
 
-mcp = MCPServer("WSBCO CRM - local read-only prototype")
+mcp = FastMCP("WSBCO CRM - local read-only prototype")
 
 @mcp.tool()
 def preview_call_candidates(limit: int = 10) -> list[dict]:
