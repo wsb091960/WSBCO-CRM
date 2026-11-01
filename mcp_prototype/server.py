@@ -7,8 +7,18 @@ if os.getenv('WSBCO_MCP_DEV_ONLY') != '1':
     raise RuntimeError('Set WSBCO_MCP_DEV_ONLY=1 for isolated local development')
 if os.getenv('WSBCO_MCP_SYNTHETIC_DATA') != '1':
     raise RuntimeError('Synthetic-data confirmation required')
+# Require a real, pre-existing isolated SQLite database, not just a flag.
+from pathlib import Path
+from sqlalchemy.engine import make_url
+test_dir = Path(os.environ.get("WSBCO_MCP_TEST_DIR", "")).expanduser()
+if not test_dir.is_absolute() or not test_dir.is_dir() or not (test_dir / ".wsbco-mcp-synthetic").is_file():
+    raise RuntimeError("A marked, isolated synthetic-data directory is required")
+
 from sqlalchemy import select
-from app.database import SessionLocal
+from app.database import DATA_DIR, engine, SessionLocal
+if DATA_DIR.resolve() != test_dir.resolve():
+    raise RuntimeError("CRM database must reside in the marked synthetic directory")
+
 from app.call_list_v1 import candidates, selection_reason, active_batch
 from app.golf_integration import GolfProfile
 from app.models import Lead
