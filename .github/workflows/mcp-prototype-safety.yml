@@ -1,0 +1,19 @@
+name: MCP prototype safety checks
+on:
+  push:
+    branches: [feature/mcp-readonly-prototype]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Compile prototype source
+        run: python -m compileall -q mcp_prototype
+      - name: Run static safety tests
+        run: python -m unittest discover -s mcp_prototype -p 'test_*.py' -v
