@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta, timezone
+import os
 from typing import Annotated
 from uuid import uuid4
 from app.services.manual_calls import OUTCOMES, pending_item, save_manual_call, usable_phone
@@ -12,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import Lead, CallLog
+from app.golf_integration import GolfProfile
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -175,11 +177,17 @@ def lead_detail(
     if not lead:
         raise HTTPException(status_code=404, detail="Contact not found")
 
+    golf_profile = db.scalar(
+        select(GolfProfile).where(GolfProfile.lead_id == lead_id)
+    )
+
     return templates.TemplateResponse(
         request=request,
         name="lead_detail.html",
         context={
             "lead": lead,
+            "golf_profile": golf_profile,
+            "golf_coach_base_url": os.getenv("GOLF_COACH_API_URL", "").rstrip("/"),
             "saved": bool(saved),
             "calling": bool(calling),
             "call_id": call_id,
