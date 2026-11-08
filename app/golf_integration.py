@@ -124,10 +124,7 @@ def golf_contacts(x_golf_admin_key: str | None = Header(default=None),
              "golf_student_id": profile.golf_student_id} for profile, lead in rows]
 
 
-@router.post("/contacts/{lead_id}/convert")
-def convert_to_student(lead_id: int, x_golf_admin_key: str | None = Header(default=None),
-                       db: Session = Depends(get_db)):
-    require_key(x_golf_admin_key, "GOLF_ADMIN_API_KEY")
+def _convert_to_student(lead_id: int, db: Session):
     profile = db.query(GolfProfile).filter_by(lead_id=lead_id).first()
     lead = db.get(Lead, lead_id)
     if not profile or not lead:
@@ -135,24 +132,74 @@ def convert_to_student(lead_id: int, x_golf_admin_key: str | None = Header(defau
     if profile.golf_student_id:
         return {"crm_contact_id": lead_id, "golf_student_id": profile.golf_student_id,
                 "already_linked": True}
+
     url = os.getenv("GOLF_COACH_API_URL", "").rstrip("/")
     token = os.getenv("GOLF_COACH_SYNC_KEY", "").strip()
     if not url or not token or not url.startswith("https://"):
-        raise HTTPException(503, "Golf Coach HTTPS URL and sync key must be configured")
-    data = json.dumps({"crm_contact_id": lead.id, "first_name": lead.first_name,
-                       "last_name": lead.last_name, "email": lead.email,
-                       "phone": lead.phone, "primary_goal": profile.goal}).encode()
-    request = Request(url + "/integrations/crm/students", data=data, method="POST",
-                      headers={"Content-Type": "application/json", "X-Golf-Sync-Key": token})
+        raise HTTPException(503, "Golf Coach sync is not configured")
+    data = json.dumps({
+        "crm_contact_id": lead.id,
+        "first_name": lead.first_name,
+        "last_name": lead.last_name,
+        "email": lead.email,
+        "phone": lead.phone,
+        "primary_goal": profile.goal,
+    }).encode()
+    req = Request(
+        url + "/integrations/crm/students",
+        data=data,
+        method="POST",
+        headers={"Content-Type": "application/json", "X-Golf-Sync-Key": token},
+    )
     try:
-        with urlopen(request, timeout=15) as response:
+        with urlopen(req, timeout=15) as response:
             result = json.load(response)
-    except (HTTPError, URLError, TimeoutError, ValueError) as exc:
-        raise HTTPException(502, "Golf Coach sync unavailable") from exc
+    except HTTPError as exc:
+        if exc.code == 409:
+            raise HTTPException(
+                409,
+                "A matching Golf Coach student may already exist. Review the Coach student list before trying again.",
+            ) from exc
+        raise HTTPException(502, "Golf Coach sync returned an error") from exc
+    except (URLError, TimeoutError, ValueError) as exc:
+        raise HTTPException(502, "Golf Coach sync is unavailable") from exc
+
     student_id = result.get("student_id")
     if not student_id:
         raise HTTPException(502, "Golf Coach returned no student ID")
     profile.golf_student_id = str(student_id)
     profile.stage = "Active student"
     db.commit()
-    return {"crm_contact_id": lead_id, "golf_student_id": student_id, "already_linked": False}
+    return {
+        "crm_contact_id": lead_id,
+        "golf_student_id": str(student_id),
+        "already_linked": bool(result.get("already_linked", False)),
+    }
+
+
+@router.post("/contacts/{lead_id}/convert")
+def convert_to_student(lead_id: int, x_golf_admin_key: str | None = Header(default=None),
+                       db: Session = Depends(get_db)):
+    require_key(x_golf_admin_key, "GOLF_ADMIN_API_KEY")
+    return _convert_to_student(lead_id, db)
+
+
+@router.post("/contacts/{lead_id}/convert-from-console")
+def convert_from_console(lead_id: int, db: Session = Depends(get_db)):
+    """Owner-authenticated Contact Console action; never exposes the sync key."""
+    from fastapi.responses import RedirectResponse
+
+    try:
+        _convert_to_student(lead_id, db)
+    except HTTPException as exc:
+        code = "existing" if exc.status_code == 409 else (
+            "unconfigured" if exc.status_code == 503 else "unavailable"
+        )
+        return RedirectResponse(
+            url=f"/leads/{lead_id}?conversion_error={code}",
+            status_code=303,
+        )
+    return RedirectResponse(
+        url=f"/leads/{lead_id}?conversion_success=1",
+        status_code=303,
+    )
