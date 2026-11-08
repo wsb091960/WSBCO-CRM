@@ -14,6 +14,7 @@
 <div class="actions"><a href="/leads/{{lead.id}}/compare" onclick="window.open(this.href, 'wsbco_plan_compare_{{lead.id}}', 'width=1180,height=850,resizable=yes,scrollbars=yes'); return false;">Compare Plans</a><a href="/leads">Contacts</a><a href="/leads/{{lead.id}}/edit">Edit</a><form method="post" action="/leads/{{lead.id}}/call"><button title="Optional agent-first automated call" {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ Auto call</button></form></div></header>
 {% if request.query_params.get('recorded') %}<div class="notice" role="status">Call result saved. Call history and saved-list progress updated.</div>{% endif %}
 {% if calling %}<div class="notice">Calling your agent phone first. Answer to connect with {{lead.first_name}}.</div>{% endif %}
+{% if request.query_params.get('conversion_success') %}<div class="notice" role="status">Golf Coach student created and linked to this CRM contact.</div>{% endif %}
 {% if call_error %}<div class="notice err">{{call_error}}</div>{% endif %}
 <div class="columns">
 <section class="panel left"><h3>CONTACT</h3>
@@ -24,11 +25,30 @@
   {% else %}<button class="contact-map-button" type="button" disabled aria-describedby="contact-map-help">Map It</button><small id="contact-map-help" class="contact-map-help">Add an address to map this contact.</small>{% endif %}
 </div>
 <div class="field"><label>County</label><b>{{lead.county or '—'}}</b></div>
+{% if golf_profile %}
+<h3>GOLF</h3>
+<div class="grid">
+<div><label>GOLF STAGE</label><b>{{golf_profile.stage or 'Inquiry'}}</b></div>
+<div><label>PROGRAM</label><b>{{golf_profile.program or 'Individual lesson'}}</b></div>
+</div>
+<div class="field"><label>GOAL</label><b>{{golf_profile.goal or '—'}}</b></div>
+{% if request.query_params.get('conversion_success') %}<div class="notice" role="status">Golf Coach student created and linked to this CRM contact.</div>{% endif %}
+{% if request.query_params.get('conversion_error') == 'existing' %}<div class="notice err">A matching Coach student may already exist. Review the Students list before converting again.</div>{% elif request.query_params.get('conversion_error') == 'unconfigured' %}<div class="notice err">Golf Coach sync is not configured yet.</div>{% elif request.query_params.get('conversion_error') %}<div class="notice err">Golf Coach could not complete the conversion. Try again shortly.</div>{% endif %}
+{% if golf_profile.golf_student_id %}
+<div class="field"><label>GOLF COACH STUDENT</label><b>{% if golf_coach_base_url %}<a href="{{golf_coach_base_url}}/students/{{golf_profile.golf_student_id}}" target="_blank" rel="noopener noreferrer">{{golf_profile.golf_student_id}} · Open profile ↗</a>{% else %}{{golf_profile.golf_student_id}}{% endif %}</b></div>
+{% else %}
+<form method="post" action="/golf/contacts/{{lead.id}}/convert-from-console">
+<button class="save" type="submit">Convert to Golf Coach student</button>
+</form>
+<p class="manual-help">This creates a student only when you choose to convert this golfer inquiry.</p>
+{% endif %}
+{% else %}
 <h3>MEDICARE</h3><div class="grid">
 <div><label>DOB</label><b>{{lead.date_of_birth or '—'}}</b></div><div><label>EFFECTIVE</label><b>{{lead.medicare_effective_date or '—'}}</b></div>
 <div><label>COVERAGE</label><b>{{lead.current_coverage or '—'}}</b></div><div><label>PLAN ID</label><b>{{lead.plan_id or '—'}}</b></div>
 <div><label>MBI</label><b>{% if lead.medicare_mbi %}••••{{lead.medicare_mbi[-4:]}}{% else %}—{% endif %}</b></div><div><label>MEDICAID</label><b>{% if lead.medicaid_number %}••••{{lead.medicaid_number[-4:]}}{% else %}—{% endif %}</b></div></div>
 <h3>PRODUCT INTEREST</h3><div class="pills"><span class="{{'on' if lead.interested_supplement else ''}}">Med Supp</span><span class="{{'on' if lead.interested_advantage else ''}}">Advantage</span><span class="{{'on' if lead.interested_pdp else ''}}">Part D</span><span class="{{'on' if lead.interested_dental else ''}}">Dental</span></div>
+{% endif %}
 </section>
 <section class="panel center"><nav class="tabs"><button class="active" data-tab="notes">Notes</button><button data-tab="activity">Activity</button><button data-tab="follow">Follow-up</button></nav>
 <div id="notes" class="tab active"><div class="sectionhead"><div><small>CALL PREP</small><h2>Contact Notes</h2></div><a href="/leads/{{lead.id}}/edit">Edit notes</a></div><div class="notes">{{lead.notes or 'No notes have been entered for this contact.'}}</div>
