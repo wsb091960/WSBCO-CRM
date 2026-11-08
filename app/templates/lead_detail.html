@@ -14,7 +14,7 @@
 <div class="actions"><a href="/leads/{{lead.id}}/compare" onclick="window.open(this.href, 'wsbco_plan_compare_{{lead.id}}', 'width=1180,height=850,resizable=yes,scrollbars=yes'); return false;">Compare Plans</a><a href="/leads">Contacts</a><a href="/leads/{{lead.id}}/edit">Edit</a><form method="post" action="/leads/{{lead.id}}/call"><button title="Optional agent-first automated call" {% if lead.status=='Do Not Call' or not ph %}disabled{% endif %}>☎ Auto call</button></form></div></header>
 {% if request.query_params.get('recorded') %}<div class="notice" role="status">Call result saved. Call history and saved-list progress updated.</div>{% endif %}
 {% if calling %}<div class="notice">Calling your agent phone first. Answer to connect with {{lead.first_name}}.</div>{% endif %}
-{% if request.query_params.get('conversion_success') %}<div class="notice" role="status">Golf Coach student created and linked to this CRM contact.</div>{% endif %}
+
 {% if call_error %}<div class="notice err">{{call_error}}</div>{% endif %}
 <div class="columns">
 <section class="panel left"><h3>CONTACT</h3>
