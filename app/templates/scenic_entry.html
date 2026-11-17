@@ -7,6 +7,7 @@
   <title>Golf and Medicare Made Easy · William Burton</title>
   <link rel="preload" as="image" href="/static/images/coastal-golf-entry.webp">
   <link rel="stylesheet" href="/static/css/scenic_entry.css?v=1">
+  <link rel="stylesheet" href="/static/css/golf_workspace.css?v=1">
 </head>
 <body>
   <main class="entry">
@@ -30,6 +31,7 @@
           <p class="card-eyebrow">YOUR DAY, MADE EASY</p>
           <h2 id="sign-in-title">Welcome back,<br>William.</h2>
           <p class="card-copy">Your contacts, golf inquiries and follow-ups are ready when you are.</p>
+          {% if golf_count is defined %}{% include "golf_summary.html" %}{% endif %}
           <a class="primary-button" href="{{ next_path or '/leads' }}">Open my contacts <span aria-hidden="true">→</span></a>
           <div class="quick-links"><a href="/call-list">10-call list</a><a href="/calendar">Follow-ups</a><a href="/gis">Territory map</a></div>
           <form method="post" action="/logout" class="signout"><button type="submit">Sign out securely</button></form>

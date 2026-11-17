@@ -23,8 +23,8 @@
   <header class="contacts-hero">
     <div>
       <p class="eyebrow">Contact Management</p>
-      <h1>Contacts & Leads</h1>
-      <p>Search, review, call, and follow up with your Medicare prospects.</p>
+      <h1>{% if workspace == 'golf' %}{% if golf_filter == 'new' %}New Golf Requests{% else %}Golf Contacts{% endif %}{% elif workspace == 'medicare' %}Medicare Contacts{% else %}Contacts & Leads{% endif %}</h1>
+      <p>Search, review, call, and follow up with your contacts.</p>
     </div>
     <div class="hero-actions">
 <a href="/imports" class="btn btn-outline-primary"><i class="bi bi-upload"></i> Import Data</a>
@@ -33,8 +33,21 @@
     </div>
   </header>
 
+  {% include "golf_summary.html" %}
+  <nav class="workspace-switch" aria-label="Contact workspace">
+    <a href="/leads" {% if workspace == 'all' %}aria-current="page"{% endif %}>All Contacts</a>
+    <a href="/leads?workspace=medicare" {% if workspace == 'medicare' %}aria-current="page"{% endif %}>Medicare</a>
+    <a href="/leads?workspace=golf" {% if workspace == 'golf' %}aria-current="page"{% endif %}>Golf</a>
+  </nav>
   <section class="toolbar-card">
     <form class="contacts-toolbar" method="get" action="/leads">
+      <input type="hidden" name="workspace" value="{{workspace}}">
+      {% if workspace == 'golf' %}
+      <div class="filter-box"><select name="golf_filter" aria-label="Golf request filter">
+        <option value="all" {% if golf_filter == 'all' %}selected{% endif %}>All golf contacts</option>
+        <option value="new" {% if golf_filter == 'new' %}selected{% endif %}>New golf requests</option>
+      </select></div>
+      {% endif %}
       <div class="search-box">
         <i class="bi bi-search"></i>
         <input type="search" name="q" value="{{ q }}" placeholder="Search name, phone, email, city, or ZIP">
@@ -49,7 +62,7 @@
         </select>
       </div>
       <button class="btn btn-primary" type="submit">Search</button>
-      {% if q or status %}<a class="btn btn-light" href="/leads">Clear</a>{% endif %}
+      {% if q or status or golf_filter == 'new' %}<a class="btn btn-light" href="/leads?workspace={{workspace}}">Clear</a>{% endif %}
     </form>
   </section>
 
@@ -62,10 +75,11 @@
   <section class="table-card">
     <div class="desktop-contacts">
       <div class="contacts-head">
-        <div>Contact</div><div>Medicare</div><div>Interest</div><div>Status</div><div>Priority</div><div>Next Follow-up</div><div>Actions</div>
+        <div>Contact</div><div>Profile</div><div>Interest / Goal</div><div>Status</div><div>Priority</div><div>Next Follow-up</div><div>Actions</div>
       </div>
 
       {% for lead in leads %}
+      {% set golf = golf_profiles.get(lead.id) %}
       {% set initials = (lead.first_name[:1] if lead.first_name else "") ~ (lead.last_name[:1] if lead.last_name else "") %}
       {% set status_key = (lead.status or "New")|lower|replace(" ","-") %}
       {% set priority_key = (lead.priority or "Normal")|lower|replace(" ","-") %}
@@ -74,6 +88,7 @@
           <div class="avatar">{{ initials|upper or "?" }}</div>
           <div>
             <a class="person-name" href="/leads/{{ lead.id }}">{{ lead.first_name }} {{ lead.last_name }}</a>
+            {% if golf %}<span class="golf-badge">Golf · {{golf.stage}}</span>{% endif %}
             <div class="secondary">
               {% if lead.phone %}<i class="bi bi-telephone"></i> {{ phone_display(lead.phone) }}
               {% elif lead.mobile %}<i class="bi bi-phone"></i> {{ phone_display(lead.mobile) }}
@@ -84,17 +99,21 @@
         </div>
 
         <div class="stack-cell">
+          {% if golf %}<strong>{{golf.program}}</strong><span>{{golf.stage}}</span>{% else %}
           <strong>{{ lead.medicare_effective_date or "—" }}</strong>
           <span>{{ lead.current_coverage or "Coverage not entered" }}</span>
+          {% endif %}
         </div>
 
         <div class="product-pills">
+          {% if golf %}<span>{{golf.goal or 'Goal not provided'}}</span>{% else %}
           {% if lead.interested_supplement %}<span class="pill supplement">Supplement</span>{% endif %}
           {% if lead.interested_advantage %}<span class="pill advantage">Advantage</span>{% endif %}
           {% if lead.interested_pdp %}<span class="pill pdp">PDP</span>{% endif %}
           {% if lead.interested_dental %}<span class="pill dental">Dental</span>{% endif %}
           {% if not (lead.interested_supplement or lead.interested_advantage or lead.interested_pdp or lead.interested_dental) %}
           <span class="muted">No interest selected</span>{% endif %}
+          {% endif %}
         </div>
 
         <div><span class="status status-{{ status_key }}"><span></span>{{ lead.status or "New" }}</span></div>
@@ -122,6 +141,7 @@
 
     <div class="mobile-contacts">
       {% for lead in leads %}
+      {% set golf = golf_profiles.get(lead.id) %}
       {% set initials = (lead.first_name[:1] if lead.first_name else "") ~ (lead.last_name[:1] if lead.last_name else "") %}
       {% set status_key = (lead.status or "New")|lower|replace(" ","-") %}
       <article class="mobile-card">
@@ -131,10 +151,17 @@
           <span class="status status-{{ status_key }}"><span></span>{{ lead.status or "New" }}</span>
         </div>
         <div class="mobile-grid">
+          {% if golf %}
+          <div><small>Golf Stage</small><strong>{{golf.stage}}</strong></div>
+          <div><small>Program</small><strong>{{golf.program}}</strong></div>
+          <div><small>Next Follow-up</small><strong>{{lead.next_follow_up or '—'}}</strong></div>
+          <div><small>Golf Goal</small><strong>{{golf.goal or '—'}}</strong></div>
+          {% else %}
           <div><small>Medicare Effective</small><strong>{{ lead.medicare_effective_date or "—" }}</strong></div>
           <div><small>Priority</small><strong>{{ lead.priority or "Normal" }}</strong></div>
           <div><small>Next Follow-up</small><strong>{{ lead.next_follow_up or "—" }}</strong></div>
           <div><small>Coverage</small><strong>{{ lead.current_coverage or "—" }}</strong></div>
+          {% endif %}
         </div>
         <div class="mobile-actions">
           {% if lead.status != "Do Not Call" and (lead.phone or lead.mobile) %}
@@ -152,8 +179,9 @@
   <section class="empty-state">
     <div class="empty-icon"><i class="bi bi-people"></i></div>
     <h2>No contacts found</h2>
-    <p>{% if q or status %}No contacts match your current search or filter.{% else %}Add your first Medicare prospect to begin.{% endif %}</p>
-    {% if q or status %}<a class="btn btn-outline-primary" href="/leads">Clear Filters</a>
+    <p>{% if q or status %}No contacts match your current search or filter.{% elif workspace == 'golf' and golf_filter == 'new' %}You're caught up. No golf requests are awaiting your first response.{% elif workspace == 'golf' %}Golf lesson inquiries will appear here when received.{% elif q or status %}No contacts match your current search or filter.{% else %}Add your first contact to begin.{% endif %}</p>
+    {% if workspace == 'golf' %}<a class="btn btn-outline-primary" href="/leads?workspace=golf">View all golf contacts</a>
+    {% elif q or status %}<a class="btn btn-outline-primary" href="/leads?workspace={{workspace}}">Clear Filters</a>
     {% else %}<a class="btn btn-primary" href="/leads/new">Add First Contact</a>{% endif %}
   </section>
   {% endif %}

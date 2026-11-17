@@ -27,6 +27,12 @@
 <div class="field"><label>County</label><b>{{lead.county or '—'}}</b></div>
 {% if golf_profile %}
 <h3>GOLF</h3>
+{% if request.query_params.get('golf_contacted') %}<p role="status">Golf request marked contacted.</p>{% endif %}
+{% if golf_profile.stage == 'Inquiry' %}
+<form class="golf-stage-form" method="post" action="/golf/contacts/{{lead.id}}/contacted">
+<button type="submit">Mark Contacted</button>
+</form>
+{% endif %}
 <div class="grid">
 <div><label>GOLF STAGE</label><b>{{golf_profile.stage or 'Inquiry'}}</b></div>
 <div><label>PROGRAM</label><b>{{golf_profile.program or 'Individual lesson'}}</b></div>
