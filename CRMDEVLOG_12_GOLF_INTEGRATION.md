@@ -29,3 +29,12 @@ Connect the existing published Reedsport Golf Course lesson request Form to WSBC
 - The original Google Forms response notification remains enabled. Automatic approval review prevented disabling it, so both the generic Form notification and detailed post-save CRM alert may arrive.
 - Flyer QR replacement and Golf workspace/Coach conversion are separate follow-up work.
 - Manual recovery check completed successfully with no pending deliveries. The synthetic contact is marked Do Not Call to exclude it from calling workflows; no call was placed or logged.
+
+## Golf overview and navigation — November 16, 2026
+
+- Signed-in opening page and Contacts page show clickable Golf Contacts and New Golf Requests counts, with a View Golf Contacts button. No counts are exposed before sign-in.
+- Contacts offers All Contacts, Medicare (contacts without a golf profile), and Golf views. Search and status filtering retain the chosen workspace. Golf rows show stage, program and goal on desktop and mobile. Sidebar links open Golf Contacts and New Golf Requests directly.
+- A new golf request has an existing golf profile at Inquiry, contact status New, and no last-contact timestamp. Do Not Call and already handled requests are excluded from the new count; every existing golf contact remains in the total. Deleted-contact profiles are excluded.
+- The Golf panel's explicit Mark Contacted action moves Inquiry to Contacted. Merely opening a request changes nothing. Acknowledgement preserves shared contact status/notes and does not fabricate a call attempt.
+- This release adds navigation over the existing golf profiles; independent Golf/Insurance dual memberships and manual golf enrollment remain separate work.
+- Validation: 76 focused checks passed for counts, click-through filters, request acknowledgement, owner access, intake, manual calling and Map It.

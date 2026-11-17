@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Lead, CallLog
 from app.golf_integration import GolfProfile
+from app.services.golf_workspace import golf_summary, new_golf_request
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -73,12 +74,14 @@ def _lead_from_form(form) -> dict:
 
 
 @router.get("/")
-def dashboard(request: Request):
+def dashboard(request: Request, db: Session = Depends(get_db)):
+    signed_in = bool(getattr(request.state, "crm_owner", None))
     return templates.TemplateResponse(
         request=request,
         name="scenic_entry.html",
         context={
-            "signed_in": bool(getattr(request.state, "crm_owner", None)),
+            "signed_in": signed_in,
+            **(golf_summary(db) if signed_in else {}),
             "next_path": "/leads", "login_error": "",
         },
     )
@@ -89,9 +92,18 @@ def list_leads(
     request: Request,
     q: str = Query(default=""),
     status: str = Query(default=""),
+    workspace: str = Query(default="all", pattern="^(all|medicare|golf)$"),
+    golf_filter: str = Query(default="all", pattern="^(all|new)$"),
     db: Session = Depends(get_db),
 ):
     statement = select(Lead)
+    has_golf = select(GolfProfile.id).where(GolfProfile.lead_id == Lead.id).exists()
+    if workspace == "golf":
+        statement = statement.join(GolfProfile, GolfProfile.lead_id == Lead.id)
+        if golf_filter == "new":
+            statement = statement.where(new_golf_request())
+    elif workspace == "medicare":
+        statement = statement.where(~has_golf)
 
     if q.strip():
         search = f"%{q.strip()}%"
@@ -118,11 +130,15 @@ def list_leads(
     )
 
     leads = db.scalars(statement).all()
+    profiles = {p.lead_id: p for p in db.scalars(select(GolfProfile).join(
+        Lead, Lead.id == GolfProfile.lead_id))}
 
     return templates.TemplateResponse(
         request=request,
         name="leads.html",
-        context={"leads": leads, "q": q, "status": status},
+        context={"leads": leads, "q": q, "status": status,
+                 "workspace": workspace, "golf_filter": golf_filter,
+                 "golf_profiles": profiles, **golf_summary(db)},
     )
 
 

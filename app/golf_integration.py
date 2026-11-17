@@ -124,6 +124,20 @@ def golf_contacts(x_golf_admin_key: str | None = Header(default=None),
              "golf_student_id": profile.golf_student_id} for profile, lead in rows]
 
 
+@router.post("/contacts/{lead_id}/contacted")
+def mark_contacted(lead_id: int, db: Session = Depends(get_db)):
+    """Record an owner's explicit first-response acknowledgement, not a call."""
+    from fastapi.responses import RedirectResponse
+
+    profile = db.query(GolfProfile).filter_by(lead_id=lead_id).first()
+    if not profile or not db.get(Lead, lead_id):
+        raise HTTPException(404, "Golf contact not found")
+    if profile.stage == "Inquiry":
+        profile.stage = "Contacted"
+        db.commit()
+    return RedirectResponse(f"/leads/{lead_id}?golf_contacted=1", status_code=303)
+
+
 def _convert_to_student(lead_id: int, db: Session):
     profile = db.query(GolfProfile).filter_by(lead_id=lead_id).first()
     lead = db.get(Lead, lead_id)
