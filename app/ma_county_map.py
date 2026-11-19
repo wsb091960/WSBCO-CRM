@@ -10,7 +10,11 @@ from fastapi.templating import Jinja2Templates
 router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
 DATA_DIR = Path(__file__).resolve().parent / 'data' / 'ma_map'
-CATALOG_FILES = {2026: 'wv_2026.json', 2027: 'wv_2027.json'}
+STATES = {'WV': 'West Virginia', 'OR': 'Oregon'}
+CATALOG_FILES = {
+    'WV': {2026: 'wv_2026.json', 2027: 'wv_2027.json'},
+    'OR': {2026: 'or_2026.json', 2027: 'or_2027.json'},
+}
 COMPARE_FIELDS = [
     ('Insurance company / brand', 'carrier'), ('Parent organization', 'parent_organization'),
     ('CMS contract-plan-segment ID', 'id'), ('Plan type', 'plan_type'),
@@ -27,17 +31,20 @@ COMPARE_FIELDS = [
 ]
 
 
-@lru_cache(maxsize=3)
-def load_geometry():
-    return json.loads((DATA_DIR / 'wv_counties.json').read_text())
+@lru_cache(maxsize=4)
+def load_geometry(state='WV'):
+    data = json.loads((DATA_DIR / f'{state.lower()}_counties.json').read_text())
+    if data['state'] != state:
+        raise ValueError('Map state does not match the selected area')
+    return data
 
 
-@lru_cache(maxsize=3)
-def load_catalog(year):
-    if year not in CATALOG_FILES:
+@lru_cache(maxsize=8)
+def load_catalog(year, state='WV'):
+    if state not in CATALOG_FILES or year not in CATALOG_FILES[state]:
         raise HTTPException(422, 'Choose an installed plan year: 2026 or 2027.')
-    data = json.loads((DATA_DIR / CATALOG_FILES[year]).read_text())
-    if data['year'] != year or data['state'] != 'WV':
+    data = json.loads((DATA_DIR / CATALOG_FILES[state][year]).read_text())
+    if data['year'] != year or data['state'] != state:
         raise ValueError('Catalog state/year does not match the selected area')
     return data
 
@@ -57,24 +64,28 @@ def plan_values(data, county_id, carrier='', coverage='all', eligibility='all'):
 
 
 @router.get('/ma-map')
-def map_page(request: Request, year: int = 2027, county: str = Query('', max_length=5),
+def map_page(request: Request, year: int = 2027, state: str = Query('WV', max_length=2),
+             county: str = Query('', max_length=5),
              carrier: str = Query('', max_length=200), coverage: str = 'all', eligibility: str = 'all',
              selected_ids: list[str] = Query(default=[])):
-    if year not in CATALOG_FILES:
+    state = state.upper()
+    if state not in STATES:
+        raise HTTPException(422, 'Choose an installed state: West Virginia or Oregon.')
+    if year not in CATALOG_FILES[state]:
         raise HTTPException(422, 'Choose an installed plan year: 2026 or 2027.')
     if coverage not in {'all', 'with', 'without'} or eligibility not in {'all', 'general', 'snp'}:
         raise HTTPException(422, 'Invalid coverage or eligibility filter.')
-    geometry = load_geometry()
+    geometry = load_geometry(state)
     counties = {c['id']: c for c in geometry['counties']}
     if county and county not in counties:
-        raise HTTPException(422, 'Choose a West Virginia county from the map or county list.')
+        raise HTTPException(422, f'Choose a {STATES[state]} county from the map or county list.')
     if len(selected_ids) > 3 or len(selected_ids) != len(set(selected_ids)):
         raise HTTPException(422, 'Choose up to three different plans for comparison.')
     if selected_ids and not county:
         raise HTTPException(422, 'Choose a county before selecting plans.')
     error, data = '', None
     try:
-        data = load_catalog(year)
+        data = load_catalog(year, state)
     except (OSError, ValueError, KeyError):
         error = 'Plan data is unavailable for this year. Please try again after the catalog is restored.'
     plans, chosen, carriers, total, insurer_count = [], [], [], 0, 0
@@ -96,10 +107,11 @@ def map_page(request: Request, year: int = 2027, county: str = Query('', max_len
     links = []
     for c in geometry['counties']:
         count = len(data['county_plans'][c['id']]) if data else None
-        links.append({**c, 'count': count, 'url': '/ma-map?' + urlencode({'year': year, 'county': c['id']})})
+        links.append({**c, 'count': count, 'url': '/ma-map?' + urlencode({'state': state, 'year': year, 'county': c['id']})})
     response = templates.TemplateResponse(request=request, name='ma_county_map.html', context={
         'geometry': geometry, 'counties': links, 'county': counties.get(county),
-        'year': year, 'years': sorted(CATALOG_FILES, reverse=True), 'catalog': data,
+        'year': year, 'years': sorted(CATALOG_FILES[state], reverse=True), 'catalog': data,
+        'state': state, 'state_name': STATES[state], 'states': STATES,
         'plans': plans, 'chosen': chosen, 'selected_ids': selected_ids, 'compare_fields': COMPARE_FIELDS,
         'carriers': carriers, 'carrier': carrier, 'coverage': coverage, 'eligibility': eligibility,
         'total': total, 'insurer_count': insurer_count, 'data_error': error,

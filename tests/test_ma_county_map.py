@@ -102,7 +102,7 @@ def test_invalid_counties_years_and_plan_selections_are_rejected(client):
 
 
 def test_missing_data_is_unavailable_not_no_plans(client, monkeypatch):
-    def missing(_):
+    def missing(*_):
         raise FileNotFoundError()
     monkeypatch.setattr(ma, 'load_catalog', missing)
     page = client.get('/ma-map?county=54039')
@@ -115,7 +115,7 @@ def test_missing_data_is_unavailable_not_no_plans(client, monkeypatch):
 def test_empty_county_and_filters_do_not_substitute_other_areas(client, monkeypatch):
     original = json.loads(json.dumps(ma.load_catalog(2027)))
     original['county_plans']['54039'] = []
-    monkeypatch.setattr(ma, 'load_catalog', lambda _: original)
+    monkeypatch.setattr(ma, 'load_catalog', lambda *_: original)
     page = client.get('/ma-map?county=54039')
     assert page.status_code == 200 and page.context['total'] == 0
     assert page.context['plans'] == []
@@ -135,7 +135,99 @@ def test_map_and_comparison_keep_existing_owner_access(monkeypatch):
         db.commit()
     with TestClient(app, base_url='https://wsbco-crm.onrender.com', follow_redirects=False) as client:
         assert client.get('/ma-map?county=54039').status_code == 401
+        assert client.get('/ma-map?state=OR&county=41019').status_code == 401
         assert client.get('/ma-map', headers={'Accept': 'text/html'}).status_code == 303
         client.cookies.set(auth.SESSION_COOKIE, 'b' * 64)
         assert client.get('/ma-map?county=54039').status_code == 200
+        assert client.get('/ma-map?state=OR&county=41019').status_code == 200
     engine.dispose()
+
+
+def test_oregon_has_all_36_counties_with_state_in_links_and_forms(client):
+    page = client.get('/ma-map?state=OR&county=41019')
+    assert page.status_code == 200
+    assert page.context['state_name'] == 'Oregon'
+    assert len(page.context['counties']) == 36
+    assert all(c['id'].startswith('41') and 'state=OR' in c['url'] for c in page.context['counties'])
+    assert 'Oregon county map' in page.text and 'Browse all 36 counties' in page.text
+    assert page.text.count('name="state" value="OR"') == 3
+    assert 'Selected 2027 plans listed in Douglas County' not in page.text  # No selection yet.
+    assert 'state=WV&amp;year=2027' in page.text
+    assert 'action="/ma-map" class="ma-location-form"' in page.text
+
+
+@pytest.mark.parametrize('year,rows,segments,brands,empty_counties', [
+    (2026, 595, 101, 15, 6), (2027, 518, 95, 14, 5),
+])
+def test_oregon_catalog_integrity(year, rows, segments, brands, empty_counties):
+    data = ma.load_catalog(year, 'OR')
+    geometry = ma.load_geometry('OR')
+    assert data['state'] == 'OR' and data['year'] == year
+    assert len(data['county_plans']) == 36
+    assert set(data['county_plans']) == {c['id'] for c in geometry['counties']}
+    assert all(key.startswith('41') for key in data['county_plans'])
+    assert data['county_plan_rows'] == sum(len(ids) for ids in data['county_plans'].values()) == rows
+    assert len(data['plans']) == segments
+    assert len({p['carrier'] for p in data['plans'].values()}) == brands
+    assert len([ids for ids in data['county_plans'].values() if not ids]) == empty_counties
+    assert {p['category'] for p in data['plans'].values()} == {'MA', 'MA-PD', 'SNP'}
+    assert {p['year'] for p in data['plans'].values()} == {year}
+    assert set(data['plans']) == {key for ids in data['county_plans'].values() for key in ids}
+    assert all(len(ids) == len(set(ids)) for ids in data['county_plans'].values())
+    assert 'All OR MA' in data['scope'] and len(data['source_sha256']) == 64
+
+
+def test_oregon_coos_and_douglas_keep_year_specific_plans(client):
+    assert client.get('/ma-map?state=OR&county=41011').context['total'] == 1
+    douglas_2027 = client.get('/ma-map?state=OR&county=41019')
+    douglas_2026 = client.get('/ma-map?state=OR&county=41019&year=2026')
+    assert douglas_2027.context['total'] == 6
+    assert douglas_2026.context['total'] == 14
+    assert {p['carrier'] for p in douglas_2027.context['plans']} == {'ATRIO Health Plans', 'AllCare Advantage', 'Wellcare'}
+    plans = douglas_2027.context['plans']
+    chosen = [next(p for p in plans if p['carrier'] == brand) for brand in ['ATRIO Health Plans', 'AllCare Advantage', 'Wellcare']]
+    params = [('state', 'OR'), ('county', '41019')] + [('selected_ids', p['id']) for p in chosen]
+    comparison = client.get('/ma-map', params=params)
+    assert comparison.status_code == 200 and comparison.context['chosen'] == chosen
+    assert 'Selected 2027 plans listed in Douglas County, Oregon' in comparison.text
+
+
+def test_oregon_empty_counties_are_clickable_and_do_not_show_other_counties(client):
+    page = client.get('/ma-map?state=OR&county=41023')  # Grant
+    assert page.status_code == 200 and page.context['total'] == 0
+    assert page.context['plans'] == [] and page.context['chosen'] == []
+    assert 'No Medicare Advantage plans listed' in page.text
+    assert 'lists no MA plans in Grant County, Oregon' in page.text
+    assert 'aria-label="Grant County, 0 plans"' in page.text
+    assert 'class="ma-county has-no-plans is-selected"' in page.text
+    assert 'Gray counties: no MA plans listed for 2027' in page.text
+    # Wheeler's coverage differs by year; zero plans is not a permanent county flag.
+    assert client.get('/ma-map?state=OR&county=41069&year=2026').context['total'] == 0
+    assert client.get('/ma-map?state=OR&county=41069&year=2027').context['total'] > 0
+
+
+def test_state_switch_links_reset_county_and_comparison_and_bad_states_rejected(client):
+    for url in ['/ma-map?state=CA', '/ma-map?state=OR&county=54039', '/ma-map?state=WV&county=41019']:
+        assert client.get(url).status_code == 422
+    page = client.get('/ma-map?state=or')
+    assert page.status_code == 200 and page.context['state'] == 'OR'
+    assert page.context['county'] is None and not page.context['chosen']
+    # State navigation retains only the plan year, never a stale county or selection.
+    assert '<a href="/ma-map?state=WV&amp;year=2027"' in page.text
+    wv_id = ma.plan_values(ma.load_catalog(2027), '54039')[0]['id']
+    assert client.get('/ma-map', params={'state': 'OR', 'county': '41019', 'selected_ids': wv_id}).status_code == 422
+
+
+def test_oregon_filters_preserve_source_values_and_distinguish_empty_filter_result(client):
+    page = client.get('/ma-map?state=OR&county=41051')  # Multnomah
+    plans = page.context['plans']
+    assert {p['part_d'] for p in plans} == {'Yes', 'No'}
+    assert {p['snp'] for p in plans} == {'Yes', 'No'}
+    filtered = client.get('/ma-map?state=OR&county=41051&coverage=without&eligibility=general')
+    assert filtered.context['plans']
+    assert all(p['part_d'] == 'No' and p['snp'] == 'No' and p['monthly_premium'] == p['part_c_premium'] for p in filtered.context['plans'])
+    no_match = client.get('/ma-map?state=OR&county=41051&coverage=without&eligibility=snp')
+    assert no_match.context['total'] > 0 and no_match.context['plans'] == []
+    assert 'No plans match these filters' in no_match.text
+    assert 'No Medicare Advantage plans listed</h3>' not in no_match.text
+    assert 'state=OR&amp;year=2027&amp;county=41051' in no_match.text
