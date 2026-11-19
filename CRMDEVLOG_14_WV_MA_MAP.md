@@ -1,4 +1,4 @@
-# CRMDevLog #14 — West Virginia MA County Map
+# CRMDevLog #14 — Medicare Advantage County Maps
 
 November 19, 2026 (America/Los_Angeles). Initial WV implementation.
 
@@ -82,3 +82,51 @@ automatic scheduled updates are not included in this first version.
 
 The initial code/QA record alone does not establish a live release. Deployment
 status and user acceptance belong in the main development log.
+
+## Oregon expansion — November 19, 2026
+
+William accepted the first WV version and requested Oregon next. The **MA County
+Map** page now has **West Virginia** and **Oregon** state tabs. Open Oregon at
+`/ma-map?state=OR`. All 36 Oregon county polygons remain clickable, including
+counties with no MA plans in the selected source year. Zero-plan counties are
+shaded gray and have a dated, explicit no-listings message. An empty result
+after applying filters is identified separately.
+
+| CMS input | Oregon county-plan rows | Distinct plan segments | Insurance brands | Counties with no MA listings |
+|---|---:|---:|---:|---:|
+| CY2027 Landscape (202611), updated 2026-11-01 | 518 | 95 | 14 | 5 |
+| CY2026 Landscape (202609), updated 2026-09-02 | 595 | 101 | 15 | 6 |
+
+Both catalogs use the same government ZIP sources and provenance format as WV.
+The county geometry comes from the same Census 2025 national boundaries,
+filtered to Oregon FIPS 41 and projected at Oregon's latitude. The source
+builder keeps its filename for backward compatibility; use `--state OR` to
+generate Oregon files and omit the flag (or use `--state WV`) for WV. Example:
+
+```sh
+python scripts/build_wv_ma_catalog.py --state OR \
+  --boundaries /path/to/cb_2025_us_county_5m.zip \
+  --landscape 2027=/path/to/cy2027-landscape-202611.zip \
+  --landscape 2026=/path/to/cy2026-landscape-202609.zip
+```
+
+State navigation clears county, filters and comparison selections while keeping
+the selected year. All county links, forms and comparison queries retain the
+state explicitly. Foreign-state counties or plans are rejected. Old WV URLs
+without a state parameter still work. Location/filter forms now use an explicit
+action so a previous comparison anchor does not pull the user to an empty
+comparison after changing year or filters.
+
+Validation: 181 repository tests passed, including 16 map/catalog cases. Every
+Oregon county-plan row, brand, plan name, coverage/SNP flag and core cost field
+was independently reconciled against the original 2026 and 2027 CMS CSVs. A WV
+rebuild produced identical geometry/catalog content apart from the import
+timestamp. Full app health and Oregon access protection, JS syntax and
+whitespace checks passed. Desktop browser checks cover county navigation,
+Douglas County comparison/year switching, state reset and zero-plan county
+handling. Detailed benefits, contact saving, source refresh automation and
+narrow-viewport browser verification retain the limits described above. No
+new runtime dependency, database migration or contact changes are introduced.
+
+California and Texas remain future states under #14. Release details are
+recorded in the main development log after deployment verification.

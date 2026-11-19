@@ -1,38 +1,42 @@
 {% extends 'base.html' %}
-{% block title %}West Virginia MA County Map · WSBCO{% endblock %}
+{% block title %}{{state_name}} MA County Map · WSBCO{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="/static/css/ma_county_map.css?v=1">
+<link rel="stylesheet" href="/static/css/ma_county_map.css?v=2">
 <main class="ma-page">
   <header class="ma-heading">
-    <div><p class="ma-eyebrow">MEDICARE ADVANTAGE · COUNTY EXPLORER</p><h1>West Virginia</h1><p>Choose a county. Explore its plans. Compare your selections.</p></div>
-    <span class="ma-state-tag">WV · 55 counties</span>
+    <div><p class="ma-eyebrow">MEDICARE ADVANTAGE · COUNTY EXPLORER</p><h1>{{state_name}}</h1><p>Choose a county. Explore its plans. Compare your selections.</p></div>
+    <span class="ma-state-tag">{{state}} · {{counties|length}} counties</span>
   </header>
+  <nav class="ma-state-nav" aria-label="Map state">{% for code, name in states.items() %}<a href="/ma-map?state={{code}}&amp;year={{year}}" {% if state == code %}aria-current="page"{% endif %}>{{name}}</a>{% endfor %}</nav>
   <div class="ma-workspace">
     <section class="ma-panel ma-map-panel" aria-labelledby="map-heading">
       <div class="ma-panel-title"><h2 id="map-heading">Find a county</h2><span>{{ year }} plan year</span></div>
-      <form method="get" class="ma-location-form">
+      <form method="get" action="/ma-map" class="ma-location-form">
+        <input type="hidden" name="state" value="{{state}}">
         <label>Plan year<select name="year">{% for y in years %}<option value="{{y}}" {% if y == year %}selected{% endif %}>{{y}}</option>{% endfor %}</select></label>
         <label>County<select name="county" id="ma-county"><option value="">Choose a county</option>{% for c in counties %}<option value="{{c.id}}" {% if county and county.id == c.id %}selected{% endif %}>{{c.name}}</option>{% endfor %}</select></label>
         <button type="submit" class="ma-button">Show plans</button>
       </form>
       <div class="ma-map-surface">
-        <svg viewBox="{{geometry.view_box}}" aria-labelledby="wv-title wv-desc" class="ma-map">
-          <title id="wv-title">West Virginia county map</title><desc id="wv-desc">Select any county to see Medicare Advantage plans for {{year}}. A county list is also available above.</desc>
-          {% for c in counties %}<a href="{{c.url}}" class="ma-county{% if county and county.id == c.id %} is-selected{% endif %}" aria-label="{{c.name}} County{% if c.count is not none %}, {{c.count}} plans{% endif %}" {% if county and county.id == c.id %}aria-current="location"{% endif %}><title>{{c.name}} County{% if c.count is not none %} · {{c.count}} plans{% endif %}</title><path d="{{c.path}}" fill-rule="evenodd" vector-effect="non-scaling-stroke"></path></a>{% endfor %}
+        <svg viewBox="{{geometry.view_box}}" aria-labelledby="ma-map-title ma-map-desc" class="ma-map">
+          <title id="ma-map-title">{{state_name}} county map</title><desc id="ma-map-desc">Select any county to see Medicare Advantage plans for {{year}}. A county list is also available above.</desc>
+          {% for c in counties %}<a href="{{c.url}}" class="ma-county{% if c.count == 0 %} has-no-plans{% endif %}{% if county and county.id == c.id %} is-selected{% endif %}" aria-label="{{c.name}} County{% if c.count is not none %}, {{c.count}} plan{{'s' if c.count != 1 else ''}}{% endif %}" {% if county and county.id == c.id %}aria-current="location"{% endif %}><title>{{c.name}} County{% if c.count is not none %} · {{c.count}} plan{{'s' if c.count != 1 else ''}}{% endif %}</title><path d="{{c.path}}" fill-rule="evenodd" vector-effect="non-scaling-stroke"></path></a>{% endfor %}
         </svg>
         <p class="ma-map-caption"><span class="ma-swatch"></span> {% if county %}{{county.name}} County selected{% else %}Click any county to begin{% endif %}</p>
+        {% if catalog %}<p class="ma-map-caption"><span class="ma-swatch ma-swatch-empty"></span> Gray counties: no MA plans listed for {{year}}</p>{% endif %}
       </div>
       <p class="ma-small">{{geometry.source_label}}. Map and county list show the same areas.</p>
-      <details class="ma-county-directory"><summary>Browse all 55 counties</summary><div>{% for c in counties %}<a href="{{c.url}}">{{c.name}}{% if c.count is not none %} <span>{{c.count}}</span>{% endif %}</a>{% endfor %}</div></details>
+      <details class="ma-county-directory"><summary>Browse all {{counties|length}} counties</summary><div>{% for c in counties %}<a href="{{c.url}}">{{c.name}}{% if c.count is not none %} <span>{{c.count}}</span>{% endif %}</a>{% endfor %}</div></details>
     </section>
     <section class="ma-panel ma-plan-panel" aria-labelledby="plans-heading">
       {% if data_error %}<h2 id="plans-heading">Plan data unavailable</h2><p role="alert">{{data_error}}</p>
       {% elif not county %}
-        <div class="ma-empty"><span class="ma-empty-icon" aria-hidden="true">WV</span><h2 id="plans-heading">Your county’s plans, in one place</h2><p>Select a county on the map or use the county list.</p><p class="ma-small">All insurers in the CMS catalog. Includes plans with drug coverage, plans without it, and Special Needs Plans.</p></div>
+        <div class="ma-empty"><span class="ma-empty-icon" aria-hidden="true">{{state}}</span><h2 id="plans-heading">Your county’s plans, in one place</h2><p>Select a county on the map or use the county list.</p><p class="ma-small">All insurers in the CMS catalog. Includes plans with drug coverage, plans without it, and Special Needs Plans.</p></div>
       {% else %}
         <div class="ma-panel-title"><div><p class="ma-eyebrow">{{year}} MEDICARE ADVANTAGE</p><h2 id="plans-heading">{{county.name}} County</h2></div><a href="https://www.medicare.gov/plan-compare/" target="_blank" rel="noopener noreferrer">Medicare.gov</a></div>
         <div class="ma-summary"><strong>{{total}} <span>listed plans</span></strong><strong>{{insurer_count}} <span>insurance brands</span></strong><strong>{{plans|length}} <span>shown with filters</span></strong></div>
-        <form method="get" class="ma-filter-form">
+        <form method="get" action="/ma-map" class="ma-filter-form">
+          <input type="hidden" name="state" value="{{state}}">
           <input type="hidden" name="year" value="{{year}}"><input type="hidden" name="county" value="{{county.id}}">
           <label>Insurance company<select name="carrier"><option value="">All insurers</option>{% for name in carriers %}<option value="{{name}}" {% if carrier == name %}selected{% endif %}>{{name}}</option>{% endfor %}</select></label>
           <label>Drug coverage<select name="coverage">{% for value, label in [('all','With and without Part D'),('with','With Part D'),('without','Without Part D')] %}<option value="{{value}}" {% if coverage == value %}selected{% endif %}>{{label}}</option>{% endfor %}</select></label>
@@ -41,9 +45,10 @@
         </form>
         <p class="ma-small">County-level listings require address and eligibility verification. Special Needs Plans have additional requirements. Prices exclude your Part B premium and applicable surcharges.</p>
         <form method="get" action="/ma-map#comparison" id="ma-compare-form">
+          <input type="hidden" name="state" value="{{state}}">
           <input type="hidden" name="year" value="{{year}}"><input type="hidden" name="county" value="{{county.id}}"><input type="hidden" name="carrier" value="{{carrier}}"><input type="hidden" name="coverage" value="{{coverage}}"><input type="hidden" name="eligibility" value="{{eligibility}}">
           <div class="ma-compare-toolbar"><div><strong>Select up to 3 plans</strong><span id="ma-selected-count" aria-live="polite">{{selected_ids|length}} selected</span></div><button class="ma-button" type="submit">Compare selected plans</button></div>
-          {% if not plans %}<p class="ma-no-results">No plans match these filters. <a href="/ma-map?year={{year}}&amp;county={{county.id}}">Show all county plans</a>.</p>{% endif %}
+          {% if not total %}<div class="ma-no-results"><h3>No Medicare Advantage plans listed</h3><p>The {{year}} CMS Landscape lists no MA plans in {{county.name}} County, {{state_name}}. Source updated {{catalog.source_updated}}. Verify current options on Medicare.gov.</p></div>{% elif not plans %}<p class="ma-no-results">No plans match these filters. <a href="/ma-map?state={{state}}&amp;year={{year}}&amp;county={{county.id}}">Show all county plans</a>.</p>{% endif %}
           <div class="ma-plan-list">{% for p in plans %}<label class="ma-plan-card{% if p.id in selected_ids %} is-checked{% endif %}">
             <input type="checkbox" name="selected_ids" value="{{p.id}}" {% if p.id in selected_ids %}checked{% endif %} aria-label="Compare {{p.plan_name}} {{p.id}}">
             <div class="ma-plan-content"><div class="ma-plan-brand">{{p.carrier}}</div><h3>{{p.plan_name}}</h3><p class="ma-plan-id">{{p.id}} · {{p.plan_type}}</p><div class="ma-badges"><span>{{'Includes Part D' if p.part_d == 'Yes' else 'No Part D'}}</span>{% if p.snp == 'Yes' %}<span class="ma-snp">{{p.snp_type}} SNP · eligibility required</span>{% endif %}{% if p.sanctioned == 'Yes' %}<span class="ma-snp">Sanctioned · verify enrollment restrictions</span>{% endif %}</div><dl class="ma-plan-metrics"><div><dt>Monthly plan premium</dt><dd>{{p.monthly_premium or 'Not reported'}}</dd></div><div><dt>In-network medical MOOP</dt><dd>{{p.moop or 'Not reported'}}</dd></div><div><dt>Annual drug deductible</dt><dd>{{p.drug_deductible or 'Not reported'}}</dd></div></dl></div>
@@ -53,8 +58,8 @@
     </section>
   </div>
   <section id="comparison" class="ma-panel ma-comparison" aria-labelledby="comparison-heading">
-    <div class="ma-panel-title"><h2 id="comparison-heading">Side-by-side comparison</h2>{% if chosen %}<span>{{county.name}} County · {{year}}</span>{% endif %}</div>
-    {% if chosen %}<div class="ma-table-scroll" tabindex="0" aria-label="Scrollable plan comparison"><table><caption>Selected {{year}} plans listed in {{county.name}} County</caption><thead><tr><th scope="col">Plan details</th>{% for p in chosen %}<th scope="col">{{p.plan_name}}<small>{{p.carrier}}</small></th>{% endfor %}</tr></thead><tbody>{% for label, key in compare_fields %}<tr><th scope="row">{{label}}</th>{% for p in chosen %}<td>{{p.get(key) or 'Not supplied in CMS Landscape'}}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div><p class="ma-small">Medical copays, medical deductibles and supplemental benefits need current plan benefit documents. Drug costs and provider networks are not evaluated here. This comparison is for review and is not saved to a contact.</p>
+    <div class="ma-panel-title"><h2 id="comparison-heading">Side-by-side comparison</h2>{% if chosen %}<span>{{county.name}} County, {{state}} · {{year}}</span>{% endif %}</div>
+    {% if chosen %}<div class="ma-table-scroll" tabindex="0" aria-label="Scrollable plan comparison"><table><caption>Selected {{year}} plans listed in {{county.name}} County, {{state_name}}</caption><thead><tr><th scope="col">Plan details</th>{% for p in chosen %}<th scope="col">{{p.plan_name}}<small>{{p.carrier}}</small></th>{% endfor %}</tr></thead><tbody>{% for label, key in compare_fields %}<tr><th scope="row">{{label}}</th>{% for p in chosen %}<td>{{p.get(key) or 'Not supplied in CMS Landscape'}}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div><p class="ma-small">Medical copays, medical deductibles and supplemental benefits need current plan benefit documents. Drug costs and provider networks are not evaluated here. This comparison is for review and is not saved to a contact.</p>
     {% else %}<p>Choose a county, select plans, then click <strong>Compare selected plans</strong>.</p>{% endif %}
   </section>
   {% if catalog %}<footer class="ma-source"><strong>Source: {{catalog.source_label}}</strong> · Updated {{catalog.source_updated}}<br>{{catalog.scope}} <a href="{{catalog.source_page}}" target="_blank" rel="noopener noreferrer">CMS source files</a>. Data is a dated snapshot; verify current service area, benefits, enrollment restrictions and eligibility with Medicare.gov and the insurer.</footer>{% endif %}
