@@ -128,5 +128,39 @@ handling. Detailed benefits, contact saving, source refresh automation and
 narrow-viewport browser verification retain the limits described above. No
 new runtime dependency, database migration or contact changes are introduced.
 
-California and Texas remain future states under #14. Release details are
-recorded in the main development log after deployment verification.
+At the Oregon release, California and Texas remained future states under #14.
+The California expansion is recorded below. Release details are recorded in
+the main development log after deployment verification.
+
+## California expansion — November 19, 2026
+
+The **MA County Map** now includes a **California** state tab at
+`/ma-map?state=CA`. All 58 Census county polygons are clickable. The existing
+2026/2027 selection, all-insurer listing, drug/SNP filters, up-to-three-plan
+comparison, missing-benefit labels, and dated no-listings behavior also apply
+to California. State/year/county identity is preserved throughout; California
+county IDs retain their leading zero (for example, Los Angeles is `06037`).
+
+| CMS input | California county-plan rows | Distinct plan segments | Insurance brands | Counties with no MA listings |
+|---|---:|---:|---:|---:|
+| CY2027 Landscape (202611), updated 2026-11-01 | 1,278 | 394 | 38 | 3 |
+| CY2026 Landscape (202609), updated 2026-09-02 | 1,334 | 402 | 41 | 2 |
+
+California geometry uses the same Census 2025 national boundaries, filtered
+to FIPS 06 and projected at latitude 37. Use `--state CA` with the existing
+source builder and original government ZIP inputs to regenerate the files.
+WV and Oregon data files and runtime dependencies are unchanged.
+
+Validation: all 188 repository tests passed, including 23 map/catalog cases.
+Independently reconciled every California county-plan row and core cost,
+carrier, plan-name, drug-coverage and SNP fields against the original CMS CSVs
+for both years. Full-app startup/health and California access checks, JS syntax
+and whitespace checks passed. Desktop browser checks confirmed the 124-entry
+2027 Los Angeles list, general-enrollment filtering, a three-brand comparison,
+Lake County's change from no listings in 2027 to one in 2026, and state/reset
+behavior. No separate narrow-viewport browser test was performed.
+
+California inherits the documented limits for detailed medical/supplemental
+benefits, provider/drug verification, contact saving and automated refreshes.
+No contact changes or database migration were introduced. Texas remains the
+next state under #14; deployment evidence is recorded in the main log.

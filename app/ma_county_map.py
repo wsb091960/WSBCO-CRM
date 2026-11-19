@@ -10,10 +10,11 @@ from fastapi.templating import Jinja2Templates
 router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
 DATA_DIR = Path(__file__).resolve().parent / 'data' / 'ma_map'
-STATES = {'WV': 'West Virginia', 'OR': 'Oregon'}
+STATES = {'WV': 'West Virginia', 'OR': 'Oregon', 'CA': 'California'}
 CATALOG_FILES = {
     'WV': {2026: 'wv_2026.json', 2027: 'wv_2027.json'},
     'OR': {2026: 'or_2026.json', 2027: 'or_2027.json'},
+    'CA': {2026: 'ca_2026.json', 2027: 'ca_2027.json'},
 }
 COMPARE_FIELDS = [
     ('Insurance company / brand', 'carrier'), ('Parent organization', 'parent_organization'),
@@ -70,7 +71,7 @@ def map_page(request: Request, year: int = 2027, state: str = Query('WV', max_le
              selected_ids: list[str] = Query(default=[])):
     state = state.upper()
     if state not in STATES:
-        raise HTTPException(422, 'Choose an installed state: West Virginia or Oregon.')
+        raise HTTPException(422, 'Choose an installed state: ' + ', '.join(STATES.values()) + '.')
     if year not in CATALOG_FILES[state]:
         raise HTTPException(422, 'Choose an installed plan year: 2026 or 2027.')
     if coverage not in {'all', 'with', 'without'} or eligibility not in {'all', 'general', 'snp'}:

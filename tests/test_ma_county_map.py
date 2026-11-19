@@ -136,10 +136,12 @@ def test_map_and_comparison_keep_existing_owner_access(monkeypatch):
     with TestClient(app, base_url='https://wsbco-crm.onrender.com', follow_redirects=False) as client:
         assert client.get('/ma-map?county=54039').status_code == 401
         assert client.get('/ma-map?state=OR&county=41019').status_code == 401
+        assert client.get('/ma-map?state=CA&county=06037').status_code == 401
         assert client.get('/ma-map', headers={'Accept': 'text/html'}).status_code == 303
         client.cookies.set(auth.SESSION_COOKIE, 'b' * 64)
         assert client.get('/ma-map?county=54039').status_code == 200
         assert client.get('/ma-map?state=OR&county=41019').status_code == 200
+        assert client.get('/ma-map?state=CA&county=06037').status_code == 200
     engine.dispose()
 
 
@@ -207,7 +209,7 @@ def test_oregon_empty_counties_are_clickable_and_do_not_show_other_counties(clie
 
 
 def test_state_switch_links_reset_county_and_comparison_and_bad_states_rejected(client):
-    for url in ['/ma-map?state=CA', '/ma-map?state=OR&county=54039', '/ma-map?state=WV&county=41019']:
+    for url in ['/ma-map?state=ZZ', '/ma-map?state=OR&county=54039', '/ma-map?state=WV&county=41019']:
         assert client.get(url).status_code == 422
     page = client.get('/ma-map?state=or')
     assert page.status_code == 200 and page.context['state'] == 'OR'
@@ -231,3 +233,93 @@ def test_oregon_filters_preserve_source_values_and_distinguish_empty_filter_resu
     assert 'No plans match these filters' in no_match.text
     assert 'No Medicare Advantage plans listed</h3>' not in no_match.text
     assert 'state=OR&amp;year=2027&amp;county=41051' in no_match.text
+
+
+def test_california_map_preserves_all_58_leading_zero_county_ids(client):
+    page = client.get('/ma-map?state=CA&county=06037')
+    assert page.status_code == 200 and page.context['state_name'] == 'California'
+    assert len(page.context['counties']) == 58
+    assert all(c['id'].startswith('06') and len(c['id']) == 5 and 'state=CA' in c['url'] for c in page.context['counties'])
+    assert page.context['county']['id'] == '06037'
+    assert page.context['county']['name'] == 'Los Angeles'
+    assert 'California county map' in page.text and 'Browse all 58 counties' in page.text
+    assert page.text.count('name="state" value="CA"') == 3
+    assert 'value="06037" selected' in page.text
+    assert set(page.context['states']) == {'WV', 'OR', 'CA'}
+
+
+@pytest.mark.parametrize('year,rows,segments,brands,empty_counties', [
+    (2026, 1334, 402, 41, 2), (2027, 1278, 394, 38, 3),
+])
+def test_california_catalog_integrity(year, rows, segments, brands, empty_counties):
+    data = ma.load_catalog(year, 'CA')
+    geometry = ma.load_geometry('CA')
+    assert data['state'] == 'CA' and data['year'] == year
+    assert len(data['county_plans']) == 58
+    assert set(data['county_plans']) == {c['id'] for c in geometry['counties']}
+    assert all(key.startswith('06') and len(key) == 5 for key in data['county_plans'])
+    assert data['county_plan_rows'] == sum(len(ids) for ids in data['county_plans'].values()) == rows
+    assert len(data['plans']) == segments
+    assert len({p['carrier'] for p in data['plans'].values()}) == brands
+    assert sum(not ids for ids in data['county_plans'].values()) == empty_counties
+    assert {p['category'] for p in data['plans'].values()} == {'MA', 'MA-PD', 'SNP'}
+    assert {p['year'] for p in data['plans'].values()} == {year}
+    assert set(data['plans']) == {key for ids in data['county_plans'].values() for key in ids}
+    assert all(len(ids) == len(set(ids)) for ids in data['county_plans'].values())
+    assert 'All CA MA' in data['scope'] and len(data['source_sha256']) == 64
+
+
+def test_california_large_county_comparison_and_year_specific_values(client):
+    page = client.get('/ma-map?state=CA&county=06037')
+    assert page.context['total'] == 124 and page.context['insurer_count'] == 21
+    assert client.get('/ma-map?state=CA&county=06037&year=2026').context['total'] == 121
+    plans = page.context['plans']
+    brands = sorted({p['carrier'] for p in plans})[:3]
+    chosen = [next(p for p in plans if p['carrier'] == brand) for brand in brands]
+    params = [('state', 'CA'), ('county', '06037')] + [('selected_ids', p['id']) for p in chosen]
+    result = client.get('/ma-map', params=params)
+    assert result.status_code == 200 and result.context['chosen'] == chosen
+    assert 'Selected 2027 plans listed in Los Angeles County, California' in result.text
+    assert 'Not supplied in CMS Landscape' in result.text
+    assert all(p['monthly_premium'] in result.text for p in chosen)
+
+
+def test_california_zero_plan_counties_are_year_specific_and_clickable(client):
+    page = client.get('/ma-map?state=CA&county=06033')  # Lake
+    assert page.status_code == 200 and page.context['total'] == 0
+    assert page.context['plans'] == []
+    assert 'lists no MA plans in Lake County, California' in page.text
+    assert 'aria-label="Lake County, 0 plans"' in page.text
+    assert 'class="ma-county has-no-plans is-selected"' in page.text
+    assert client.get('/ma-map?state=CA&county=06033&year=2026').context['total'] == 1
+
+
+def test_california_filters_and_state_boundaries_remain_isolated(client):
+    for url in ['/ma-map?state=CA&county=41019', '/ma-map?state=CA&county=54039', '/ma-map?state=OR&county=06037', '/ma-map?state=CA&county=6037']:
+        assert client.get(url).status_code == 422
+    wv_id = ma.plan_values(ma.load_catalog(2027), '54039')[0]['id']
+    assert client.get('/ma-map', params={'state': 'CA', 'county': '06037', 'selected_ids': wv_id}).status_code == 422
+    filtered = client.get('/ma-map?state=CA&county=06037&coverage=without&eligibility=general')
+    assert filtered.context['plans']
+    assert all(p['part_d'] == 'No' and p['snp'] == 'No' and p['monthly_premium'] == p['part_c_premium'] for p in filtered.context['plans'])
+    brand = filtered.context['plans'][0]['carrier']
+    brand_page = client.get('/ma-map', params={'state': 'CA', 'county': '06037', 'carrier': brand})
+    assert all(p['carrier'] == brand for p in brand_page.context['plans'])
+    blank = client.get('/ma-map?state=ca')
+    assert blank.status_code == 200 and blank.context['state'] == 'CA'
+    assert blank.context['county'] is None and not blank.context['chosen']
+    assert '<a href="/ma-map?state=CA&amp;year=2027" aria-current="page"' in blank.text
+
+
+def test_california_missing_catalog_retains_map_without_fallback(client, monkeypatch):
+    original = ma.load_catalog
+    def missing(year, state='WV'):
+        if state == 'CA':
+            raise FileNotFoundError()
+        return original(year, state)
+    monkeypatch.setattr(ma, 'load_catalog', missing)
+    page = client.get('/ma-map?state=CA&county=06037')
+    assert page.status_code == 503 and len(page.context['counties']) == 58
+    assert 'Plan data unavailable' in page.text
+    assert not page.context['plans']
+    assert client.get('/ma-map?state=OR&county=41019').status_code == 200
