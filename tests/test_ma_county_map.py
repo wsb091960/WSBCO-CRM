@@ -137,11 +137,13 @@ def test_map_and_comparison_keep_existing_owner_access(monkeypatch):
         assert client.get('/ma-map?county=54039').status_code == 401
         assert client.get('/ma-map?state=OR&county=41019').status_code == 401
         assert client.get('/ma-map?state=CA&county=06037').status_code == 401
+        assert client.get('/ma-map?state=TX&county=48201').status_code == 401
         assert client.get('/ma-map', headers={'Accept': 'text/html'}).status_code == 303
         client.cookies.set(auth.SESSION_COOKIE, 'b' * 64)
         assert client.get('/ma-map?county=54039').status_code == 200
         assert client.get('/ma-map?state=OR&county=41019').status_code == 200
         assert client.get('/ma-map?state=CA&county=06037').status_code == 200
+        assert client.get('/ma-map?state=TX&county=48201').status_code == 200
     engine.dispose()
 
 
@@ -245,7 +247,7 @@ def test_california_map_preserves_all_58_leading_zero_county_ids(client):
     assert 'California county map' in page.text and 'Browse all 58 counties' in page.text
     assert page.text.count('name="state" value="CA"') == 3
     assert 'value="06037" selected' in page.text
-    assert set(page.context['states']) == {'WV', 'OR', 'CA'}
+    assert set(page.context['states']) == {'WV', 'OR', 'CA', 'TX'}
 
 
 @pytest.mark.parametrize('year,rows,segments,brands,empty_counties', [
@@ -323,3 +325,104 @@ def test_california_missing_catalog_retains_map_without_fallback(client, monkeyp
     assert 'Plan data unavailable' in page.text
     assert not page.context['plans']
     assert client.get('/ma-map?state=OR&county=41019').status_code == 200
+
+
+def test_texas_has_all_254_county_links_and_four_state_navigation(client):
+    page = client.get('/ma-map?state=TX&county=48201')
+    assert page.status_code == 200 and page.context['state_name'] == 'Texas'
+    assert len(page.context['counties']) == 254
+    assert all(c['id'].startswith('48') and len(c['id']) == 5 and 'state=TX' in c['url'] for c in page.context['counties'])
+    assert page.context['county']['name'] == 'Harris'
+    assert page.context['county']['id'] == '48201'
+    assert 'Texas county map' in page.text and 'Browse all 254 counties' in page.text
+    assert page.text.count('name="state" value="TX"') == 3
+    assert set(page.context['states']) == {'WV', 'OR', 'CA', 'TX'}
+
+
+@pytest.mark.parametrize('year,rows,segments,brands', [
+    (2026, 10378, 423, 28), (2027, 9363, 421, 22),
+])
+def test_texas_catalog_integrity_and_complete_county_coverage(year, rows, segments, brands):
+    data = ma.load_catalog(year, 'TX')
+    geometry = ma.load_geometry('TX')
+    assert data['state'] == 'TX' and data['year'] == year
+    assert len(data['county_plans']) == 254
+    assert set(data['county_plans']) == {c['id'] for c in geometry['counties']}
+    assert all(key.startswith('48') and len(key) == 5 for key in data['county_plans'])
+    assert data['county_plan_rows'] == sum(len(ids) for ids in data['county_plans'].values()) == rows
+    assert len(data['plans']) == segments
+    assert len({p['carrier'] for p in data['plans'].values()}) == brands
+    assert all(data['county_plans'].values())  # Both source years have records for every TX county.
+    assert {p['category'] for p in data['plans'].values()} == {'MA', 'MA-PD', 'SNP'}
+    assert {p['year'] for p in data['plans'].values()} == {year}
+    assert set(data['plans']) == {key for ids in data['county_plans'].values() for key in ids}
+    assert all(len(ids) == len(set(ids)) for ids in data['county_plans'].values())
+    assert 'All TX MA' in data['scope'] and len(data['source_sha256']) == 64
+
+
+def test_texas_harris_county_comparison_and_year_specific_plan_values(client):
+    page = client.get('/ma-map?state=TX&county=48201')
+    assert page.context['total'] == 99 and page.context['insurer_count'] == 16
+    assert client.get('/ma-map?state=TX&county=48201&year=2026').context['total'] == 114
+    general = client.get('/ma-map?state=TX&county=48201&eligibility=general').context['plans']
+    brands = sorted({p['carrier'] for p in general})[:3]
+    chosen = [next(p for p in general if p['carrier'] == brand) for brand in brands]
+    params = [('state', 'TX'), ('county', '48201'), ('eligibility', 'general')] + [('selected_ids', p['id']) for p in chosen]
+    result = client.get('/ma-map', params=params)
+    assert result.status_code == 200 and result.context['chosen'] == chosen
+    assert 'Selected 2027 plans listed in Harris County, Texas' in result.text
+    assert all(p['monthly_premium'] in result.text and p['moop'] in result.text for p in chosen)
+    assert 'Not supplied in CMS Landscape' in result.text
+
+
+def test_texas_rural_counties_keep_their_own_year_specific_listings(client):
+    gaines = client.get('/ma-map?state=TX&county=48165')
+    assert gaines.context['county']['name'] == 'Gaines'
+    assert gaines.context['total'] == 9
+    assert client.get('/ma-map?state=TX&county=48165&year=2026').context['total'] == 7
+    loving = client.get('/ma-map?state=TX&county=48301')
+    assert loving.context['county']['name'] == 'Loving'
+    assert loving.context['total'] == 12
+    assert client.get('/ma-map?state=TX&county=48301&year=2026').context['total'] == 19
+
+
+def test_texas_filters_preserve_coverage_eligibility_and_premium_semantics(client):
+    base = '/ma-map?state=TX&county=48201'
+    all_plans = client.get(base).context['plans']
+    with_drugs = client.get(base + '&coverage=with').context['plans']
+    no_drugs = client.get(base + '&coverage=without').context['plans']
+    snp = client.get(base + '&eligibility=snp').context['plans']
+    general = client.get(base + '&eligibility=general').context['plans']
+    assert with_drugs and no_drugs and snp and general
+    assert len(with_drugs) + len(no_drugs) == len(all_plans)
+    assert len(snp) + len(general) == len(all_plans)
+    assert all(p['part_d'] == 'No' and p['monthly_premium'] == p['part_c_premium'] for p in no_drugs)
+    assert all(p['snp'] == 'Yes' for p in snp)
+    brand = all_plans[0]['carrier']
+    filtered = client.get('/ma-map', params={'state': 'TX', 'county': '48201', 'carrier': brand})
+    assert filtered.context['plans'] and all(p['carrier'] == brand for p in filtered.context['plans'])
+
+
+def test_texas_rejects_foreign_state_counties_and_foreign_county_plans(client):
+    for url in ['/ma-map?state=TX&county=06037', '/ma-map?state=TX&county=41019', '/ma-map?state=TX&county=54039', '/ma-map?state=CA&county=48201']:
+        assert client.get(url).status_code == 422
+    data = ma.load_catalog(2027, 'TX')
+    foreign = next(key for key in data['plans'] if key not in data['county_plans']['48201'])
+    assert client.get('/ma-map', params={'state': 'TX', 'county': '48201', 'selected_ids': foreign}).status_code == 422
+    blank = client.get('/ma-map?state=tx')
+    assert blank.status_code == 200 and blank.context['county'] is None
+    assert blank.context['state'] == 'TX' and not blank.context['chosen']
+    assert '<a href="/ma-map?state=TX&amp;year=2027" aria-current="page"' in blank.text
+
+
+def test_texas_missing_catalog_does_not_fall_back_to_another_state(client, monkeypatch):
+    original = ma.load_catalog
+    def missing(year, state='WV'):
+        if state == 'TX':
+            raise FileNotFoundError()
+        return original(year, state)
+    monkeypatch.setattr(ma, 'load_catalog', missing)
+    page = client.get('/ma-map?state=TX&county=48201')
+    assert page.status_code == 503 and len(page.context['counties']) == 254
+    assert 'Plan data unavailable' in page.text and not page.context['plans']
+    assert client.get('/ma-map?state=CA&county=06037').status_code == 200
