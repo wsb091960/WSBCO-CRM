@@ -20,6 +20,7 @@ STATES = {
     'WV': {'name': 'West Virginia', 'fips': '54', 'counties': 55, 'latitude': 39},
     'OR': {'name': 'Oregon', 'fips': '41', 'counties': 36, 'latitude': 44},
     'CA': {'name': 'California', 'fips': '06', 'counties': 58, 'latitude': 37},
+    'TX': {'name': 'Texas', 'fips': '48', 'counties': 254, 'latitude': 31},
 }
 FIELDS = {
     'carrier': 'Organization Marketing Name',

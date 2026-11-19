@@ -162,5 +162,43 @@ behavior. No separate narrow-viewport browser test was performed.
 
 California inherits the documented limits for detailed medical/supplemental
 benefits, provider/drug verification, contact saving and automated refreshes.
-No contact changes or database migration were introduced. Texas remains the
-next state under #14; deployment evidence is recorded in the main log.
+No contact changes or database migration were introduced. At the California
+release, Texas remained the next state under #14. Its expansion is recorded
+below; deployment evidence is recorded in the main log.
+
+## Texas expansion — November 19, 2026
+
+The **Texas** tab at `/ma-map?state=TX` completes the requested initial
+four-state county-map rollout: West Virginia, Oregon, California and Texas.
+All 254 Texas county polygons are clickable, with the same plan-year,
+all-listed-insurer, drug-coverage/SNP filters and three-plan comparison.
+No other state's catalog or geometry is replaced.
+
+| CMS input | Texas county-plan rows | Distinct plan segments | Insurance brands | Counties with MA listings |
+|---|---:|---:|---:|---:|
+| CY2027 Landscape (202611), updated 2026-11-01 | 9,363 | 421 | 22 | 254 |
+| CY2026 Landscape (202609), updated 2026-09-02 | 10,378 | 423 | 28 | 254 |
+
+Counts describe public CMS Landscape records, including Special Needs Plans
+with extra eligibility conditions; they are not individualized enrollment
+determinations. The same plan segment appears in multiple county rows. Texas
+geometry uses Census 2025 national county boundaries filtered to FIPS 48 and
+projected at latitude 31. Use `--state TX` with the existing builder and
+original government ZIP files to refresh Texas. Provenance retains the source
+URLs, dates, hashes and import timestamp.
+
+Validation: all 196 repository tests passed, including 31 map/catalog cases.
+Every Texas county-plan row, carrier, plan name, coverage/SNP flag and core
+cost field was independently reconciled with both original CMS CSVs. Desktop
+browser checks confirmed Harris County's 99-entry 2027 list, general-plan
+filtering, a three-brand comparison, a reset to 114 entries for 2026, Loving
+County's own listings, and clean state switching. Full app health/access, JS
+syntax and whitespace checks passed. No separate narrow-viewport browser test
+was performed. There are no new runtime dependencies, DB migrations or contact
+changes.
+
+The initial four-state map rollout is delivered. Item #14 remains In progress
+for the documented detailed-benefit, contact-save and source-refresh work;
+this expansion does not supply medical copays/deductibles, supplemental
+benefits, personalized drug pricing or network verification. The main
+development log records the deployed commit and production checks.

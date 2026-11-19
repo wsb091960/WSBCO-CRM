@@ -10,11 +10,12 @@ from fastapi.templating import Jinja2Templates
 router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
 DATA_DIR = Path(__file__).resolve().parent / 'data' / 'ma_map'
-STATES = {'WV': 'West Virginia', 'OR': 'Oregon', 'CA': 'California'}
+STATES = {'WV': 'West Virginia', 'OR': 'Oregon', 'CA': 'California', 'TX': 'Texas'}
 CATALOG_FILES = {
     'WV': {2026: 'wv_2026.json', 2027: 'wv_2027.json'},
     'OR': {2026: 'or_2026.json', 2027: 'or_2027.json'},
     'CA': {2026: 'ca_2026.json', 2027: 'ca_2027.json'},
+    'TX': {2026: 'tx_2026.json', 2027: 'tx_2027.json'},
 }
 COMPARE_FIELDS = [
     ('Insurance company / brand', 'carrier'), ('Parent organization', 'parent_organization'),
