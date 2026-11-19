@@ -1,4 +1,4 @@
-"""Build offline WV or Oregon map/catalogs from Census and CMS ZIP files.
+"""Build offline state maps/catalogs from Census and CMS ZIP files.
 
 Run with the development-only pyshp package; the CRM needs no new dependency.
 Example: python scripts/build_wv_ma_catalog.py --state OR --boundaries counties.zip \
@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STATES = {
     'WV': {'name': 'West Virginia', 'fips': '54', 'counties': 55, 'latitude': 39},
     'OR': {'name': 'Oregon', 'fips': '41', 'counties': 36, 'latitude': 44},
+    'CA': {'name': 'California', 'fips': '06', 'counties': 58, 'latitude': 37},
 }
 FIELDS = {
     'carrier': 'Organization Marketing Name',
