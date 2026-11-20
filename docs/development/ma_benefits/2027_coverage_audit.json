@@ -1,0 +1,106 @@
+{
+  "year": 2027,
+  "release_ready": false,
+  "source": {
+    "publisher": "CMS",
+    "url": "https://www.cms.gov/files/zip/pbp-benefits-2027.zip",
+    "source_page": "https://www.cms.gov/data-research/statistics-trends-and-reports/medicare-advantagepart-d-contract-and-enrollment-data/benefits-data/pbp-benefits-2027",
+    "http_last_modified": "Thu, 01 Oct 2026 17:45:40 GMT",
+    "zip_sha256": "6d8430e2ecb51acf3cc8547f12dd73506aa73f0dccf034cc3c3393868576ff47",
+    "member_sha256": {
+      "PBP_Benefits_2027_dictionary.xlsx": "48de37dabe5297e52d2476a82ec3990221978a0d3616d162e74b08f322c69c78",
+      "Readme_PBP_Benefits_2027.txt": "cf47b7fd2b51f8fd1d68242cfbfaa7e922d2743f9c41164d4633441739cc54b2",
+      "pbp_Section_A.txt": "4f2ccc1f6d35aadb2a6436779e5099a2ae074971a1538dbfc70024cc1da1c920",
+      "pbp_Section_D.txt": "0b8419a454a348b44a530203f714b5cff3985fffffcb4aa8144daf8165860bd9",
+      "pbp_b7_health_prof.txt": "206bf1d86ec2a112fc47e77a583aa1ea4fccd777ae087c44a70ad59db4cdca5b",
+      "pbp_b1a_inpat_hosp.txt": "38773259499987d03e2745406180fe471094c3db36a46e9f2ce07c34c3f22fa6",
+      "pbp_b16_dental.txt": "ac810244250d9e30feb112c1f1fa40bc8ef067a94be045d3f0b415d6d579b8d6",
+      "pbp_b17_eye_exams_wear.txt": "74dd299c79db203e14439305f0771f414880580aa180526ace2e655567c56a7a",
+      "pbp_b18_hearing_exams_aids.txt": "2987392a0840b67ef59480d8c5f74df628a30081a9b7887a4d6c6eb33a385d2d",
+      "pbp_Section_C.txt": "e755f27bd6b0704435654bf5af2b42babd023ff90c5aacf5239125591613a6e8",
+      "pbp_Section_C_OON.txt": "c97806715142a0986e1355a4d85cbcd9066bb89bdbee8f77db6ef5c545c96702",
+      "pbp_Section_C_POS.txt": "e84a733a1cf29d5389d25d71c076db7b1deeecb4266413fac22554e6bcef1f08",
+      "pbp_b13_other_services.txt": "35ed957f25a6242cbe91dd70affb25f26b5b7dd1d0687ec591838dd9ba5ad6ed",
+      "pbp_b19a_model_test_vbid_uf.txt": "cfdfb1f5c833c682fac4da2e62c263bb884e3d4b6f915bf3065c6538e4741365"
+    },
+    "dictionary": "PBP_Benefits_2027_dictionary.xlsx"
+  },
+  "coverage": {
+    "WV": {
+      "catalog_plans": 70,
+      "exact_identity_matches": 70,
+      "plans_with_review_issues": 0,
+      "missing_section_records": {
+        "medical_deductible_and_combined_limits": 0,
+        "professional_services": 0,
+        "inpatient_hospital": 0,
+        "dental": 0,
+        "vision": 0,
+        "hearing": 0,
+        "out_of_network": 0,
+        "out_of_network_groups": 24,
+        "point_of_service": 61,
+        "supplemental_services": 0,
+        "eligibility_and_uniform_flexibility": 67
+      }
+    },
+    "OR": {
+      "catalog_plans": 95,
+      "exact_identity_matches": 95,
+      "plans_with_review_issues": 0,
+      "missing_section_records": {
+        "medical_deductible_and_combined_limits": 0,
+        "professional_services": 0,
+        "inpatient_hospital": 0,
+        "dental": 0,
+        "vision": 0,
+        "hearing": 0,
+        "out_of_network": 0,
+        "out_of_network_groups": 55,
+        "point_of_service": 80,
+        "supplemental_services": 0,
+        "eligibility_and_uniform_flexibility": 84
+      }
+    },
+    "CA": {
+      "catalog_plans": 394,
+      "exact_identity_matches": 394,
+      "plans_with_review_issues": 0,
+      "missing_section_records": {
+        "medical_deductible_and_combined_limits": 0,
+        "professional_services": 0,
+        "inpatient_hospital": 0,
+        "dental": 0,
+        "vision": 0,
+        "hearing": 0,
+        "out_of_network": 2,
+        "out_of_network_groups": 376,
+        "point_of_service": 319,
+        "supplemental_services": 0,
+        "eligibility_and_uniform_flexibility": 381
+      }
+    },
+    "TX": {
+      "catalog_plans": 421,
+      "exact_identity_matches": 421,
+      "plans_with_review_issues": 0,
+      "missing_section_records": {
+        "medical_deductible_and_combined_limits": 0,
+        "professional_services": 0,
+        "inpatient_hospital": 0,
+        "dental": 0,
+        "vision": 0,
+        "hearing": 0,
+        "out_of_network": 0,
+        "out_of_network_groups": 342,
+        "point_of_service": 326,
+        "supplemental_services": 0,
+        "eligibility_and_uniform_flexibility": 372
+      }
+    }
+  },
+  "review_issues": {},
+  "development_only": true,
+  "production_commit": "00c6651c95230155e440bf1eab4cde07282c5246",
+  "production_integration": false
+}

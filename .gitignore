@@ -9,3 +9,6 @@ backups/
 
 # Local installation archives
 *.zip
+
+# Development PBP evidence; regenerate from the recorded official source ZIP.
+development/generated/

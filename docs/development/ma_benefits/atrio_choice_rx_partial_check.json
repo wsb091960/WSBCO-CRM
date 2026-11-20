@@ -1,0 +1,54 @@
+{
+  "year": 2027,
+  "plan_id": "H6743-007-000",
+  "county_fips": "41019",
+  "review_status": "partial_manual_check_only",
+  "release_ready": false,
+  "source_document": {
+    "url": "https://www.atriohp.com/media/zvybx12z/2027-dg-sb_final-v2.pdf",
+    "publisher": "ATRIO Health Plans",
+    "document": "2027 Douglas County Summary of Benefits",
+    "cover_plan_identifiers": [
+      "H6743-007",
+      "H6743-028",
+      "H6743-029"
+    ],
+    "reviewed_at": "2026-11-19 America/Los_Angeles",
+    "pdf_page": 7,
+    "printed_page": 6,
+    "retrieval_note": "Official PDF readable through web retrieval and page image. Direct programmatic download returned HTTP 403; no saved PDF or PDF hash claimed."
+  },
+  "checks": [
+    {
+      "benefit": "Primary care, in-network",
+      "document_value": "$0 copay",
+      "pbp_file": "pbp_b7_health_prof.txt",
+      "pbp_line": 5886,
+      "raw_fields": {
+        "pbp_b7a_copay_yn": "2",
+        "pbp_b7a_copay_amt_mc_min": "",
+        "pbp_b7a_copay_amt_mc_max": "",
+        "pbp_b7a_coins_yn": "2",
+        "pbp_b7a_ded_yn": "2"
+      },
+      "finding": "The PBP copay indicator is No and amount cells are blank; do not generally convert blank amounts to zero. The $0 copay is independently stated by this carrier document."
+    },
+    {
+      "benefit": "Specialist, in-network",
+      "document_value": "$50 copay",
+      "pbp_file": "pbp_b7_health_prof.txt",
+      "pbp_line": 5886,
+      "raw_fields": {
+        "pbp_b7d_copay_yn": "1",
+        "pbp_b7d_copay_amt_mc_min": "50.00",
+        "pbp_b7d_copay_amt_mc_max": "50.00"
+      },
+      "finding": "Carrier amount agrees with the two PBP amount fields."
+    }
+  ],
+  "limitations": [
+    "This partial check does not verify all plan benefits, all networks, other plans, or other years.",
+    "The cover identifies contract/PBP and Douglas County; segment 000 is joined through the exact CMS county catalog, not explicitly printed on the cover.",
+    "Full Evidence of Coverage and supplemental benefit rules remain to verify."
+  ]
+}
