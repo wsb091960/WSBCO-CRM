@@ -6,6 +6,7 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
 
 router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
@@ -65,14 +66,29 @@ def plan_values(data, county_id, carrier='', coverage='all', eligibility='all'):
             and (eligibility == 'all' or p['snp'] == ('Yes' if eligibility == 'snp' else 'No'))]
 
 
+@lru_cache(maxsize=4)
+def load_county_features(state):
+    return json.loads((DATA_DIR / f'{state.lower()}_counties.geojson').read_text())
+
+
+@router.get('/ma-map/counties.geojson')
+def county_features(state: str = Query('WV', max_length=2)):
+    state = state.upper()
+    if state not in STATES:
+        raise HTTPException(422, 'Choose an installed map state.')
+    return JSONResponse(load_county_features(state), headers={'Cache-Control': 'private, max-age=3600'})
+
+
 @router.get('/ma-map')
 def map_page(request: Request, year: int = 2027, state: str = Query('WV', max_length=2),
              county: str = Query('', max_length=5),
              carrier: str = Query('', max_length=200), coverage: str = 'all', eligibility: str = 'all',
-             selected_ids: list[str] = Query(default=[])):
+             selected_ids: list[str] = Query(default=[]), map_view: str = 'outline'):
     state = state.upper()
     if state not in STATES:
         raise HTTPException(422, 'Choose an installed state: ' + ', '.join(STATES.values()) + '.')
+    if map_view not in {'outline', 'esri'}:
+        raise HTTPException(422, 'Choose the outline or Esri map view.')
     if year not in CATALOG_FILES[state]:
         raise HTTPException(422, 'Choose an installed plan year: 2026 or 2027.')
     if coverage not in {'all', 'with', 'without'} or eligibility not in {'all', 'general', 'snp'}:
@@ -109,11 +125,23 @@ def map_page(request: Request, year: int = 2027, state: str = Query('WV', max_le
     links = []
     for c in geometry['counties']:
         count = len(data['county_plans'][c['id']]) if data else None
-        links.append({**c, 'count': count, 'url': '/ma-map?' + urlencode({'state': state, 'year': year, 'county': c['id']})})
+        params = {'state': state, 'year': year, 'county': c['id']}
+        if map_view == 'esri':
+            params['map_view'] = map_view
+        links.append({**c, 'count': count, 'url': '/ma-map?' + urlencode(params)})
+    map_params = [('state', state), ('year', year), ('county', county), ('carrier', carrier),
+                  ('coverage', coverage), ('eligibility', eligibility)]
+    map_params += [('selected_ids', key) for key in selected_ids]
+    map_config = {'state': state, 'year': year, 'selected': county,
+                  'features_url': '/ma-map/counties.geojson?' + urlencode({'state': state}),
+                  'counties': [{k: c[k] for k in ('id', 'name', 'count', 'url')} for c in links]}
     response = templates.TemplateResponse(request=request, name='ma_county_map.html', context={
         'geometry': geometry, 'counties': links, 'county': counties.get(county),
         'year': year, 'years': sorted(CATALOG_FILES[state], reverse=True), 'catalog': data,
         'state': state, 'state_name': STATES[state], 'states': STATES,
+        'map_view': map_view, 'map_config': map_config,
+        'outline_url': '/ma-map?' + urlencode(map_params),
+        'esri_url': '/ma-map?' + urlencode(map_params + [('map_view', 'esri')]),
         'plans': plans, 'chosen': chosen, 'selected_ids': selected_ids, 'compare_fields': COMPARE_FIELDS,
         'carriers': carriers, 'carrier': carrier, 'coverage': coverage, 'eligibility': eligibility,
         'total': total, 'insurer_count': insurer_count, 'data_error': error,

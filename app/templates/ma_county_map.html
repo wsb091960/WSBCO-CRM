@@ -1,22 +1,31 @@
 {% extends 'base.html' %}
 {% block title %}{{state_name}} MA County Map · WSBCO{% endblock %}
 {% block content %}
-<link rel="stylesheet" href="/static/css/ma_county_map.css?v=2">
+<link rel="stylesheet" href="/static/css/ma_county_map.css?v=3">
+{% if map_view == 'esri' %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endif %}
 <main class="ma-page">
   <header class="ma-heading">
     <div><p class="ma-eyebrow">MEDICARE ADVANTAGE · COUNTY EXPLORER</p><h1>{{state_name}}</h1><p>Choose a county. Explore its plans. Compare your selections.</p></div>
     <span class="ma-state-tag">{{state}} · {{counties|length}} counties</span>
   </header>
-  <nav class="ma-state-nav" aria-label="Map state">{% for code, name in states.items() %}<a href="/ma-map?state={{code}}&amp;year={{year}}" {% if state == code %}aria-current="page"{% endif %}>{{name}}</a>{% endfor %}</nav>
+  <nav class="ma-state-nav" aria-label="Map state">{% for code, name in states.items() %}<a href="/ma-map?state={{code}}&amp;year={{year}}{% if map_view == 'esri' %}&amp;map_view=esri{% endif %}" {% if state == code %}aria-current="page"{% endif %}>{{name}}</a>{% endfor %}</nav>
+  <nav class="ma-view-switch" aria-label="County map view"><a href="{{outline_url}}" {% if map_view == 'outline' %}aria-current="page"{% endif %}>County outline</a><a href="{{esri_url}}" {% if map_view == 'esri' %}aria-current="page"{% endif %}>Esri map <span>Preview</span></a></nav>
   <div class="ma-workspace">
     <section class="ma-panel ma-map-panel" aria-labelledby="map-heading">
       <div class="ma-panel-title"><h2 id="map-heading">Find a county</h2><span>{{ year }} plan year</span></div>
       <form method="get" action="/ma-map" class="ma-location-form">
-        <input type="hidden" name="state" value="{{state}}">
+        <input type="hidden" name="state" value="{{state}}">{% if map_view == 'esri' %}<input type="hidden" name="map_view" value="esri">{% endif %}
         <label>Plan year<select name="year">{% for y in years %}<option value="{{y}}" {% if y == year %}selected{% endif %}>{{y}}</option>{% endfor %}</select></label>
         <label>County<select name="county" id="ma-county"><option value="">Choose a county</option>{% for c in counties %}<option value="{{c.id}}" {% if county and county.id == c.id %}selected{% endif %}>{{c.name}}</option>{% endfor %}</select></label>
         <button type="submit" class="ma-button">Show plans</button>
       </form>
+      {% if map_view == 'esri' %}
+      <div class="ma-esri-tools"><label for="ma-basemap">Map layer<select id="ma-basemap"><option value="light">Light Gray</option><option value="streets">Streets</option><option value="satellite">Satellite</option></select></label><button id="ma-fit-state" class="ma-button ma-secondary" type="button">Fit state</button><button id="ma-fit-county" class="ma-button ma-secondary" type="button" {% if not county %}disabled{% endif %}>Zoom to county</button></div>
+      <div id="ma-esri-map" class="ma-esri-map" role="region" aria-label="Interactive Esri map of {{state_name}} counties"></div>
+      <p id="ma-map-status" class="ma-small" role="status">Loading Esri map… The county list and plan comparison are available below.</p>
+      <div class="ma-esri-legend"><span><i class="ma-swatch"></i> {% if county %}{{county.name}} selected{% else %}Selected county{% endif %}</span><span><i class="ma-swatch ma-swatch-available"></i> Plans listed</span><span><i class="ma-swatch ma-swatch-empty"></i> None listed</span></div>
+      <script type="application/json" id="ma-map-config">{{map_config|tojson}}</script>
+      {% else %}
       <div class="ma-map-surface">
         <svg viewBox="{{geometry.view_box}}" aria-labelledby="ma-map-title ma-map-desc" class="ma-map">
           <title id="ma-map-title">{{state_name}} county map</title><desc id="ma-map-desc">Select any county to see Medicare Advantage plans for {{year}}. A county list is also available above.</desc>
@@ -25,6 +34,7 @@
         <p class="ma-map-caption"><span class="ma-swatch"></span> {% if county %}{{county.name}} County selected{% else %}Click any county to begin{% endif %}</p>
         {% if catalog %}<p class="ma-map-caption"><span class="ma-swatch ma-swatch-empty"></span> Gray counties: no MA plans listed for {{year}}</p>{% endif %}
       </div>
+      {% endif %}
       <p class="ma-small">{{geometry.source_label}}. Map and county list show the same areas.</p>
       <details class="ma-county-directory"><summary>Browse all {{counties|length}} counties</summary><div>{% for c in counties %}<a href="{{c.url}}">{{c.name}}{% if c.count is not none %} <span>{{c.count}}</span>{% endif %}</a>{% endfor %}</div></details>
     </section>
@@ -36,7 +46,7 @@
         <div class="ma-panel-title"><div><p class="ma-eyebrow">{{year}} MEDICARE ADVANTAGE</p><h2 id="plans-heading">{{county.name}} County</h2></div><a href="https://www.medicare.gov/plan-compare/" target="_blank" rel="noopener noreferrer">Medicare.gov</a></div>
         <div class="ma-summary"><strong>{{total}} <span>listed plans</span></strong><strong>{{insurer_count}} <span>insurance brands</span></strong><strong>{{plans|length}} <span>shown with filters</span></strong></div>
         <form method="get" action="/ma-map" class="ma-filter-form">
-          <input type="hidden" name="state" value="{{state}}">
+          <input type="hidden" name="state" value="{{state}}">{% if map_view == 'esri' %}<input type="hidden" name="map_view" value="esri">{% endif %}
           <input type="hidden" name="year" value="{{year}}"><input type="hidden" name="county" value="{{county.id}}">
           <label>Insurance company<select name="carrier"><option value="">All insurers</option>{% for name in carriers %}<option value="{{name}}" {% if carrier == name %}selected{% endif %}>{{name}}</option>{% endfor %}</select></label>
           <label>Drug coverage<select name="coverage">{% for value, label in [('all','With and without Part D'),('with','With Part D'),('without','Without Part D')] %}<option value="{{value}}" {% if coverage == value %}selected{% endif %}>{{label}}</option>{% endfor %}</select></label>
@@ -45,10 +55,10 @@
         </form>
         <p class="ma-small">County-level listings require address and eligibility verification. Special Needs Plans have additional requirements. Prices exclude your Part B premium and applicable surcharges.</p>
         <form method="get" action="/ma-map#comparison" id="ma-compare-form">
-          <input type="hidden" name="state" value="{{state}}">
+          <input type="hidden" name="state" value="{{state}}">{% if map_view == 'esri' %}<input type="hidden" name="map_view" value="esri">{% endif %}
           <input type="hidden" name="year" value="{{year}}"><input type="hidden" name="county" value="{{county.id}}"><input type="hidden" name="carrier" value="{{carrier}}"><input type="hidden" name="coverage" value="{{coverage}}"><input type="hidden" name="eligibility" value="{{eligibility}}">
           <div class="ma-compare-toolbar"><div><strong>Select up to 3 plans</strong><span id="ma-selected-count" aria-live="polite">{{selected_ids|length}} selected</span></div><button class="ma-button" type="submit">Compare selected plans</button></div>
-          {% if not total %}<div class="ma-no-results"><h3>No Medicare Advantage plans listed</h3><p>The {{year}} CMS Landscape lists no MA plans in {{county.name}} County, {{state_name}}. Source updated {{catalog.source_updated}}. Verify current options on Medicare.gov.</p></div>{% elif not plans %}<p class="ma-no-results">No plans match these filters. <a href="/ma-map?state={{state}}&amp;year={{year}}&amp;county={{county.id}}">Show all county plans</a>.</p>{% endif %}
+          {% if not total %}<div class="ma-no-results"><h3>No Medicare Advantage plans listed</h3><p>The {{year}} CMS Landscape lists no MA plans in {{county.name}} County, {{state_name}}. Source updated {{catalog.source_updated}}. Verify current options on Medicare.gov.</p></div>{% elif not plans %}<p class="ma-no-results">No plans match these filters. <a href="/ma-map?state={{state}}&amp;year={{year}}&amp;county={{county.id}}{% if map_view == 'esri' %}&amp;map_view=esri{% endif %}">Show all county plans</a>.</p>{% endif %}
           <div class="ma-plan-list">{% for p in plans %}<label class="ma-plan-card{% if p.id in selected_ids %} is-checked{% endif %}">
             <input type="checkbox" name="selected_ids" value="{{p.id}}" {% if p.id in selected_ids %}checked{% endif %} aria-label="Compare {{p.plan_name}} {{p.id}}">
             <div class="ma-plan-content"><div class="ma-plan-brand">{{p.carrier}}</div><h3>{{p.plan_name}}</h3><p class="ma-plan-id">{{p.id}} · {{p.plan_type}}</p><div class="ma-badges"><span>{{'Includes Part D' if p.part_d == 'Yes' else 'No Part D'}}</span>{% if p.snp == 'Yes' %}<span class="ma-snp">{{p.snp_type}} SNP · eligibility required</span>{% endif %}{% if p.sanctioned == 'Yes' %}<span class="ma-snp">Sanctioned · verify enrollment restrictions</span>{% endif %}</div><dl class="ma-plan-metrics"><div><dt>Monthly plan premium</dt><dd>{{p.monthly_premium or 'Not reported'}}</dd></div><div><dt>In-network medical MOOP</dt><dd>{{p.moop or 'Not reported'}}</dd></div><div><dt>Annual drug deductible</dt><dd>{{p.drug_deductible or 'Not reported'}}</dd></div></dl></div>
@@ -65,4 +75,5 @@
   {% if catalog %}<footer class="ma-source"><strong>Source: {{catalog.source_label}}</strong> · Updated {{catalog.source_updated}}<br>{{catalog.scope}} <a href="{{catalog.source_page}}" target="_blank" rel="noopener noreferrer">CMS source files</a>. Data is a dated snapshot; verify current service area, benefits, enrollment restrictions and eligibility with Medicare.gov and the insurer.</footer>{% endif %}
 </main>
 <script src="/static/js/ma_county_map.js?v=1" defer></script>
+{% if map_view == 'esri' %}<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="/static/js/ma_esri_map.js?v=1" defer></script>{% endif %}
 {% endblock %}

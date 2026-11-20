@@ -101,6 +101,49 @@ def test_invalid_counties_years_and_plan_selections_are_rejected(client):
     assert client.get('/ma-map', params={'county': '54039', 'coverage': 'with', 'selected_ids': no_drugs['id']}).status_code == 422
 
 
+@pytest.mark.parametrize('state,county_id', [('WV', '54061'), ('OR', '41019'), ('CA', '06037'), ('TX', '48201')])
+def test_esri_preview_preserves_county_year_filters_and_plan_comparison(client, state, county_id):
+    plans = ma.plan_values(ma.load_catalog(2026, state), county_id, coverage='with')[:2]
+    params = [('state', state), ('county', county_id), ('year', '2026'),
+              ('map_view', 'esri'), ('coverage', 'with')] + [('selected_ids', p['id']) for p in plans]
+    page = client.get('/ma-map', params=params)
+    assert page.status_code == 200 and page.context['chosen'] == plans
+    assert 'id="ma-esri-map"' in page.text and 'id="ma-map-config"' in page.text
+    assert 'class="ma-map"' not in page.text
+    assert page.text.count('name="map_view" value="esri"') == 3
+    assert all('map_view=esri' in c['url'] for c in page.context['counties'])
+    config = page.context['map_config']
+    assert config['selected'] == county_id and config['year'] == 2026
+    assert all(c['count'] == len(ma.load_catalog(2026, state)['county_plans'][c['id']]) for c in config['counties'])
+    outline = client.get(page.context['outline_url'])
+    assert outline.status_code == 200 and outline.context['chosen'] == plans
+    assert 'class="ma-map"' in outline.text and 'id="ma-esri-map"' not in outline.text
+    assert client.get(outline.context['esri_url']).context['chosen'] == plans
+
+
+@pytest.mark.parametrize('state', list(ma.STATES))
+def test_geographic_counties_match_catalog_and_valid_coordinates(client, state):
+    response = client.get('/ma-map/counties.geojson', params={'state': state})
+    assert response.status_code == 200
+    layer = response.json()
+    assert layer['type'] == 'FeatureCollection'
+    assert len(layer['features']) == len(ma.load_geometry(state)['counties'])
+    assert {f['properties']['id'] for f in layer['features']} == set(ma.load_catalog(2027, state)['county_plans'])
+    for feature in layer['features']:
+        geometry = feature['geometry']
+        assert geometry['type'] in {'Polygon', 'MultiPolygon'}
+        polygons = [geometry['coordinates']] if geometry['type'] == 'Polygon' else geometry['coordinates']
+        for polygon in polygons:
+            for ring in polygon:
+                assert len(ring) >= 4 and ring[0] == ring[-1]
+                assert all(-125 < x < -66 and 24 < y < 50 for x, y in ring)
+
+
+def test_esri_preview_rejects_invalid_modes_and_boundary_states(client):
+    assert client.get('/ma-map?map_view=unknown').status_code == 422
+    assert client.get('/ma-map/counties.geojson?state=NY').status_code == 422
+
+
 def test_missing_data_is_unavailable_not_no_plans(client, monkeypatch):
     def missing(*_):
         raise FileNotFoundError()
@@ -138,12 +181,14 @@ def test_map_and_comparison_keep_existing_owner_access(monkeypatch):
         assert client.get('/ma-map?state=OR&county=41019').status_code == 401
         assert client.get('/ma-map?state=CA&county=06037').status_code == 401
         assert client.get('/ma-map?state=TX&county=48201').status_code == 401
+        assert client.get('/ma-map/counties.geojson?state=OR').status_code == 401
         assert client.get('/ma-map', headers={'Accept': 'text/html'}).status_code == 303
         client.cookies.set(auth.SESSION_COOKIE, 'b' * 64)
         assert client.get('/ma-map?county=54039').status_code == 200
         assert client.get('/ma-map?state=OR&county=41019').status_code == 200
         assert client.get('/ma-map?state=CA&county=06037').status_code == 200
         assert client.get('/ma-map?state=TX&county=48201').status_code == 200
+        assert client.get('/ma-map/counties.geojson?state=OR').status_code == 200
     engine.dispose()
 
 
