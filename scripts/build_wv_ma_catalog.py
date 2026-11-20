@@ -140,6 +140,25 @@ def catalog(path, year, counties, state='WV'):
             'plans': plans, 'county_plans': county_plans}
 
 
+def county_geojson(path, state):
+    """Keep geographic Census coordinates for the optional Esri basemap view."""
+    import shapefile
+    with ZipFile(path) as z:
+        def part(ext):
+            return io.BytesIO(z.read(next(n for n in z.namelist() if n.endswith(ext))))
+        reader = shapefile.Reader(shp=part('.shp'), shx=part('.shx'), dbf=part('.dbf'))
+        features = []
+        for record in reader.iterShapeRecords():
+            props = record.record.as_dict()
+            if props['STATEFP'] != STATES[state]['fips']:
+                continue
+            features.append({'type': 'Feature', 'properties': {'id': props['GEOID'], 'name': props['NAME']},
+                             'geometry': record.shape.__geo_interface__})
+    if len(features) != STATES[state]['counties']:
+        raise ValueError('The geographic county layer is incomplete')
+    return {'type': 'FeatureCollection', 'features': sorted(features, key=lambda f: f['properties']['id'])}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--state', choices=sorted(STATES), default='WV')
@@ -150,7 +169,8 @@ def main():
     geometry = boundaries(args.boundaries, args.state)
     # Validate all inputs before replacing any generated output.
     prefix = args.state.lower()
-    outputs = {f'{prefix}_counties.json': geometry}
+    outputs = {f'{prefix}_counties.json': geometry,
+               f'{prefix}_counties.geojson': county_geojson(args.boundaries, args.state)}
     for entry in args.landscape:
         year, path = entry.split('=', 1)
         outputs[f'{prefix}_{int(year)}.json'] = catalog(path, int(year), geometry['counties'], args.state)
