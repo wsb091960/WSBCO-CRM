@@ -1,0 +1,1538 @@
+{
+  "state": "TX",
+  "vintage": 2025,
+  "reference_date": "2025-07-01",
+  "source_label": "U.S. Census Bureau, CC-EST2025-SYASEX",
+  "source_release": "June 2026",
+  "source_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/counties/asrh/cc-est2025-syasex-48.csv",
+  "source_page": "https://www.census.gov/data/tables/time-series/demo/popest/2020s-counties-detail.html",
+  "source_layout": "https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2020-2025/CC-EST2025-SYASEX.pdf",
+  "source_sha256": "5c9a39e288252ade81ea6215565c37dd29dc1ce7bcf4ea48e540a1f06fc88960",
+  "built_at": "2026-11-20T07:50:05.537706+00:00",
+  "counties": {
+    "48001": {
+      "population": 59805,
+      "age64": 742,
+      "age65plus": 10663,
+      "name": "Anderson"
+    },
+    "48003": {
+      "population": 18914,
+      "age64": 194,
+      "age65plus": 2341,
+      "name": "Andrews"
+    },
+    "48005": {
+      "population": 88154,
+      "age64": 1106,
+      "age65plus": 17569,
+      "name": "Angelina"
+    },
+    "48007": {
+      "population": 26146,
+      "age64": 490,
+      "age65plus": 8181,
+      "name": "Aransas"
+    },
+    "48009": {
+      "population": 9129,
+      "age64": 166,
+      "age65plus": 2059,
+      "name": "Archer"
+    },
+    "48011": {
+      "population": 1843,
+      "age64": 26,
+      "age65plus": 474,
+      "name": "Armstrong"
+    },
+    "48013": {
+      "population": 53590,
+      "age64": 611,
+      "age65plus": 8836,
+      "name": "Atascosa"
+    },
+    "48015": {
+      "population": 33625,
+      "age64": 443,
+      "age65plus": 7508,
+      "name": "Austin"
+    },
+    "48017": {
+      "population": 6963,
+      "age64": 69,
+      "age65plus": 1064,
+      "name": "Bailey"
+    },
+    "48019": {
+      "population": 22876,
+      "age64": 436,
+      "age65plus": 7304,
+      "name": "Bandera"
+    },
+    "48021": {
+      "population": 118908,
+      "age64": 1384,
+      "age65plus": 19402,
+      "name": "Bastrop"
+    },
+    "48023": {
+      "population": 3472,
+      "age64": 48,
+      "age65plus": 884,
+      "name": "Baylor"
+    },
+    "48025": {
+      "population": 32515,
+      "age64": 337,
+      "age65plus": 4806,
+      "name": "Bee"
+    },
+    "48027": {
+      "population": 402248,
+      "age64": 3974,
+      "age65plus": 55482,
+      "name": "Bell"
+    },
+    "48029": {
+      "population": 2160088,
+      "age64": 21564,
+      "age65plus": 309662,
+      "name": "Bexar"
+    },
+    "48031": {
+      "population": 13581,
+      "age64": 271,
+      "age65plus": 4394,
+      "name": "Blanco"
+    },
+    "48033": {
+      "population": 567,
+      "age64": 5,
+      "age65plus": 148,
+      "name": "Borden"
+    },
+    "48035": {
+      "population": 18918,
+      "age64": 292,
+      "age65plus": 5266,
+      "name": "Bosque"
+    },
+    "48037": {
+      "population": 92696,
+      "age64": 1136,
+      "age65plus": 17550,
+      "name": "Bowie"
+    },
+    "48039": {
+      "population": 419080,
+      "age64": 4478,
+      "age65plus": 60953,
+      "name": "Brazoria"
+    },
+    "48041": {
+      "population": 249088,
+      "age64": 1861,
+      "age65plus": 29492,
+      "name": "Brazos"
+    },
+    "48043": {
+      "population": 9458,
+      "age64": 125,
+      "age65plus": 2341,
+      "name": "Brewster"
+    },
+    "48045": {
+      "population": 1474,
+      "age64": 22,
+      "age65plus": 397,
+      "name": "Briscoe"
+    },
+    "48047": {
+      "population": 6579,
+      "age64": 57,
+      "age65plus": 1344,
+      "name": "Brooks"
+    },
+    "48049": {
+      "population": 38711,
+      "age64": 535,
+      "age65plus": 9063,
+      "name": "Brown"
+    },
+    "48051": {
+      "population": 20549,
+      "age64": 311,
+      "age65plus": 4818,
+      "name": "Burleson"
+    },
+    "48053": {
+      "population": 57015,
+      "age64": 976,
+      "age65plus": 14349,
+      "name": "Burnet"
+    },
+    "48055": {
+      "population": 55150,
+      "age64": 566,
+      "age65plus": 8408,
+      "name": "Caldwell"
+    },
+    "48057": {
+      "population": 19599,
+      "age64": 265,
+      "age65plus": 4275,
+      "name": "Calhoun"
+    },
+    "48059": {
+      "population": 14491,
+      "age64": 223,
+      "age65plus": 3497,
+      "name": "Callahan"
+    },
+    "48061": {
+      "population": 433946,
+      "age64": 4290,
+      "age65plus": 68087,
+      "name": "Cameron"
+    },
+    "48063": {
+      "population": 13380,
+      "age64": 182,
+      "age65plus": 2542,
+      "name": "Camp"
+    },
+    "48065": {
+      "population": 5805,
+      "age64": 77,
+      "age65plus": 1288,
+      "name": "Carson"
+    },
+    "48067": {
+      "population": 28651,
+      "age64": 404,
+      "age65plus": 7156,
+      "name": "Cass"
+    },
+    "48069": {
+      "population": 7295,
+      "age64": 95,
+      "age65plus": 1310,
+      "name": "Castro"
+    },
+    "48071": {
+      "population": 57594,
+      "age64": 538,
+      "age65plus": 7609,
+      "name": "Chambers"
+    },
+    "48073": {
+      "population": 53337,
+      "age64": 601,
+      "age65plus": 10628,
+      "name": "Cherokee"
+    },
+    "48075": {
+      "population": 6643,
+      "age64": 63,
+      "age65plus": 1199,
+      "name": "Childress"
+    },
+    "48077": {
+      "population": 10764,
+      "age64": 172,
+      "age65plus": 2658,
+      "name": "Clay"
+    },
+    "48079": {
+      "population": 2546,
+      "age64": 26,
+      "age65plus": 435,
+      "name": "Cochran"
+    },
+    "48081": {
+      "population": 3412,
+      "age64": 65,
+      "age65plus": 1005,
+      "name": "Coke"
+    },
+    "48083": {
+      "population": 7915,
+      "age64": 131,
+      "age65plus": 2284,
+      "name": "Coleman"
+    },
+    "48085": {
+      "population": 1297179,
+      "age64": 12300,
+      "age65plus": 161061,
+      "name": "Collin"
+    },
+    "48087": {
+      "population": 2487,
+      "age64": 47,
+      "age65plus": 608,
+      "name": "Collingsworth"
+    },
+    "48089": {
+      "population": 21439,
+      "age64": 321,
+      "age65plus": 5648,
+      "name": "Colorado"
+    },
+    "48091": {
+      "population": 209166,
+      "age64": 2997,
+      "age65plus": 43588,
+      "name": "Comal"
+    },
+    "48093": {
+      "population": 14432,
+      "age64": 208,
+      "age65plus": 3689,
+      "name": "Comanche"
+    },
+    "48095": {
+      "population": 3607,
+      "age64": 46,
+      "age65plus": 723,
+      "name": "Concho"
+    },
+    "48097": {
+      "population": 44461,
+      "age64": 584,
+      "age65plus": 9267,
+      "name": "Cooke"
+    },
+    "48099": {
+      "population": 85592,
+      "age64": 791,
+      "age65plus": 11188,
+      "name": "Coryell"
+    },
+    "48101": {
+      "population": 1224,
+      "age64": 22,
+      "age65plus": 356,
+      "name": "Cottle"
+    },
+    "48103": {
+      "population": 4554,
+      "age64": 50,
+      "age65plus": 700,
+      "name": "Crane"
+    },
+    "48105": {
+      "population": 2769,
+      "age64": 38,
+      "age65plus": 685,
+      "name": "Crockett"
+    },
+    "48107": {
+      "population": 4852,
+      "age64": 59,
+      "age65plus": 1055,
+      "name": "Crosby"
+    },
+    "48109": {
+      "population": 2267,
+      "age64": 37,
+      "age65plus": 434,
+      "name": "Culberson"
+    },
+    "48111": {
+      "population": 7508,
+      "age64": 61,
+      "age65plus": 829,
+      "name": "Dallam"
+    },
+    "48113": {
+      "population": 2661397,
+      "age64": 26558,
+      "age65plus": 346250,
+      "name": "Dallas"
+    },
+    "48115": {
+      "population": 11776,
+      "age64": 139,
+      "age65plus": 2044,
+      "name": "Dawson"
+    },
+    "48117": {
+      "population": 18626,
+      "age64": 193,
+      "age65plus": 2768,
+      "name": "Deaf Smith"
+    },
+    "48119": {
+      "population": 5549,
+      "age64": 72,
+      "age65plus": 1269,
+      "name": "Delta"
+    },
+    "48121": {
+      "population": 1069346,
+      "age64": 10850,
+      "age65plus": 134252,
+      "name": "Denton"
+    },
+    "48123": {
+      "population": 20309,
+      "age64": 279,
+      "age65plus": 4567,
+      "name": "DeWitt"
+    },
+    "48125": {
+      "population": 1692,
+      "age64": 35,
+      "age65plus": 489,
+      "name": "Dickens"
+    },
+    "48127": {
+      "population": 8024,
+      "age64": 93,
+      "age65plus": 1549,
+      "name": "Dimmit"
+    },
+    "48129": {
+      "population": 3213,
+      "age64": 36,
+      "age65plus": 890,
+      "name": "Donley"
+    },
+    "48131": {
+      "population": 9402,
+      "age64": 135,
+      "age65plus": 1794,
+      "name": "Duval"
+    },
+    "48133": {
+      "population": 18143,
+      "age64": 266,
+      "age65plus": 4445,
+      "name": "Eastland"
+    },
+    "48135": {
+      "population": 173801,
+      "age64": 1561,
+      "age65plus": 19734,
+      "name": "Ector"
+    },
+    "48137": {
+      "population": 1370,
+      "age64": 22,
+      "age65plus": 429,
+      "name": "Edwards"
+    },
+    "48139": {
+      "population": 240867,
+      "age64": 2551,
+      "age65plus": 34010,
+      "name": "Ellis"
+    },
+    "48141": {
+      "population": 877858,
+      "age64": 9342,
+      "age65plus": 136683,
+      "name": "El Paso"
+    },
+    "48143": {
+      "population": 43911,
+      "age64": 472,
+      "age65plus": 7620,
+      "name": "Erath"
+    },
+    "48145": {
+      "population": 17869,
+      "age64": 246,
+      "age65plus": 3642,
+      "name": "Falls"
+    },
+    "48147": {
+      "population": 39265,
+      "age64": 566,
+      "age65plus": 7876,
+      "name": "Fannin"
+    },
+    "48149": {
+      "population": 25459,
+      "age64": 400,
+      "age65plus": 7403,
+      "name": "Fayette"
+    },
+    "48151": {
+      "population": 3692,
+      "age64": 53,
+      "age65plus": 953,
+      "name": "Fisher"
+    },
+    "48153": {
+      "population": 4881,
+      "age64": 84,
+      "age65plus": 1058,
+      "name": "Floyd"
+    },
+    "48155": {
+      "population": 1044,
+      "age64": 20,
+      "age65plus": 307,
+      "name": "Foard"
+    },
+    "48157": {
+      "population": 975191,
+      "age64": 9690,
+      "age65plus": 138013,
+      "name": "Fort Bend"
+    },
+    "48159": {
+      "population": 10994,
+      "age64": 165,
+      "age65plus": 2543,
+      "name": "Franklin"
+    },
+    "48161": {
+      "population": 20811,
+      "age64": 291,
+      "age65plus": 4725,
+      "name": "Freestone"
+    },
+    "48163": {
+      "population": 18823,
+      "age64": 178,
+      "age65plus": 2595,
+      "name": "Frio"
+    },
+    "48165": {
+      "population": 23956,
+      "age64": 202,
+      "age65plus": 2317,
+      "name": "Gaines"
+    },
+    "48167": {
+      "population": 372207,
+      "age64": 5015,
+      "age65plus": 67499,
+      "name": "Galveston"
+    },
+    "48169": {
+      "population": 4510,
+      "age64": 68,
+      "age65plus": 892,
+      "name": "Garza"
+    },
+    "48171": {
+      "population": 28527,
+      "age64": 467,
+      "age65plus": 9556,
+      "name": "Gillespie"
+    },
+    "48173": {
+      "population": 1128,
+      "age64": 22,
+      "age65plus": 211,
+      "name": "Glasscock"
+    },
+    "48175": {
+      "population": 7208,
+      "age64": 113,
+      "age65plus": 1929,
+      "name": "Goliad"
+    },
+    "48177": {
+      "population": 20159,
+      "age64": 255,
+      "age65plus": 4260,
+      "name": "Gonzales"
+    },
+    "48179": {
+      "population": 20919,
+      "age64": 235,
+      "age65plus": 3836,
+      "name": "Gray"
+    },
+    "48181": {
+      "population": 153613,
+      "age64": 2005,
+      "age65plus": 29556,
+      "name": "Grayson"
+    },
+    "48183": {
+      "population": 126095,
+      "age64": 1422,
+      "age65plus": 23458,
+      "name": "Gregg"
+    },
+    "48185": {
+      "population": 34252,
+      "age64": 475,
+      "age65plus": 7260,
+      "name": "Grimes"
+    },
+    "48187": {
+      "population": 201111,
+      "age64": 2234,
+      "age65plus": 32560,
+      "name": "Guadalupe"
+    },
+    "48189": {
+      "population": 31819,
+      "age64": 352,
+      "age65plus": 5358,
+      "name": "Hale"
+    },
+    "48191": {
+      "population": 2737,
+      "age64": 50,
+      "age65plus": 686,
+      "name": "Hall"
+    },
+    "48193": {
+      "population": 8680,
+      "age64": 131,
+      "age65plus": 2247,
+      "name": "Hamilton"
+    },
+    "48195": {
+      "population": 4944,
+      "age64": 54,
+      "age65plus": 846,
+      "name": "Hansford"
+    },
+    "48197": {
+      "population": 3292,
+      "age64": 37,
+      "age65plus": 796,
+      "name": "Hardeman"
+    },
+    "48199": {
+      "population": 58723,
+      "age64": 774,
+      "age65plus": 11639,
+      "name": "Hardin"
+    },
+    "48201": {
+      "population": 5045026,
+      "age64": 48334,
+      "age65plus": 660682,
+      "name": "Harris"
+    },
+    "48203": {
+      "population": 71956,
+      "age64": 934,
+      "age65plus": 13670,
+      "name": "Harrison"
+    },
+    "48205": {
+      "population": 4904,
+      "age64": 52,
+      "age65plus": 812,
+      "name": "Hartley"
+    },
+    "48207": {
+      "population": 5499,
+      "age64": 70,
+      "age65plus": 1331,
+      "name": "Haskell"
+    },
+    "48209": {
+      "population": 304390,
+      "age64": 2800,
+      "age65plus": 40947,
+      "name": "Hays"
+    },
+    "48211": {
+      "population": 3083,
+      "age64": 55,
+      "age65plus": 650,
+      "name": "Hemphill"
+    },
+    "48213": {
+      "population": 88595,
+      "age64": 1377,
+      "age65plus": 21248,
+      "name": "Henderson"
+    },
+    "48215": {
+      "population": 921549,
+      "age64": 7735,
+      "age65plus": 118695,
+      "name": "Hidalgo"
+    },
+    "48217": {
+      "population": 39503,
+      "age64": 603,
+      "age65plus": 8718,
+      "name": "Hill"
+    },
+    "48219": {
+      "population": 21600,
+      "age64": 261,
+      "age65plus": 3880,
+      "name": "Hockley"
+    },
+    "48221": {
+      "population": 70501,
+      "age64": 1142,
+      "age65plus": 19432,
+      "name": "Hood"
+    },
+    "48223": {
+      "population": 39063,
+      "age64": 483,
+      "age65plus": 7896,
+      "name": "Hopkins"
+    },
+    "48225": {
+      "population": 22316,
+      "age64": 327,
+      "age65plus": 5341,
+      "name": "Houston"
+    },
+    "48227": {
+      "population": 30504,
+      "age64": 373,
+      "age65plus": 5140,
+      "name": "Howard"
+    },
+    "48229": {
+      "population": 3433,
+      "age64": 29,
+      "age65plus": 446,
+      "name": "Hudspeth"
+    },
+    "48231": {
+      "population": 123336,
+      "age64": 1418,
+      "age65plus": 19238,
+      "name": "Hunt"
+    },
+    "48233": {
+      "population": 19633,
+      "age64": 258,
+      "age65plus": 3934,
+      "name": "Hutchinson"
+    },
+    "48235": {
+      "population": 1463,
+      "age64": 20,
+      "age65plus": 367,
+      "name": "Irion"
+    },
+    "48237": {
+      "population": 9563,
+      "age64": 136,
+      "age65plus": 1740,
+      "name": "Jack"
+    },
+    "48239": {
+      "population": 15393,
+      "age64": 224,
+      "age65plus": 3378,
+      "name": "Jackson"
+    },
+    "48241": {
+      "population": 33075,
+      "age64": 446,
+      "age65plus": 7667,
+      "name": "Jasper"
+    },
+    "48243": {
+      "population": 1711,
+      "age64": 49,
+      "age65plus": 741,
+      "name": "Jeff Davis"
+    },
+    "48245": {
+      "population": 254321,
+      "age64": 3092,
+      "age65plus": 43836,
+      "name": "Jefferson"
+    },
+    "48247": {
+      "population": 4555,
+      "age64": 54,
+      "age65plus": 909,
+      "name": "Jim Hogg"
+    },
+    "48249": {
+      "population": 38804,
+      "age64": 484,
+      "age65plus": 7371,
+      "name": "Jim Wells"
+    },
+    "48251": {
+      "population": 218048,
+      "age64": 2354,
+      "age65plus": 32740,
+      "name": "Johnson"
+    },
+    "48253": {
+      "population": 20861,
+      "age64": 224,
+      "age65plus": 3411,
+      "name": "Jones"
+    },
+    "48255": {
+      "population": 15018,
+      "age64": 158,
+      "age65plus": 2660,
+      "name": "Karnes"
+    },
+    "48257": {
+      "population": 209235,
+      "age64": 1808,
+      "age65plus": 23150,
+      "name": "Kaufman"
+    },
+    "48259": {
+      "population": 53289,
+      "age64": 771,
+      "age65plus": 12711,
+      "name": "Kendall"
+    },
+    "48261": {
+      "population": 319,
+      "age64": 4,
+      "age65plus": 63,
+      "name": "Kenedy"
+    },
+    "48263": {
+      "population": 674,
+      "age64": 8,
+      "age65plus": 248,
+      "name": "Kent"
+    },
+    "48265": {
+      "population": 54037,
+      "age64": 835,
+      "age65plus": 17402,
+      "name": "Kerr"
+    },
+    "48267": {
+      "population": 4438,
+      "age64": 75,
+      "age65plus": 1485,
+      "name": "Kimble"
+    },
+    "48269": {
+      "population": 192,
+      "age64": 2,
+      "age65plus": 44,
+      "name": "King"
+    },
+    "48271": {
+      "population": 3128,
+      "age64": 40,
+      "age65plus": 799,
+      "name": "Kinney"
+    },
+    "48273": {
+      "population": 30315,
+      "age64": 275,
+      "age65plus": 4837,
+      "name": "Kleberg"
+    },
+    "48275": {
+      "population": 3192,
+      "age64": 57,
+      "age65plus": 778,
+      "name": "Knox"
+    },
+    "48277": {
+      "population": 51503,
+      "age64": 685,
+      "age65plus": 10767,
+      "name": "Lamar"
+    },
+    "48279": {
+      "population": 12579,
+      "age64": 158,
+      "age65plus": 2510,
+      "name": "Lamb"
+    },
+    "48281": {
+      "population": 23657,
+      "age64": 356,
+      "age65plus": 5538,
+      "name": "Lampasas"
+    },
+    "48283": {
+      "population": 6517,
+      "age64": 71,
+      "age65plus": 1262,
+      "name": "La Salle"
+    },
+    "48285": {
+      "population": 20651,
+      "age64": 298,
+      "age65plus": 5468,
+      "name": "Lavaca"
+    },
+    "48287": {
+      "population": 18729,
+      "age64": 287,
+      "age65plus": 4063,
+      "name": "Lee"
+    },
+    "48289": {
+      "population": 16894,
+      "age64": 287,
+      "age65plus": 4712,
+      "name": "Leon"
+    },
+    "48291": {
+      "population": 121364,
+      "age64": 1106,
+      "age65plus": 14341,
+      "name": "Liberty"
+    },
+    "48293": {
+      "population": 22849,
+      "age64": 338,
+      "age65plus": 5003,
+      "name": "Limestone"
+    },
+    "48295": {
+      "population": 2955,
+      "age64": 47,
+      "age65plus": 685,
+      "name": "Lipscomb"
+    },
+    "48297": {
+      "population": 11929,
+      "age64": 189,
+      "age65plus": 2778,
+      "name": "Live Oak"
+    },
+    "48299": {
+      "population": 23353,
+      "age64": 447,
+      "age65plus": 8719,
+      "name": "Llano"
+    },
+    "48301": {
+      "population": 52,
+      "age64": 1,
+      "age65plus": 5,
+      "name": "Loving"
+    },
+    "48303": {
+      "population": 328906,
+      "age64": 3367,
+      "age65plus": 49666,
+      "name": "Lubbock"
+    },
+    "48305": {
+      "population": 6017,
+      "age64": 61,
+      "age65plus": 978,
+      "name": "Lynn"
+    },
+    "48307": {
+      "population": 7472,
+      "age64": 110,
+      "age65plus": 2087,
+      "name": "McCulloch"
+    },
+    "48309": {
+      "population": 272020,
+      "age64": 2950,
+      "age65plus": 45827,
+      "name": "McLennan"
+    },
+    "48311": {
+      "population": 544,
+      "age64": 4,
+      "age65plus": 137,
+      "name": "McMullen"
+    },
+    "48313": {
+      "population": 14226,
+      "age64": 161,
+      "age65plus": 2346,
+      "name": "Madison"
+    },
+    "48315": {
+      "population": 9896,
+      "age64": 220,
+      "age65plus": 3068,
+      "name": "Marion"
+    },
+    "48317": {
+      "population": 5284,
+      "age64": 46,
+      "age65plus": 743,
+      "name": "Martin"
+    },
+    "48319": {
+      "population": 3990,
+      "age64": 66,
+      "age65plus": 1383,
+      "name": "Mason"
+    },
+    "48321": {
+      "population": 36463,
+      "age64": 486,
+      "age65plus": 7399,
+      "name": "Matagorda"
+    },
+    "48323": {
+      "population": 58823,
+      "age64": 569,
+      "age65plus": 8997,
+      "name": "Maverick"
+    },
+    "48325": {
+      "population": 56881,
+      "age64": 783,
+      "age65plus": 11207,
+      "name": "Medina"
+    },
+    "48327": {
+      "population": 1956,
+      "age64": 31,
+      "age65plus": 630,
+      "name": "Menard"
+    },
+    "48329": {
+      "population": 187855,
+      "age64": 1731,
+      "age65plus": 21623,
+      "name": "Midland"
+    },
+    "48331": {
+      "population": 26258,
+      "age64": 373,
+      "age65plus": 6212,
+      "name": "Milam"
+    },
+    "48333": {
+      "population": 4580,
+      "age64": 73,
+      "age65plus": 1401,
+      "name": "Mills"
+    },
+    "48335": {
+      "population": 8947,
+      "age64": 94,
+      "age65plus": 1466,
+      "name": "Mitchell"
+    },
+    "48337": {
+      "population": 21966,
+      "age64": 352,
+      "age65plus": 5213,
+      "name": "Montague"
+    },
+    "48339": {
+      "population": 781194,
+      "age64": 8325,
+      "age65plus": 116585,
+      "name": "Montgomery"
+    },
+    "48341": {
+      "population": 21891,
+      "age64": 188,
+      "age65plus": 2655,
+      "name": "Moore"
+    },
+    "48343": {
+      "population": 12133,
+      "age64": 191,
+      "age65plus": 2875,
+      "name": "Morris"
+    },
+    "48345": {
+      "population": 1043,
+      "age64": 18,
+      "age65plus": 283,
+      "name": "Motley"
+    },
+    "48347": {
+      "population": 66035,
+      "age64": 720,
+      "age65plus": 11536,
+      "name": "Nacogdoches"
+    },
+    "48349": {
+      "population": 57181,
+      "age64": 738,
+      "age65plus": 10304,
+      "name": "Navarro"
+    },
+    "48351": {
+      "population": 11954,
+      "age64": 205,
+      "age65plus": 2946,
+      "name": "Newton"
+    },
+    "48353": {
+      "population": 14117,
+      "age64": 173,
+      "age65plus": 2879,
+      "name": "Nolan"
+    },
+    "48355": {
+      "population": 352992,
+      "age64": 4186,
+      "age65plus": 62524,
+      "name": "Nueces"
+    },
+    "48357": {
+      "population": 9284,
+      "age64": 111,
+      "age65plus": 1435,
+      "name": "Ochiltree"
+    },
+    "48359": {
+      "population": 1783,
+      "age64": 23,
+      "age65plus": 323,
+      "name": "Oldham"
+    },
+    "48361": {
+      "population": 86266,
+      "age64": 1140,
+      "age65plus": 15911,
+      "name": "Orange"
+    },
+    "48363": {
+      "population": 30791,
+      "age64": 430,
+      "age65plus": 6756,
+      "name": "Palo Pinto"
+    },
+    "48365": {
+      "population": 23018,
+      "age64": 330,
+      "age65plus": 5116,
+      "name": "Panola"
+    },
+    "48367": {
+      "population": 184767,
+      "age64": 2371,
+      "age65plus": 31637,
+      "name": "Parker"
+    },
+    "48369": {
+      "population": 9678,
+      "age64": 117,
+      "age65plus": 1476,
+      "name": "Parmer"
+    },
+    "48371": {
+      "population": 14560,
+      "age64": 178,
+      "age65plus": 2274,
+      "name": "Pecos"
+    },
+    "48373": {
+      "population": 53434,
+      "age64": 1018,
+      "age65plus": 12158,
+      "name": "Polk"
+    },
+    "48375": {
+      "population": 114453,
+      "age64": 1297,
+      "age65plus": 18924,
+      "name": "Potter"
+    },
+    "48377": {
+      "population": 5433,
+      "age64": 75,
+      "age65plus": 1183,
+      "name": "Presidio"
+    },
+    "48379": {
+      "population": 13542,
+      "age64": 235,
+      "age65plus": 3586,
+      "name": "Rains"
+    },
+    "48381": {
+      "population": 152351,
+      "age64": 1684,
+      "age65plus": 26242,
+      "name": "Randall"
+    },
+    "48383": {
+      "population": 3166,
+      "age64": 38,
+      "age65plus": 489,
+      "name": "Reagan"
+    },
+    "48385": {
+      "population": 2745,
+      "age64": 52,
+      "age65plus": 955,
+      "name": "Real"
+    },
+    "48387": {
+      "population": 11816,
+      "age64": 204,
+      "age65plus": 3176,
+      "name": "Red River"
+    },
+    "48389": {
+      "population": 12138,
+      "age64": 136,
+      "age65plus": 1890,
+      "name": "Reeves"
+    },
+    "48391": {
+      "population": 6657,
+      "age64": 100,
+      "age65plus": 1591,
+      "name": "Refugio"
+    },
+    "48393": {
+      "population": 867,
+      "age64": 15,
+      "age65plus": 215,
+      "name": "Roberts"
+    },
+    "48395": {
+      "population": 17839,
+      "age64": 243,
+      "age65plus": 4029,
+      "name": "Robertson"
+    },
+    "48397": {
+      "population": 140738,
+      "age64": 1547,
+      "age65plus": 19959,
+      "name": "Rockwall"
+    },
+    "48399": {
+      "population": 9693,
+      "age64": 120,
+      "age65plus": 2339,
+      "name": "Runnels"
+    },
+    "48401": {
+      "population": 54854,
+      "age64": 685,
+      "age65plus": 10592,
+      "name": "Rusk"
+    },
+    "48403": {
+      "population": 10012,
+      "age64": 200,
+      "age65plus": 3271,
+      "name": "Sabine"
+    },
+    "48405": {
+      "population": 7722,
+      "age64": 138,
+      "age65plus": 2205,
+      "name": "San Augustine"
+    },
+    "48407": {
+      "population": 29488,
+      "age64": 451,
+      "age65plus": 7031,
+      "name": "San Jacinto"
+    },
+    "48409": {
+      "population": 72053,
+      "age64": 876,
+      "age65plus": 12586,
+      "name": "San Patricio"
+    },
+    "48411": {
+      "population": 5787,
+      "age64": 85,
+      "age65plus": 1427,
+      "name": "San Saba"
+    },
+    "48413": {
+      "population": 2245,
+      "age64": 30,
+      "age65plus": 607,
+      "name": "Schleicher"
+    },
+    "48415": {
+      "population": 16162,
+      "age64": 178,
+      "age65plus": 2934,
+      "name": "Scurry"
+    },
+    "48417": {
+      "population": 3197,
+      "age64": 46,
+      "age65plus": 795,
+      "name": "Shackelford"
+    },
+    "48419": {
+      "population": 24286,
+      "age64": 290,
+      "age65plus": 4770,
+      "name": "Shelby"
+    },
+    "48421": {
+      "population": 2781,
+      "age64": 26,
+      "age65plus": 450,
+      "name": "Sherman"
+    },
+    "48423": {
+      "population": 252549,
+      "age64": 2919,
+      "age65plus": 48386,
+      "name": "Smith"
+    },
+    "48425": {
+      "population": 10261,
+      "age64": 135,
+      "age65plus": 2361,
+      "name": "Somervell"
+    },
+    "48427": {
+      "population": 66319,
+      "age64": 621,
+      "age65plus": 9153,
+      "name": "Starr"
+    },
+    "48429": {
+      "population": 9380,
+      "age64": 130,
+      "age65plus": 2186,
+      "name": "Stephens"
+    },
+    "48431": {
+      "population": 1349,
+      "age64": 10,
+      "age65plus": 248,
+      "name": "Sterling"
+    },
+    "48433": {
+      "population": 1186,
+      "age64": 19,
+      "age65plus": 402,
+      "name": "Stonewall"
+    },
+    "48435": {
+      "population": 3203,
+      "age64": 46,
+      "age65plus": 766,
+      "name": "Sutton"
+    },
+    "48437": {
+      "population": 6703,
+      "age64": 78,
+      "age65plus": 1263,
+      "name": "Swisher"
+    },
+    "48439": {
+      "population": 2248466,
+      "age64": 23733,
+      "age65plus": 312063,
+      "name": "Tarrant"
+    },
+    "48441": {
+      "population": 150077,
+      "age64": 1603,
+      "age65plus": 25288,
+      "name": "Taylor"
+    },
+    "48443": {
+      "population": 702,
+      "age64": 8,
+      "age65plus": 219,
+      "name": "Terrell"
+    },
+    "48445": {
+      "population": 11720,
+      "age64": 121,
+      "age65plus": 1901,
+      "name": "Terry"
+    },
+    "48447": {
+      "population": 1554,
+      "age64": 20,
+      "age65plus": 406,
+      "name": "Throckmorton"
+    },
+    "48449": {
+      "population": 31563,
+      "age64": 335,
+      "age65plus": 5251,
+      "name": "Titus"
+    },
+    "48451": {
+      "population": 120602,
+      "age64": 1430,
+      "age65plus": 23040,
+      "name": "Tom Green"
+    },
+    "48453": {
+      "population": 1389670,
+      "age64": 11922,
+      "age65plus": 161031,
+      "name": "Travis"
+    },
+    "48455": {
+      "population": 14384,
+      "age64": 268,
+      "age65plus": 4014,
+      "name": "Trinity"
+    },
+    "48457": {
+      "population": 20443,
+      "age64": 317,
+      "age65plus": 5038,
+      "name": "Tyler"
+    },
+    "48459": {
+      "population": 44410,
+      "age64": 638,
+      "age65plus": 8785,
+      "name": "Upshur"
+    },
+    "48461": {
+      "population": 3131,
+      "age64": 33,
+      "age65plus": 598,
+      "name": "Upton"
+    },
+    "48463": {
+      "population": 24963,
+      "age64": 270,
+      "age65plus": 4538,
+      "name": "Uvalde"
+    },
+    "48465": {
+      "population": 47835,
+      "age64": 459,
+      "age65plus": 7474,
+      "name": "Val Verde"
+    },
+    "48467": {
+      "population": 66130,
+      "age64": 905,
+      "age65plus": 14561,
+      "name": "Van Zandt"
+    },
+    "48469": {
+      "population": 92656,
+      "age64": 1112,
+      "age65plus": 18088,
+      "name": "Victoria"
+    },
+    "48471": {
+      "population": 83842,
+      "age64": 950,
+      "age65plus": 13931,
+      "name": "Walker"
+    },
+    "48473": {
+      "population": 69858,
+      "age64": 673,
+      "age65plus": 9339,
+      "name": "Waller"
+    },
+    "48475": {
+      "population": 11125,
+      "age64": 113,
+      "age65plus": 1709,
+      "name": "Ward"
+    },
+    "48477": {
+      "population": 38288,
+      "age64": 587,
+      "age65plus": 9692,
+      "name": "Washington"
+    },
+    "48479": {
+      "population": 281224,
+      "age64": 2388,
+      "age65plus": 31847,
+      "name": "Webb"
+    },
+    "48481": {
+      "population": 42060,
+      "age64": 513,
+      "age65plus": 8501,
+      "name": "Wharton"
+    },
+    "48483": {
+      "population": 4773,
+      "age64": 63,
+      "age65plus": 1173,
+      "name": "Wheeler"
+    },
+    "48485": {
+      "population": 129555,
+      "age64": 1596,
+      "age65plus": 22853,
+      "name": "Wichita"
+    },
+    "48487": {
+      "population": 12481,
+      "age64": 180,
+      "age65plus": 2501,
+      "name": "Wilbarger"
+    },
+    "48489": {
+      "population": 19971,
+      "age64": 227,
+      "age65plus": 3358,
+      "name": "Willacy"
+    },
+    "48491": {
+      "population": 752827,
+      "age64": 6843,
+      "age65plus": 102878,
+      "name": "Williamson"
+    },
+    "48493": {
+      "population": 56139,
+      "age64": 836,
+      "age65plus": 10782,
+      "name": "Wilson"
+    },
+    "48495": {
+      "population": 7540,
+      "age64": 78,
+      "age65plus": 1041,
+      "name": "Winkler"
+    },
+    "48497": {
+      "population": 83778,
+      "age64": 1089,
+      "age65plus": 14240,
+      "name": "Wise"
+    },
+    "48499": {
+      "population": 49688,
+      "age64": 913,
+      "age65plus": 14622,
+      "name": "Wood"
+    },
+    "48501": {
+      "population": 7438,
+      "age64": 78,
+      "age65plus": 1114,
+      "name": "Yoakum"
+    },
+    "48503": {
+      "population": 18154,
+      "age64": 239,
+      "age65plus": 4026,
+      "name": "Young"
+    },
+    "48505": {
+      "population": 13753,
+      "age64": 133,
+      "age65plus": 2134,
+      "name": "Zapata"
+    },
+    "48507": {
+      "population": 9037,
+      "age64": 94,
+      "age65plus": 1654,
+      "name": "Zavala"
+    }
+  }
+}

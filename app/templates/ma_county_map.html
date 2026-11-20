@@ -10,6 +10,7 @@
   </header>
   <nav class="ma-state-nav" aria-label="Map state">{% for code, name in states.items() %}<a href="/ma-map?state={{code}}&amp;year={{year}}&amp;map_view={{map_view}}" {% if state == code %}aria-current="page"{% endif %}>{{name}}</a>{% endfor %}</nav>
   <nav class="ma-view-switch" aria-label="County map view"><a href="{{outline_url}}" {% if map_view == 'outline' %}aria-current="page"{% endif %}>County outline</a><a href="{{esri_url}}" {% if map_view == 'esri' %}aria-current="page"{% endif %}>Esri map</a></nav>
+  <p class="ma-small"><a href="/turning65?state={{state}}&amp;year={{year}}{% if county %}&amp;county={{county.id}}{% endif %}">Turning 65 population and lead targeting in {{state_name}}</a></p>
   <div class="ma-workspace">
     <section class="ma-panel ma-map-panel" aria-labelledby="map-heading">
       <div class="ma-panel-title"><h2 id="map-heading">Find a county</h2><span>{{ year }} plan year</span></div>

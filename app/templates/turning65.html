@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Turning 65 Heat Map · {{state_name}} · WSBCO{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/turning65.css?v=1">
+{% if f.map_view == 'esri' %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endif %}
+<main class="t65-page">
+  <header class="t65-heading"><div><p class="t65-eyebrow">MEDICARE · LEAD GENERATION TARGETING</p><h1>Turning 65 heat map</h1><p>Find promising counties. Plan your next birthday follow-ups.</p></div><a class="t65-button t65-secondary" href="{{csv_url}}"><i class="bi bi-download" aria-hidden="true"></i> Export territory CSV</a></header>
+  <nav class="t65-states" aria-label="Target state">{% for code,name in states.items() %}<a href="{{state_links[code]}}" {% if code == f.state %}aria-current="page"{% endif %}>{{name}}</a>{% endfor %}</nav>
+  <nav class="t65-tabs" aria-label="Targeting view"><a href="{{population_url}}" {% if f.layer == 'population' %}aria-current="page"{% endif %}>Population estimates</a><a href="{{birthdays_url}}" {% if f.layer == 'contacts' %}aria-current="page"{% endif %}>CRM contacts turning 65</a></nav>
+  {% if notice %}<p class="t65-notice" role="status">{{notice}}</p>{% endif %}
+  <form method="get" action="/turning65" class="t65-filters" id="t65-filters">
+    <input type="hidden" name="state" value="{{f.state}}"><input type="hidden" name="layer" value="{{f.layer}}"><input type="hidden" name="map_view" value="{{f.map_view}}">
+    <div class="t65-filter-row">
+      <label>County<select name="county" id="t65-county"><option value="">All {{scoped|length}} counties in area</option>{% for c in scoped %}<option value="{{c.id}}" {% if selected and c.id == selected.id %}selected{% endif %}>{{c.name}}</option>{% endfor %}</select></label>
+      {% if f.layer == 'population' %}
+      <label>Population group<select name="age"><option value="64" {% if f.age == '64' %}selected{% endif %}>Exactly age 64</option><option value="65plus" {% if f.age == '65plus' %}selected{% endif %}>Age 65 and older</option></select></label>
+      <label>Shade counties by<select name="measure"><option value="count" {% if f.measure == 'count' %}selected{% endif %}>Number of residents</option><option value="share" {% if f.measure == 'share' %}selected{% endif %}>Percentage of county residents</option></select></label>
+      <input type="hidden" name="window" value="{{f.window}}"><input type="hidden" name="date_from" value="{{f.date_from}}"><input type="hidden" name="date_to" value="{{f.date_to}}">
+      {% else %}
+      <input type="hidden" name="age" value="{{f.age}}"><input type="hidden" name="measure" value="count">
+      <label>Birthday group<select name="window" id="t65-window">{% for value,label in [('6','Turning 65 in next 6 months'),('12','Turning 65 in next 12 months'),('age64','Currently age 64'),('custom','Choose birthday date range')] %}<option value="{{value}}" {% if f.window == value %}selected{% endif %}>{{label}}</option>{% endfor %}</select></label>
+      <div class="t65-custom-dates" id="t65-custom-dates" {% if f.window != 'custom' %}hidden{% endif %}><label>From<input type="date" name="date_from" min="{{targeting.today}}" value="{{custom_start}}"></label><label>Through<input type="date" name="date_to" min="{{targeting.today}}" value="{{custom_end}}"></label></div>
+      {% endif %}
+      <button type="submit" class="t65-button">Update map</button>
+    </div>
+    <details class="t65-plan-filters" {% if area.filtered %}open{% endif %}>
+      <summary>Plan service area · {{area.selected_plan.plan_name if area.selected_plan else (f.carrier or 'All insurers')}}{% if f.stars != 'all' %} · {{f.stars}}+ stars{% endif %}</summary>
+      <div class="t65-filter-row">
+        <label>Plan year<select name="year" data-reset-plan>{% for year in [2027,2026] %}<option value="{{year}}" {% if f.year == year %}selected{% endif %}>{{year}}</option>{% endfor %}</select></label>
+        <label>Insurer<select name="carrier" data-reset-plan><option value="">All insurers</option>{% for name in area.carriers %}<option value="{{name}}" {% if f.carrier == name %}selected{% endif %}>{{name}}</option>{% endfor %}</select></label>
+        <label>Minimum CMS rating<select name="stars" data-reset-plan>{% for value,label in [('all','All ratings'),('4','4 stars and higher'),('4.5','4.5 stars and higher'),('5','5 stars')] %}<option value="{{value}}" {% if f.stars == value %}selected{% endif %}>{{label}}</option>{% endfor %}</select></label>
+        <label class="t65-plan-select">Exact plan<select name="plan_id" id="t65-plan"><option value="">All matching plans</option>{% for plan in area.plans %}<option value="{{plan.id}}" {% if f.plan_id == plan.id %}selected{% endif %}>{{plan.carrier}} · {{plan.plan_name}} · {{plan.id}} · {{plan.stars}} stars</option>{% endfor %}</select></label>
+      </div>
+      <p class="t65-small">Choose an insurer or rating and update the map to refresh plan choices. A county is counted once even when several selected plans cover it. <a href="{{clear_url}}">Clear service-area filters</a>.</p>
+    </details>
+  </form>
+  <section class="t65-stats" aria-label="Selected service area totals">
+    {% if f.layer == 'population' %}<div><span>Residents exactly age 64</span><strong>{{'{:,}'.format(totals.age64)}}</strong><small>July 1, 2025 estimate</small></div><div><span>Residents age 65+</span><strong>{{'{:,}'.format(totals.age65plus)}}</strong><small>July 1, 2025 estimate</small></div>
+    {% else %}<div><span>{{targeting.window_label}}</span><strong>{{'{:,}'.format(totals.matching)}}</strong><small>Matching CRM contacts · as of {{targeting.today}}</small></div><div><span>Verified map locations</span><strong>{{'{:,}'.format(targeting.counts.mapped)}}</strong><small>{{targeting.counts.unmapped}} matching contacts need a map location</small></div>{% endif %}
+    <div><span>{{'Plan service area' if area.filtered else state_name}}</span><strong>{{scoped|length}} <small>counties</small></strong><small>{{'{:,}'.format(totals.contacts)}} existing Medicare contacts</small></div>
+  </section>
+  <p class="t65-small t65-reference">{% if f.layer == 'population' %}Census population snapshot: <strong>July 1, 2025</strong>. This identifies markets by age, not individuals or current upcoming birthdays.{% else %}{{targeting.window_label}} · Dates of birth from your CRM · {{targeting.counts.missing_dob}} missing and {{targeting.counts.invalid_dob}} invalid/future birth dates excluded from this area.{% endif %}</p>
+  {% if not scoped %}<p class="t65-notice" role="status">No counties match these insurer, plan and rating filters. <a href="{{clear_url}}">Show all {{state_name}} counties</a>.</p>{% endif %}
+  <div class="t65-workspace">
+    <section class="t65-panel t65-map-panel" aria-label="{{state_name}} targeting map">
+      <div class="t65-panel-heading"><h2>{{state_name}}</h2><nav class="t65-view-switch" aria-label="Map style"><a href="{{esri_url}}" {% if f.map_view == 'esri' %}aria-current="page"{% endif %}>Esri map</a><a href="{{outline_url}}" {% if f.map_view == 'outline' %}aria-current="page"{% endif %}>County outline</a></nav></div>
+      {% if f.map_view == 'esri' %}
+      <div class="t65-map-tools"><label>Map layer<select id="t65-basemap"><option value="light">Light Gray</option><option value="streets">Streets</option><option value="satellite">Satellite</option></select></label><button type="button" class="t65-button t65-secondary" id="t65-fit-state">Fit state</button><button type="button" class="t65-button t65-secondary" id="t65-fit-county" {% if not selected %}disabled{% endif %}>Zoom to county</button></div>
+      <div id="t65-esri-map" class="t65-esri-map" role="region" aria-label="Interactive {{state_name}} county targeting map"></div>
+      <p id="t65-map-status" class="t65-small" role="status">Loading map… County rankings and contacts remain available below.</p>
+      <script type="application/json" id="t65-map-config">{{map_config|tojson}}</script>
+      {% else %}
+      <svg class="t65-outline-map" viewBox="{{geometry.view_box}}" role="img" aria-labelledby="t65-svg-title t65-svg-desc"><title id="t65-svg-title">{{state_name}} county targeting</title><desc id="t65-svg-desc">{{map_config.metric_label}}. {{'Percentage of county residents' if map_config.measure == 'share' else 'Count'}}. Select a county or use the county selector and ranked table.</desc>
+        {% for c in counties %}{% if c.in_scope %}<a href="{{c.url}}" aria-label="{{c.name}} County · {{'{:,.2f}%'.format(c.share) if map_config.measure == 'share' else '{:,}'.format(c.value)}} {{map_config.metric_label}}" class="t65-county t65-bucket-{{c.bucket}}{% if selected and selected.id == c.id %} is-selected{% endif %}"><title>{{c.name}} County · {{'{:,.2f}%'.format(c.share) if map_config.measure == 'share' else '{:,}'.format(c.value)}} {{map_config.metric_label}}</title><path d="{{c.path}}" fill-rule="evenodd"></path></a>{% else %}<g class="t65-county t65-outside"><title>{{c.name}} County · Outside selected plan service area</title><path d="{{c.path}}" fill-rule="evenodd"></path></g>{% endif %}{% endfor %}
+      </svg>
+      {% if f.layer == 'contacts' %}<p class="t65-small">County totals shown. Switch to Esri map for verified contact locations.</p>{% endif %}
+      {% endif %}
+      <div class="t65-legend" aria-label="Map legend">{% for label in legend %}<span><i class="t65-swatch t65-bucket-{{loop.index0}}" aria-hidden="true"></i>{{label}}</span>{% endfor %}{% if area.filtered %}<span><i class="t65-swatch t65-outside" aria-hidden="true"></i>Outside plan area</span>{% endif %}</div>
+      <p class="t65-small">{{map_config.metric_label}}{% if map_config.measure == 'share' %} · % of county residents{% endif %} · {{'Census, July 1, 2025' if f.layer == 'population' else targeting.window_label}}. {{geometry.source_label}}.</p>
+    </section>
+    <aside class="t65-panel t65-detail" aria-label="County details">
+      {% if selected %}<p class="t65-eyebrow">SELECTED COUNTY</p><h2>{{selected.name}} County</h2><div class="t65-detail-value">{{'{:,}'.format(selected.value)}}</div><p class="t65-small">{{map_config.metric_label}}{% if f.layer == 'population' %} · July 1, 2025{% else %} · {{targeting.window_label}}{% endif %}</p>
+      <dl class="t65-details"><div><dt>County population</dt><dd>{{'{:,}'.format(selected.population)}}</dd></div><div><dt>Residents age 64</dt><dd>{{'{:,}'.format(selected.age64)}}</dd></div><div><dt>Residents age 65+</dt><dd>{{'{:,}'.format(selected.age65plus)}}</dd></div><div><dt>Age-64 share of residents</dt><dd>{{'{:.2f}%'.format(selected.age64 / selected.population * 100) if selected.population else '0%'}}</dd></div><div><dt>Matching CRM birthdays</dt><dd>{{selected.matching}}</dd></div></dl>
+      <a class="t65-button" href="{{selected.contacts_url}}">Open {{selected.matching}} matching contacts</a><a class="t65-button t65-secondary" href="{{selected.plans_url}}">View {{f.year}} county plans</a>
+      {% else %}<p class="t65-eyebrow">COUNTY DETAILS</p><h2>Explore a county</h2><p>Click a county on the map or choose one above.</p><a class="t65-button" href="{{contacts_url}}">Open {{totals.matching}} matching contacts</a>{% endif %}
+      <h3 class="t65-ranking-heading">{{'Highest percentage' if map_config.measure == 'share' else 'Largest target groups'}}</h3><ol class="t65-top-counties">{% for c in ranked[:5] %}<li><a href="{{c.url}}"><span>{{c.name}}</span><strong>{{'{:.2f}%'.format(c.share) if map_config.measure == 'share' else '{:,}'.format(c.value)}}</strong></a></li>{% endfor %}</ol>
+    </aside>
+  </div>
+  <section class="t65-panel t65-contact-summary"><h2>CRM birthday targeting</h2><p>{{targeting.window_label}} · <strong>{{selected.matching if selected else totals.matching}}</strong> matching contacts{% if selected %} in {{selected.name}} County{% else %} in the selected area{% endif %}. <a href="{{contacts_url}}">Open the contact list</a>.</p><p class="t65-small">{{targeting.counts.missing_dob}} missing birth dates and {{targeting.counts.invalid_dob}} invalid/future birth dates in the service area. {{targeting.counts.unresolved_county}} Medicare contacts in {{state_name}} need county/address review and are not assigned to a county total. <a href="/address-cleanup">Review address data</a>. For Feb 29 birthdays, this planning view uses Feb 28 in non-leap years.</p></section>
+  <details class="t65-panel t65-county-table"><summary>All {{ranked|length}} counties ranked · {{map_config.metric_label}}</summary><div class="t65-table-scroll"><table><thead><tr><th scope="col">County</th><th scope="col">Age 64</th><th scope="col">Age 64 %</th><th scope="col">Age 65+</th><th scope="col">CRM birthdays</th><th scope="col">Explore</th></tr></thead><tbody>{% for c in ranked %}<tr><th scope="row"><a href="{{c.url}}">{{c.name}}</a></th><td>{{'{:,}'.format(c.age64)}}</td><td>{{'{:.2f}%'.format(c.age64/c.population*100) if c.population else '0%'}}</td><td>{{'{:,}'.format(c.age65plus)}}</td><td><a href="{{c.contacts_url}}">{{c.matching}}</a></td><td><a href="{{c.plans_url}}">{{f.year}} plans</a></td></tr>{% endfor %}</tbody></table></div></details>
+  <footer class="t65-source"><strong>{{population.source_label}}</strong> · {{population.source_release}} release · Population reference date {{population.reference_date}}. <a href="{{population.source_url}}" target="_blank" rel="noopener noreferrer">Census source CSV</a> · <a href="{{population.source_layout}}" target="_blank" rel="noopener noreferrer">Data definitions</a>.<br>Plan service areas: {{area.catalog.source_label}} · Updated {{area.catalog.source_updated}}. Star ratings and availability follow the selected plan year. County listings require address and eligibility verification. Population totals are market estimates, not available leads or confirmed Medicare eligibility.</footer>
+</main>
+<script src="/static/js/turning65.js?v=1" defer></script>
+{% if f.map_view == 'esri' %}<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="/static/js/turning65_map.js?v=1" defer></script>{% endif %}
+{% endblock %}
