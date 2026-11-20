@@ -76,3 +76,8 @@ class CallLog(Base):
 
     notes: Mapped[str] = mapped_column(Text, default="")
     error_message: Mapped[str] = mapped_column(Text, default="")
+
+
+# One transactional queue for manual entry, imports and website/integration intake.
+from app.services.geocoding import install_contact_hooks
+install_contact_hooks(Lead)

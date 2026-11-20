@@ -25,6 +25,7 @@
   {% else %}<button class="contact-map-button" type="button" disabled aria-describedby="contact-map-help">Map It</button><small id="contact-map-help" class="contact-map-help">Add an address to map this contact.</small>{% endif %}
 </div>
 <div class="field"><label>County</label><b>{{lead.county or '—'}}</b></div>
+<div class="field"><label>Address location</label><span role="status">{{geocoding_status}}</span></div>
 {% if golf_profile %}
 <h3>GOLF</h3>
 {% if request.query_params.get('golf_contacted') %}<p role="status">Golf request marked contacted.</p>{% endif %}

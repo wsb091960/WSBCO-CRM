@@ -46,6 +46,16 @@ def create_database_tables() -> None:
     from app.services.golf_intake_backup import backup_before_golf_intake
     backup_before_golf_intake(engine)
     Base.metadata.create_all(bind=engine)
+    from app.services.geocoding import GeocodingWorker
+    app.state.geocoding_worker = GeocodingWorker(engine)
+    app.state.geocoding_worker.start()
+
+
+@app.on_event("shutdown")
+def stop_geocoding_worker() -> None:
+    worker = getattr(app.state, "geocoding_worker", None)
+    if worker:
+        worker.stop()
 
 
 @app.get("/health")
