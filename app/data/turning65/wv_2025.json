@@ -1,0 +1,344 @@
+{
+  "state": "WV",
+  "vintage": 2025,
+  "reference_date": "2025-07-01",
+  "source_label": "U.S. Census Bureau, CC-EST2025-SYASEX",
+  "source_release": "June 2026",
+  "source_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/counties/asrh/cc-est2025-syasex-54.csv",
+  "source_page": "https://www.census.gov/data/tables/time-series/demo/popest/2020s-counties-detail.html",
+  "source_layout": "https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2020-2025/CC-EST2025-SYASEX.pdf",
+  "source_sha256": "016d435c521edf10a8acfe286b43b2befb4e6c46964b59446bd6584cb90fa48a",
+  "built_at": "2026-11-20T07:49:59.433687+00:00",
+  "counties": {
+    "54001": {
+      "population": 15414,
+      "age64": 229,
+      "age65plus": 3493,
+      "name": "Barbour"
+    },
+    "54003": {
+      "population": 139522,
+      "age64": 1673,
+      "age65plus": 23492,
+      "name": "Berkeley"
+    },
+    "54005": {
+      "population": 20251,
+      "age64": 276,
+      "age65plus": 4925,
+      "name": "Boone"
+    },
+    "54007": {
+      "population": 11885,
+      "age64": 187,
+      "age65plus": 3259,
+      "name": "Braxton"
+    },
+    "54009": {
+      "population": 21142,
+      "age64": 324,
+      "age65plus": 5793,
+      "name": "Brooke"
+    },
+    "54011": {
+      "population": 91183,
+      "age64": 1054,
+      "age65plus": 18808,
+      "name": "Cabell"
+    },
+    "54013": {
+      "population": 5978,
+      "age64": 113,
+      "age65plus": 1616,
+      "name": "Calhoun"
+    },
+    "54015": {
+      "population": 7538,
+      "age64": 117,
+      "age65plus": 1810,
+      "name": "Clay"
+    },
+    "54017": {
+      "population": 7634,
+      "age64": 117,
+      "age65plus": 1665,
+      "name": "Doddridge"
+    },
+    "54019": {
+      "population": 38165,
+      "age64": 530,
+      "age65plus": 9377,
+      "name": "Fayette"
+    },
+    "54021": {
+      "population": 7085,
+      "age64": 76,
+      "age65plus": 1330,
+      "name": "Gilmer"
+    },
+    "54023": {
+      "population": 11041,
+      "age64": 178,
+      "age65plus": 2896,
+      "name": "Grant"
+    },
+    "54025": {
+      "population": 31578,
+      "age64": 502,
+      "age65plus": 8587,
+      "name": "Greenbrier"
+    },
+    "54027": {
+      "population": 24105,
+      "age64": 410,
+      "age65plus": 6228,
+      "name": "Hampshire"
+    },
+    "54029": {
+      "population": 27729,
+      "age64": 460,
+      "age65plus": 7285,
+      "name": "Hancock"
+    },
+    "54031": {
+      "population": 14337,
+      "age64": 269,
+      "age65plus": 3511,
+      "name": "Hardy"
+    },
+    "54033": {
+      "population": 64221,
+      "age64": 903,
+      "age65plus": 14351,
+      "name": "Harrison"
+    },
+    "54035": {
+      "population": 27450,
+      "age64": 400,
+      "age65plus": 6228,
+      "name": "Jackson"
+    },
+    "54037": {
+      "population": 63102,
+      "age64": 824,
+      "age65plus": 11950,
+      "name": "Jefferson"
+    },
+    "54039": {
+      "population": 172381,
+      "age64": 2327,
+      "age65plus": 41176,
+      "name": "Kanawha"
+    },
+    "54041": {
+      "population": 16394,
+      "age64": 225,
+      "age65plus": 3693,
+      "name": "Lewis"
+    },
+    "54043": {
+      "population": 19177,
+      "age64": 257,
+      "age65plus": 4356,
+      "name": "Lincoln"
+    },
+    "54045": {
+      "population": 30375,
+      "age64": 350,
+      "age65plus": 7070,
+      "name": "Logan"
+    },
+    "54047": {
+      "population": 16878,
+      "age64": 257,
+      "age65plus": 3874,
+      "name": "McDowell"
+    },
+    "54049": {
+      "population": 55584,
+      "age64": 649,
+      "age65plus": 12167,
+      "name": "Marion"
+    },
+    "54051": {
+      "population": 29159,
+      "age64": 455,
+      "age65plus": 7623,
+      "name": "Marshall"
+    },
+    "54053": {
+      "population": 24707,
+      "age64": 360,
+      "age65plus": 5985,
+      "name": "Mason"
+    },
+    "54055": {
+      "population": 57503,
+      "age64": 789,
+      "age65plus": 13507,
+      "name": "Mercer"
+    },
+    "54057": {
+      "population": 26792,
+      "age64": 365,
+      "age65plus": 6422,
+      "name": "Mineral"
+    },
+    "54059": {
+      "population": 21455,
+      "age64": 320,
+      "age65plus": 4926,
+      "name": "Mingo"
+    },
+    "54061": {
+      "population": 107991,
+      "age64": 1014,
+      "age65plus": 16134,
+      "name": "Monongalia"
+    },
+    "54063": {
+      "population": 12491,
+      "age64": 170,
+      "age65plus": 3262,
+      "name": "Monroe"
+    },
+    "54065": {
+      "population": 18027,
+      "age64": 344,
+      "age65plus": 4844,
+      "name": "Morgan"
+    },
+    "54067": {
+      "population": 23848,
+      "age64": 357,
+      "age65plus": 6242,
+      "name": "Nicholas"
+    },
+    "54069": {
+      "population": 40496,
+      "age64": 540,
+      "age65plus": 9848,
+      "name": "Ohio"
+    },
+    "54071": {
+      "population": 5826,
+      "age64": 122,
+      "age65plus": 1879,
+      "name": "Pendleton"
+    },
+    "54073": {
+      "population": 7338,
+      "age64": 105,
+      "age65plus": 1703,
+      "name": "Pleasants"
+    },
+    "54075": {
+      "population": 7602,
+      "age64": 125,
+      "age65plus": 2213,
+      "name": "Pocahontas"
+    },
+    "54077": {
+      "population": 34004,
+      "age64": 450,
+      "age65plus": 7664,
+      "name": "Preston"
+    },
+    "54079": {
+      "population": 56885,
+      "age64": 797,
+      "age65plus": 12524,
+      "name": "Putnam"
+    },
+    "54081": {
+      "population": 71775,
+      "age64": 864,
+      "age65plus": 16577,
+      "name": "Raleigh"
+    },
+    "54083": {
+      "population": 26882,
+      "age64": 407,
+      "age65plus": 6541,
+      "name": "Randolph"
+    },
+    "54085": {
+      "population": 8034,
+      "age64": 117,
+      "age65plus": 2106,
+      "name": "Ritchie"
+    },
+    "54087": {
+      "population": 13317,
+      "age64": 227,
+      "age65plus": 3399,
+      "name": "Roane"
+    },
+    "54089": {
+      "population": 11532,
+      "age64": 165,
+      "age65plus": 3245,
+      "name": "Summers"
+    },
+    "54091": {
+      "population": 16287,
+      "age64": 221,
+      "age65plus": 3697,
+      "name": "Taylor"
+    },
+    "54093": {
+      "population": 6540,
+      "age64": 102,
+      "age65plus": 1880,
+      "name": "Tucker"
+    },
+    "54095": {
+      "population": 7881,
+      "age64": 113,
+      "age65plus": 2076,
+      "name": "Tyler"
+    },
+    "54097": {
+      "population": 23758,
+      "age64": 331,
+      "age65plus": 5494,
+      "name": "Upshur"
+    },
+    "54099": {
+      "population": 37309,
+      "age64": 503,
+      "age65plus": 8601,
+      "name": "Wayne"
+    },
+    "54101": {
+      "population": 7760,
+      "age64": 124,
+      "age65plus": 2171,
+      "name": "Webster"
+    },
+    "54103": {
+      "population": 13734,
+      "age64": 227,
+      "age65plus": 3434,
+      "name": "Wetzel"
+    },
+    "54105": {
+      "population": 4879,
+      "age64": 88,
+      "age65plus": 1251,
+      "name": "Wirt"
+    },
+    "54107": {
+      "population": 82385,
+      "age64": 1226,
+      "age65plus": 19112,
+      "name": "Wood"
+    },
+    "54109": {
+      "population": 19801,
+      "age64": 277,
+      "age65plus": 4889,
+      "name": "Wyoming"
+    }
+  }
+}

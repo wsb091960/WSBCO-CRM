@@ -1,0 +1,230 @@
+{
+  "state": "OR",
+  "vintage": 2025,
+  "reference_date": "2025-07-01",
+  "source_label": "U.S. Census Bureau, CC-EST2025-SYASEX",
+  "source_release": "June 2026",
+  "source_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/counties/asrh/cc-est2025-syasex-41.csv",
+  "source_page": "https://www.census.gov/data/tables/time-series/demo/popest/2020s-counties-detail.html",
+  "source_layout": "https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2020-2025/CC-EST2025-SYASEX.pdf",
+  "source_sha256": "70d6eb57932c6938c0eee4215ffa8f44822aba4ff5f73cbc66ba2a6919b0331d",
+  "built_at": "2026-11-20T07:49:48.554694+00:00",
+  "counties": {
+    "41001": {
+      "population": 16658,
+      "age64": 267,
+      "age65plus": 4948,
+      "name": "Baker"
+    },
+    "41003": {
+      "population": 97728,
+      "age64": 1014,
+      "age65plus": 19773,
+      "name": "Benton"
+    },
+    "41005": {
+      "population": 426280,
+      "age64": 5518,
+      "age65plus": 93454,
+      "name": "Clackamas"
+    },
+    "41007": {
+      "population": 40926,
+      "age64": 647,
+      "age65plus": 11294,
+      "name": "Clatsop"
+    },
+    "41009": {
+      "population": 54091,
+      "age64": 782,
+      "age65plus": 12194,
+      "name": "Columbia"
+    },
+    "41011": {
+      "population": 63992,
+      "age64": 997,
+      "age65plus": 19537,
+      "name": "Coos"
+    },
+    "41013": {
+      "population": 27564,
+      "age64": 433,
+      "age65plus": 7536,
+      "name": "Crook"
+    },
+    "41015": {
+      "population": 22621,
+      "age64": 438,
+      "age65plus": 9051,
+      "name": "Curry"
+    },
+    "41017": {
+      "population": 213072,
+      "age64": 2732,
+      "age65plus": 49247,
+      "name": "Deschutes"
+    },
+    "41019": {
+      "population": 111951,
+      "age64": 1670,
+      "age65plus": 32168,
+      "name": "Douglas"
+    },
+    "41021": {
+      "population": 1971,
+      "age64": 27,
+      "age65plus": 574,
+      "name": "Gilliam"
+    },
+    "41023": {
+      "population": 7075,
+      "age64": 137,
+      "age65plus": 2338,
+      "name": "Grant"
+    },
+    "41025": {
+      "population": 7380,
+      "age64": 127,
+      "age65plus": 2099,
+      "name": "Harney"
+    },
+    "41027": {
+      "population": 23720,
+      "age64": 300,
+      "age65plus": 4869,
+      "name": "Hood River"
+    },
+    "41029": {
+      "population": 221795,
+      "age64": 2947,
+      "age65plus": 57028,
+      "name": "Jackson"
+    },
+    "41031": {
+      "population": 25740,
+      "age64": 345,
+      "age65plus": 5655,
+      "name": "Jefferson"
+    },
+    "41033": {
+      "population": 87867,
+      "age64": 1313,
+      "age65plus": 26219,
+      "name": "Josephine"
+    },
+    "41035": {
+      "population": 70274,
+      "age64": 978,
+      "age65plus": 17035,
+      "name": "Klamath"
+    },
+    "41037": {
+      "population": 8187,
+      "age64": 116,
+      "age65plus": 2207,
+      "name": "Lake"
+    },
+    "41039": {
+      "population": 381584,
+      "age64": 4759,
+      "age65plus": 89132,
+      "name": "Lane"
+    },
+    "41041": {
+      "population": 50636,
+      "age64": 903,
+      "age65plus": 17543,
+      "name": "Lincoln"
+    },
+    "41043": {
+      "population": 132843,
+      "age64": 1755,
+      "age65plus": 28473,
+      "name": "Linn"
+    },
+    "41045": {
+      "population": 32261,
+      "age64": 409,
+      "age65plus": 6060,
+      "name": "Malheur"
+    },
+    "41047": {
+      "population": 355777,
+      "age64": 3990,
+      "age65plus": 65678,
+      "name": "Marion"
+    },
+    "41049": {
+      "population": 12602,
+      "age64": 126,
+      "age65plus": 2261,
+      "name": "Morrow"
+    },
+    "41051": {
+      "population": 795391,
+      "age64": 7916,
+      "age65plus": 129878,
+      "name": "Multnomah"
+    },
+    "41053": {
+      "population": 90037,
+      "age64": 974,
+      "age65plus": 19119,
+      "name": "Polk"
+    },
+    "41055": {
+      "population": 2051,
+      "age64": 42,
+      "age65plus": 511,
+      "name": "Sherman"
+    },
+    "41057": {
+      "population": 27384,
+      "age64": 425,
+      "age65plus": 8322,
+      "name": "Tillamook"
+    },
+    "41059": {
+      "population": 81119,
+      "age64": 918,
+      "age65plus": 14601,
+      "name": "Umatilla"
+    },
+    "41061": {
+      "population": 25900,
+      "age64": 317,
+      "age65plus": 6082,
+      "name": "Union"
+    },
+    "41063": {
+      "population": 7595,
+      "age64": 119,
+      "age65plus": 2516,
+      "name": "Wallowa"
+    },
+    "41065": {
+      "population": 26310,
+      "age64": 327,
+      "age65plus": 6353,
+      "name": "Wasco"
+    },
+    "41067": {
+      "population": 611708,
+      "age64": 6294,
+      "age65plus": 101024,
+      "name": "Washington"
+    },
+    "41069": {
+      "population": 1472,
+      "age64": 37,
+      "age65plus": 563,
+      "name": "Wheeler"
+    },
+    "41071": {
+      "population": 110024,
+      "age64": 1390,
+      "age65plus": 23226,
+      "name": "Yamhill"
+    }
+  }
+}

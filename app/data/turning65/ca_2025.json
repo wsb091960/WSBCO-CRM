@@ -1,0 +1,362 @@
+{
+  "state": "CA",
+  "vintage": 2025,
+  "reference_date": "2025-07-01",
+  "source_label": "U.S. Census Bureau, CC-EST2025-SYASEX",
+  "source_release": "June 2026",
+  "source_url": "https://www2.census.gov/programs-surveys/popest/datasets/2020-2025/counties/asrh/cc-est2025-syasex-06.csv",
+  "source_page": "https://www.census.gov/data/tables/time-series/demo/popest/2020s-counties-detail.html",
+  "source_layout": "https://www2.census.gov/programs-surveys/popest/technical-documentation/file-layouts/2020-2025/CC-EST2025-SYASEX.pdf",
+  "source_sha256": "818ac90967c5bcafa9ae00b74ca33fd1bf9722c719c5b9291cb5e04c1471d55c",
+  "built_at": "2026-11-20T07:49:53.089065+00:00",
+  "counties": {
+    "06001": {
+      "population": 1636630,
+      "age64": 17762,
+      "age65plus": 278354,
+      "name": "Alameda"
+    },
+    "06003": {
+      "population": 1043,
+      "age64": 20,
+      "age65plus": 318,
+      "name": "Alpine"
+    },
+    "06005": {
+      "population": 41876,
+      "age64": 684,
+      "age65plus": 12756,
+      "name": "Amador"
+    },
+    "06007": {
+      "population": 209211,
+      "age64": 2445,
+      "age65plus": 43831,
+      "name": "Butte"
+    },
+    "06009": {
+      "population": 46605,
+      "age64": 849,
+      "age65plus": 14331,
+      "name": "Calaveras"
+    },
+    "06011": {
+      "population": 21836,
+      "age64": 253,
+      "age65plus": 3723,
+      "name": "Colusa"
+    },
+    "06013": {
+      "population": 1170070,
+      "age64": 14163,
+      "age65plus": 223339,
+      "name": "Contra Costa"
+    },
+    "06015": {
+      "population": 26410,
+      "age64": 397,
+      "age65plus": 5855,
+      "name": "Del Norte"
+    },
+    "06017": {
+      "population": 192323,
+      "age64": 3135,
+      "age65plus": 50296,
+      "name": "El Dorado"
+    },
+    "06019": {
+      "population": 1035456,
+      "age64": 10081,
+      "age65plus": 150704,
+      "name": "Fresno"
+    },
+    "06021": {
+      "population": 28141,
+      "age64": 321,
+      "age65plus": 5294,
+      "name": "Glenn"
+    },
+    "06023": {
+      "population": 131647,
+      "age64": 1591,
+      "age65plus": 29330,
+      "name": "Humboldt"
+    },
+    "06025": {
+      "population": 181411,
+      "age64": 1850,
+      "age65plus": 27683,
+      "name": "Imperial"
+    },
+    "06027": {
+      "population": 18158,
+      "age64": 279,
+      "age65plus": 4800,
+      "name": "Inyo"
+    },
+    "06029": {
+      "population": 927068,
+      "age64": 9265,
+      "age65plus": 124214,
+      "name": "Kern"
+    },
+    "06031": {
+      "population": 154327,
+      "age64": 1413,
+      "age65plus": 19162,
+      "name": "Kings"
+    },
+    "06033": {
+      "population": 67772,
+      "age64": 1061,
+      "age65plus": 17002,
+      "name": "Lake"
+    },
+    "06035": {
+      "population": 28117,
+      "age64": 360,
+      "age65plus": 5447,
+      "name": "Lassen"
+    },
+    "06037": {
+      "population": 9694934,
+      "age64": 111459,
+      "age65plus": 1653035,
+      "name": "Los Angeles"
+    },
+    "06039": {
+      "population": 167927,
+      "age64": 1727,
+      "age65plus": 25937,
+      "name": "Madera"
+    },
+    "06041": {
+      "population": 253694,
+      "age64": 3597,
+      "age65plus": 65291,
+      "name": "Marin"
+    },
+    "06043": {
+      "population": 16918,
+      "age64": 292,
+      "age65plus": 5263,
+      "name": "Mariposa"
+    },
+    "06045": {
+      "population": 88122,
+      "age64": 1136,
+      "age65plus": 23293,
+      "name": "Mendocino"
+    },
+    "06047": {
+      "population": 297260,
+      "age64": 2875,
+      "age65plus": 38858,
+      "name": "Merced"
+    },
+    "06049": {
+      "population": 8426,
+      "age64": 125,
+      "age65plus": 2540,
+      "name": "Modoc"
+    },
+    "06051": {
+      "population": 12505,
+      "age64": 155,
+      "age65plus": 2525,
+      "name": "Mono"
+    },
+    "06053": {
+      "population": 433729,
+      "age64": 4406,
+      "age65plus": 71521,
+      "name": "Monterey"
+    },
+    "06055": {
+      "population": 132949,
+      "age64": 1763,
+      "age65plus": 31546,
+      "name": "Napa"
+    },
+    "06057": {
+      "population": 101911,
+      "age64": 1637,
+      "age65plus": 30977,
+      "name": "Nevada"
+    },
+    "06059": {
+      "population": 3149507,
+      "age64": 38683,
+      "age65plus": 581218,
+      "name": "Orange"
+    },
+    "06061": {
+      "population": 442081,
+      "age64": 5563,
+      "age65plus": 98138,
+      "name": "Placer"
+    },
+    "06063": {
+      "population": 18583,
+      "age64": 347,
+      "age65plus": 6306,
+      "name": "Plumas"
+    },
+    "06065": {
+      "population": 2544916,
+      "age64": 28794,
+      "age65plus": 435849,
+      "name": "Riverside"
+    },
+    "06067": {
+      "population": 1618460,
+      "age64": 18186,
+      "age65plus": 275559,
+      "name": "Sacramento"
+    },
+    "06069": {
+      "population": 70082,
+      "age64": 753,
+      "age65plus": 10805,
+      "name": "San Benito"
+    },
+    "06071": {
+      "population": 2224091,
+      "age64": 24052,
+      "age65plus": 323852,
+      "name": "San Bernardino"
+    },
+    "06073": {
+      "population": 3282248,
+      "age64": 36929,
+      "age65plus": 573993,
+      "name": "San Diego"
+    },
+    "06075": {
+      "population": 826079,
+      "age64": 8846,
+      "age65plus": 155701,
+      "name": "San Francisco"
+    },
+    "06077": {
+      "population": 823815,
+      "age64": 8490,
+      "age65plus": 123725,
+      "name": "San Joaquin"
+    },
+    "06079": {
+      "population": 282367,
+      "age64": 3659,
+      "age65plus": 70439,
+      "name": "San Luis Obispo"
+    },
+    "06081": {
+      "population": 743568,
+      "age64": 8868,
+      "age65plus": 144132,
+      "name": "San Mateo"
+    },
+    "06083": {
+      "population": 442065,
+      "age64": 4712,
+      "age65plus": 83798,
+      "name": "Santa Barbara"
+    },
+    "06085": {
+      "population": 1914391,
+      "age64": 20888,
+      "age65plus": 311142,
+      "name": "Santa Clara"
+    },
+    "06087": {
+      "population": 258852,
+      "age64": 3281,
+      "age65plus": 57528,
+      "name": "Santa Cruz"
+    },
+    "06089": {
+      "population": 181648,
+      "age64": 2544,
+      "age65plus": 43779,
+      "name": "Shasta"
+    },
+    "06091": {
+      "population": 3098,
+      "age64": 65,
+      "age65plus": 1072,
+      "name": "Sierra"
+    },
+    "06093": {
+      "population": 42013,
+      "age64": 678,
+      "age65plus": 12690,
+      "name": "Siskiyou"
+    },
+    "06095": {
+      "population": 455376,
+      "age64": 5773,
+      "age65plus": 87943,
+      "name": "Solano"
+    },
+    "06097": {
+      "population": 486444,
+      "age64": 6637,
+      "age65plus": 117598,
+      "name": "Sonoma"
+    },
+    "06099": {
+      "population": 557719,
+      "age64": 5835,
+      "age65plus": 86860,
+      "name": "Stanislaus"
+    },
+    "06101": {
+      "population": 98787,
+      "age64": 1138,
+      "age65plus": 17592,
+      "name": "Sutter"
+    },
+    "06103": {
+      "population": 64665,
+      "age64": 911,
+      "age65plus": 14228,
+      "name": "Tehama"
+    },
+    "06105": {
+      "population": 15720,
+      "age64": 278,
+      "age65plus": 4724,
+      "name": "Trinity"
+    },
+    "06107": {
+      "population": 485146,
+      "age64": 4633,
+      "age65plus": 65466,
+      "name": "Tulare"
+    },
+    "06109": {
+      "population": 53160,
+      "age64": 860,
+      "age65plus": 16232,
+      "name": "Tuolumne"
+    },
+    "06111": {
+      "population": 830851,
+      "age64": 10714,
+      "age65plus": 165764,
+      "name": "Ventura"
+    },
+    "06113": {
+      "population": 224410,
+      "age64": 2145,
+      "age65plus": 35055,
+      "name": "Yolo"
+    },
+    "06115": {
+      "population": 88691,
+      "age64": 962,
+      "age65plus": 12755,
+      "name": "Yuba"
+    }
+  }
+}

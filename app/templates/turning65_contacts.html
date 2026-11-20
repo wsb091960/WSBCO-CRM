@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Turning 65 Contacts · {{state_name}} · WSBCO{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/turning65.css?v=1">
+<main class="t65-page">
+  <header class="t65-heading"><div><p class="t65-eyebrow">PRIVATE CRM · BIRTHDAY TARGETING</p><h1>{{'Age-64 contacts' if f.window == 'age64' else 'Contacts turning 65'}}</h1><p>{{state_name}}{% if selected %} · {{selected.name}} County{% endif %} · {{targeting.window_label}} · {{contact_count}} matches</p></div><a class="t65-button t65-secondary" href="{{map_url}}">Back to targeting map</a></header>
+  <p class="t65-small">Calculated from known dates of birth as of {{targeting.today}} (Pacific time). Missing/future birth dates and unresolved counties are excluded. Feb 29 birthdays use Feb 28 in non-leap years for planning.</p>
+  <section class="t65-panel">
+  {% if matches %}<div class="t65-table-scroll"><table><thead><tr><th scope="col">Contact</th><th scope="col">Age now</th><th scope="col">65th birthday</th><th scope="col">County / city</th><th scope="col">Phone</th><th scope="col">Status</th></tr></thead><tbody>{% for c in matches %}<tr><th scope="row"><a href="{{c.url}}">{{c.name or 'Open contact'}}</a></th><td>{{c.age}}</td><td>{{c.turns65}}</td><td>{{c.county}}{% if c.city %}<small>{{c.city}}</small>{% endif %}</td><td>{{phone_display(c.phone) or '—'}}</td><td>{{c.status}}</td></tr>{% endfor %}</tbody></table></div>
+  <nav class="t65-pagination" aria-label="Contact pages">{% if page > 1 %}<a href="{{previous_url}}">Previous</a>{% endif %}<span>Page {{page}} of {{pages}}</span>{% if page < pages %}<a href="{{next_url}}">Next</a>{% endif %}</nav>
+  {% else %}<h2>No matching contacts yet</h2><p>There are no Medicare contacts with a known date of birth and resolved county matching this birthday group and territory.</p><a href="{{map_url}}">Change the birthday window or territory</a>{% endif %}
+  </section>
+</main>
+{% endblock %}
