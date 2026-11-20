@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Territory Contacts · {{state_name}} · WSBCO{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/turning65.css?v=1">
+<main class="t65-page">
+<header class="t65-heading"><div><p class="t65-eyebrow">PRIVATE CRM · TERRITORY REVIEW</p><h1>Territory contacts</h1><p>{{state_name}}{% if selected %} · {{selected.name}} County{% endif %} · {{contact_count}} contacts</p></div><a class="t65-button t65-secondary" href="{{map_url}}">Back to territory map</a></header>
+<nav class="t65-tabs" aria-label="Contact activity filter"><a href="{{gap_url}}" {% if gap %}aria-current="page"{% endif %}>No outreach in last {{f.days}} days</a><a href="{{all_url}}" {% if not gap %}aria-current="page"{% endif %}>All contacts in territory</a></nav>
+{% if notice %}<p class="t65-notice">{{notice}} <a href="{{map_url}}">Adjust territory filters</a>.</p>{% endif %}
+{% if not coverage.activity_available %}<p class="t65-notice">Activity history is unavailable; saved call logs and last-contact dates are shown. Missing activity can overstate the outreach gap.</p>{% endif %}
+<p class="t65-small">{{coverage.start}} through {{coverage.as_of}} · Pacific time. These are existing Medicare CRM contacts of all ages. Do Not Call records are labeled for review. “No outreach” means none recorded in this window.</p>
+<section class="t65-panel"><div class="t65-table-scroll"><table><thead><tr><th scope="col">Contact</th><th scope="col">County / city</th><th scope="col">Phone</th><th scope="col">Latest recorded outreach</th><th scope="col">Status</th></tr></thead><tbody>{% for c in matches %}<tr><th scope="row"><a href="{{c.url}}">{{c.name or 'Open contact'}}</a></th><td>{{c.county}}{% if c.city %}<small>{{c.city}}</small>{% endif %}</td><td>{{phone_display(c.phone) or '—'}}</td><td>{{c.last_worked[:10] if c.last_worked else 'None recorded'}}<small>{{'Within window' if c.worked else 'No outreach in window'}}</small></td><td>{% if c.dnc %}<strong>Do Not Call</strong>{% else %}{{c.status}}{% endif %}</td></tr>{% else %}<tr><td colspan="5">No contacts match this territory and activity filter.</td></tr>{% endfor %}</tbody></table></div><nav class="t65-pagination" aria-label="Contact pages">{% if page > 1 %}<a href="{{previous_url}}">Previous</a>{% endif %}<span>Page {{page}} of {{pages}}</span>{% if page < pages %}<a href="{{next_url}}">Next</a>{% endif %}</nav></section>
+</main>
+{% endblock %}

@@ -62,10 +62,15 @@
         const box = document.createElement('div');
         const title = document.createElement('strong'); title.textContent = c.name + ' County';
         const value = document.createElement('div');
-        value.textContent = !c.in_scope ? 'Outside selected plan service area' :
+        value.textContent = !c.in_scope ? (config.outside_label || 'Outside selected plan service area') :
           c.value === null ? 'Population data unavailable' :
             (config.measure === 'share' ? c.share.toFixed(2) + '% of residents' : format.format(c.value)) + ' · ' + config.metric_label;
         box.append(title, value);
+        if (c.in_scope && Array.isArray(c.details)) {
+          for (const text of c.details) {
+            const line = document.createElement('div'); line.textContent = text; box.append(line);
+          }
+        }
         layer.bindTooltip(box, {sticky: true, direction: 'top'});
         layer.on('mouseover', () => layer.setStyle({weight: 3}));
         layer.on('mouseout', () => outlines.resetStyle(layer));

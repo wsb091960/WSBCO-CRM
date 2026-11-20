@@ -7,13 +7,14 @@ const script=fs.readFileSync(path.join(__dirname,'../app/static/js/turning65_map
 const tick=async()=>{for(let i=0;i<8;i++)await new Promise(r=>setImmediate(r));};
 function node(){return {textContent:'',value:'light',children:[],events:{},attrs:{},disabled:false,
  append(...children){this.children.push(...children);},addEventListener(k,f){this.events[k]=f;},setAttribute(k,v){this.attrs[k]=v;}};}
-function run({layer='population',leaflet=true,mismatch=false,reject=false}={}){
+function run({layer='population',leaflet=true,mismatch=false,reject=false,territory=false}={}){
  const nodes=new Map();for(const id of ['t65-esri-map','t65-map-status','t65-basemap','t65-fit-state','t65-fit-county','t65-map-config'])nodes.set(id,node());
  const counties=[{id:'48029',name:'Bexar',value:21564,share:1,in_scope:true,url:'/turning65?state=TX&county=48029'},
   {id:'48201',name:'Harris',value:40000,share:.9,in_scope:false,url:'/turning65?state=TX&county=48201'}];
  const config={state:'TX',selected:'48029',layer,metric_label:'Residents age 64',measure:'count',
   features_url:'/ma-map/counties.geojson?state=TX',thresholds:[500,2000,10000,20000],counties,
   points:[{name:'<img src=x onerror=alert(1)>',turns65:'2027-01-01',lat:29.4,lon:-98.5,url:'/leads/1'}],point_total:1};
+ if(territory){config.outside_label='Outside selected territory filters';counties[0].details=['21,564 residents age 64','3 CRM contacts · 1 recently worked','<img src=x>'];}
  nodes.get('t65-map-config').textContent=JSON.stringify(config);
  const features=counties.map(c=>({properties:{id:c.id}}));if(mismatch)features.pop();
  const requests=[],navigation=[],outlines=[],markers=[],tiles=[];
@@ -52,6 +53,13 @@ test('birthday locations use text-only popups and contact links',async()=>{
  assert.equal(r.markers[0].popup.children[0].textContent,'<img src=x onerror=alert(1)>');
  assert.equal(r.markers[0].popup.children.at(-1).href,'/leads/1');
  assert.match(r.nodes.get('t65-map-status').textContent,/1 of 1 verified/);
+});
+test('territory tooltips expose aggregate counts and use territory filter labels safely',async()=>{
+ const r=run({territory:true});await tick();
+ assert.equal(r.outlines[0].tooltip.children[2].textContent,'21,564 residents age 64');
+ assert.equal(r.outlines[0].tooltip.children[3].textContent,'3 CRM contacts · 1 recently worked');
+ assert.equal(r.outlines[0].tooltip.children[4].textContent,'<img src=x>');
+ assert.equal(r.outlines[1].tooltip.children[1].textContent,'Outside selected territory filters');
 });
 test('missing Leaflet preserves county selection and table fallback',async()=>{
  const r=run({leaflet:false});await tick();

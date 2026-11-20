@@ -19,6 +19,7 @@ from app.imports_v35 import router as imports_v35_router
 from app.plan_compare_v36 import router as plan_compare_v36_router
 from app.ma_county_map import router as ma_county_map_router
 from app.turning65 import router as turning65_router
+from app.territories import router as territories_router
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -41,6 +42,7 @@ app.include_router(imports_v35_router)
 app.include_router(plan_compare_v36_router)
 app.include_router(ma_county_map_router)
 app.include_router(turning65_router)
+app.include_router(territories_router)
 
 
 @app.on_event("startup")
