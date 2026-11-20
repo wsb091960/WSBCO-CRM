@@ -4,6 +4,7 @@ from typing import Annotated
 from uuid import uuid4
 from app.services.manual_calls import OUTCOMES, pending_item, save_manual_call, usable_phone
 from app.services.contact_map import contact_map_url
+from app.services.geocoding import contact_geocoding_status
 
 from fastapi import APIRouter, Depends, Form, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
@@ -213,6 +214,7 @@ def lead_detail(
             "list_item": pending_item(db, lead_id),
             "manual_phone": usable_phone(lead),
             "contact_map_url": contact_map_url(db, lead),
+            "geocoding_status": contact_geocoding_status(db, lead),
         },
     )
 
