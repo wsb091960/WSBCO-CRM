@@ -83,7 +83,7 @@ def county_features(state: str = Query('WV', max_length=2)):
 def map_page(request: Request, year: int = 2027, state: str = Query('WV', max_length=2),
              county: str = Query('', max_length=5),
              carrier: str = Query('', max_length=200), coverage: str = 'all', eligibility: str = 'all',
-             selected_ids: list[str] = Query(default=[]), map_view: str = 'outline'):
+             selected_ids: list[str] = Query(default=[]), map_view: str = 'esri'):
     state = state.upper()
     if state not in STATES:
         raise HTTPException(422, 'Choose an installed state: ' + ', '.join(STATES.values()) + '.')
@@ -125,9 +125,7 @@ def map_page(request: Request, year: int = 2027, state: str = Query('WV', max_le
     links = []
     for c in geometry['counties']:
         count = len(data['county_plans'][c['id']]) if data else None
-        params = {'state': state, 'year': year, 'county': c['id']}
-        if map_view == 'esri':
-            params['map_view'] = map_view
+        params = {'state': state, 'year': year, 'county': c['id'], 'map_view': map_view}
         links.append({**c, 'count': count, 'url': '/ma-map?' + urlencode(params)})
     map_params = [('state', state), ('year', year), ('county', county), ('carrier', carrier),
                   ('coverage', coverage), ('eligibility', eligibility)]
@@ -140,7 +138,7 @@ def map_page(request: Request, year: int = 2027, state: str = Query('WV', max_le
         'year': year, 'years': sorted(CATALOG_FILES[state], reverse=True), 'catalog': data,
         'state': state, 'state_name': STATES[state], 'states': STATES,
         'map_view': map_view, 'map_config': map_config,
-        'outline_url': '/ma-map?' + urlencode(map_params),
+        'outline_url': '/ma-map?' + urlencode(map_params + [('map_view', 'outline')]),
         'esri_url': '/ma-map?' + urlencode(map_params + [('map_view', 'esri')]),
         'plans': plans, 'chosen': chosen, 'selected_ids': selected_ids, 'compare_fields': COMPARE_FIELDS,
         'carriers': carriers, 'carrier': carrier, 'coverage': coverage, 'eligibility': eligibility,

@@ -21,7 +21,7 @@ def client():
 
 
 def test_map_has_all_55_real_counties_and_keyboard_links(client):
-    page = client.get('/ma-map')
+    page = client.get('/ma-map?map_view=outline')
     assert page.status_code == 200
     assert len(page.context['counties']) == 55
     assert {c['id'] for c in page.context['counties']} == set(ma.load_catalog(2027)['county_plans'])
@@ -30,6 +30,19 @@ def test_map_has_all_55_real_counties_and_keyboard_links(client):
     assert 'value="54039"' in page.text
     assert 'name="year"' in page.text and '2026' in page.text and '2027' in page.text
     assert not page.context['plans']  # Do not substitute a default county.
+
+
+@pytest.mark.parametrize('state', list(ma.STATES))
+def test_esri_is_default_and_outline_remains_usable_through_navigation(client, state):
+    page = client.get('/ma-map', params={'state': state})
+    assert page.status_code == 200 and page.context['map_view'] == 'esri'
+    assert 'id="ma-esri-map"' in page.text and '<span>Preview</span>' not in page.text
+    outline = client.get(page.context['outline_url'])
+    assert outline.context['map_view'] == 'outline'
+    assert 'class="ma-map"' in outline.text
+    assert 'name="map_view" value="outline"' in outline.text
+    county = client.get(outline.context['counties'][0]['url'])
+    assert county.context['map_view'] == 'outline'
 
 
 @pytest.mark.parametrize('year,rows', [(2026, 2526), (2027, 2519)])
@@ -242,7 +255,7 @@ def test_oregon_coos_and_douglas_keep_year_specific_plans(client):
 
 
 def test_oregon_empty_counties_are_clickable_and_do_not_show_other_counties(client):
-    page = client.get('/ma-map?state=OR&county=41023')  # Grant
+    page = client.get('/ma-map?state=OR&county=41023&map_view=outline')  # Grant
     assert page.status_code == 200 and page.context['total'] == 0
     assert page.context['plans'] == [] and page.context['chosen'] == []
     assert 'No Medicare Advantage plans listed' in page.text
@@ -261,8 +274,8 @@ def test_state_switch_links_reset_county_and_comparison_and_bad_states_rejected(
     page = client.get('/ma-map?state=or')
     assert page.status_code == 200 and page.context['state'] == 'OR'
     assert page.context['county'] is None and not page.context['chosen']
-    # State navigation retains only the plan year, never a stale county or selection.
-    assert '<a href="/ma-map?state=WV&amp;year=2027"' in page.text
+    # State navigation retains plan year and map view, never a stale county or selection.
+    assert '<a href="/ma-map?state=WV&amp;year=2027&amp;map_view=esri"' in page.text
     wv_id = ma.plan_values(ma.load_catalog(2027), '54039')[0]['id']
     assert client.get('/ma-map', params={'state': 'OR', 'county': '41019', 'selected_ids': wv_id}).status_code == 422
 
@@ -332,7 +345,7 @@ def test_california_large_county_comparison_and_year_specific_values(client):
 
 
 def test_california_zero_plan_counties_are_year_specific_and_clickable(client):
-    page = client.get('/ma-map?state=CA&county=06033')  # Lake
+    page = client.get('/ma-map?state=CA&county=06033&map_view=outline')  # Lake
     assert page.status_code == 200 and page.context['total'] == 0
     assert page.context['plans'] == []
     assert 'lists no MA plans in Lake County, California' in page.text
@@ -355,7 +368,7 @@ def test_california_filters_and_state_boundaries_remain_isolated(client):
     blank = client.get('/ma-map?state=ca')
     assert blank.status_code == 200 and blank.context['state'] == 'CA'
     assert blank.context['county'] is None and not blank.context['chosen']
-    assert '<a href="/ma-map?state=CA&amp;year=2027" aria-current="page"' in blank.text
+    assert '<a href="/ma-map?state=CA&amp;year=2027&amp;map_view=esri" aria-current="page"' in blank.text
 
 
 def test_california_missing_catalog_retains_map_without_fallback(client, monkeypatch):
@@ -457,7 +470,7 @@ def test_texas_rejects_foreign_state_counties_and_foreign_county_plans(client):
     blank = client.get('/ma-map?state=tx')
     assert blank.status_code == 200 and blank.context['county'] is None
     assert blank.context['state'] == 'TX' and not blank.context['chosen']
-    assert '<a href="/ma-map?state=TX&amp;year=2027" aria-current="page"' in blank.text
+    assert '<a href="/ma-map?state=TX&amp;year=2027&amp;map_view=esri" aria-current="page"' in blank.text
 
 
 def test_texas_missing_catalog_does_not_fall_back_to_another_state(client, monkeypatch):
