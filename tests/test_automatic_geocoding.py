@@ -231,13 +231,61 @@ def test_unreliable_matches_are_not_promoted(monkeypatch, change):
     assert geo.lookup_address(Lead(**contact()))['status'] == 'review'
 
 
-def test_missing_configuration_and_provider_errors_are_retryable(monkeypatch):
+def test_missing_or_invalid_esri_configuration_uses_census(monkeypatch):
+    fallback = {'status': 'review', 'reason': 'no_match'}
+    monkeypatch.setattr(geo, 'lookup_census', lambda _: fallback)
     monkeypatch.delenv('ARCGIS_API_KEY', raising=False)
-    assert geo.lookup_address(Lead(**contact())) == {'status': 'retry', 'reason': 'configuration'}
+    assert geo.lookup_address(Lead(**contact())) == fallback
     provider(monkeypatch, {'error': {'code': 498}}, [])
-    assert geo.lookup_address(Lead(**contact())) == {'status': 'retry', 'reason': 'configuration'}
+    assert geo.lookup_address(Lead(**contact())) == fallback
     monkeypatch.setattr(geo, 'urlopen', lambda *a, **k: (_ for _ in ()).throw(TimeoutError()))
     assert geo.lookup_address(Lead(**contact())) == {'status': 'retry', 'reason': 'service_error'}
+
+
+def census_result():
+    return {'result': {'addressMatches': [{
+        'coordinates': {'x': -123.35, 'y': 43.21},
+        'addressComponents': {'state': 'OR', 'zip': '97470', 'city': 'ROSEBURG'},
+        'matchedAddress': '123 EXAMPLE ST, ROSEBURG, OR, 97470',
+        'geographies': {'Counties': [{'NAME': 'Douglas County', 'GEOID': '41019'}]},
+        'tigerLine': {'tigerLineId': '123456', 'side': 'L'}}]}}
+
+
+def test_census_fallback_persists_pin_county_and_honest_precision(setup, monkeypatch):
+    client, factory, engine = setup
+    monkeypatch.delenv('ARCGIS_API_KEY', raising=False)
+    sent = []
+    def request(req, timeout):
+        assert req.full_url == 'https://geocoding.geo.census.gov/geocoder/geographies/address'
+        sent.append(parse_qs(req.data.decode()))
+        return io.StringIO(json.dumps(census_result()))
+    monkeypatch.setattr(geo, 'urlopen', request)
+    response = client.post('/leads/new', data=contact(notes='PRIVATE', medicare_mbi='SECRET'))
+    assert geo.process_next(engine)
+    assert 'Address located' in client.get(response.headers['location']).text
+    assert 'SECRET' not in str(sent) and 'PRIVATE' not in str(sent) and 'Synthetic' not in str(sent)
+    with factory() as db:
+        lead = db.scalar(select(Lead))
+        assert lead.county == 'Douglas County'
+        assert db.execute(text('SELECT score FROM gis_address_points')).scalar() is None
+        source = db.execute(text('SELECT source,precision FROM gis_coordinate_sources')).first()
+        assert source[0].startswith('U.S. Census') and source[1] == 'Estimated street-range location'
+
+
+@pytest.mark.parametrize('change', ['state', 'zip', 'number', 'county', 'tiger', 'nan', 'ambiguous', 'missing'])
+def test_census_rejects_inconsistent_or_ambiguous_matches(monkeypatch, change):
+    result = census_result()
+    c = result['result']['addressMatches'][0]
+    if change == 'state': c['addressComponents']['state'] = 'CA'
+    if change == 'zip': c['addressComponents']['zip'] = '97467'
+    if change == 'number': c['matchedAddress'] = '999 EXAMPLE ST'
+    if change == 'county': c['geographies']['Counties'] = []
+    if change == 'tiger': c['tigerLine'] = {}
+    if change == 'nan': c['coordinates']['x'] = float('nan')
+    if change == 'ambiguous': result['result']['addressMatches'].append(c.copy())
+    if change == 'missing': result['result']['addressMatches'] = []
+    monkeypatch.setattr(geo, 'urlopen', lambda *a, **k: io.StringIO(json.dumps(result)))
+    assert geo.lookup_census(Lead(**contact()))['status'] == 'review'
 
 
 def test_upgrade_does_not_queue_historical_contacts(tmp_path):

@@ -1,6 +1,6 @@
 """Transactional contact geocoding queue, processed outside contact saves.
 
-Only address fields are sent to Esri. Jobs survive restarts, and a lease plus
+Only address fields are sent to the geocoder. Jobs survive restarts, and a lease plus
 address fingerprint prevents concurrent or outdated lookups overwriting a pin.
 """
 import json
@@ -78,7 +78,7 @@ def lookup_address(lead):
     from app.gis_map import _address
     token = os.getenv("ARCGIS_API_KEY", "").strip()
     if not token:
-        return {"status": "retry", "reason": "configuration"}
+        return lookup_census(lead)
     payload = urlencode({"SingleLine": _address(lead), "outFields": "Addr_type,Region,Postal,Subregion",
                          "f": "json", "token": token, "outSR": "4326",
                          "forStorage": "true", "maxLocations": "2"}).encode()
@@ -91,7 +91,7 @@ def lookup_address(lead):
             result = json.load(response)
         if result.get("error"):
             reason = "configuration" if result["error"].get("code") in (401, 403, 498, 499) else "service_error"
-            return {"status": "retry", "reason": reason}
+            return lookup_census(lead) if reason == "configuration" else {"status": "retry", "reason": reason}
         candidates = result.get("candidates") or []
         if not candidates:
             return {"status": "review", "reason": "no_match"}
@@ -117,6 +117,53 @@ def lookup_address(lead):
                 "county": str(attr.get("Subregion") or "").strip()[:100]}
     except Exception:
         # Never log request URLs, provider bodies, addresses, or credentials.
+        return {"status": "retry", "reason": "service_error"}
+
+
+def lookup_census(lead):
+    """Key-free US Census address-range geocoder with county geography.
+
+    Official API: https://geocoding.geo.census.gov/geocoder/Geocoding_Services_API.html
+    Census provides interpolated locations, not a numeric confidence score.
+    """
+    from app.call_list_gis import state_code, zip5
+    fields = {k: str(getattr(lead, k, "") or "").strip() for k in ADDRESS_FIELDS}
+    payload = urlencode({"street": fields["address"], "city": fields["city"],
+                         "state": fields["state"], "zip": fields["zip_code"],
+                         "benchmark": "Public_AR_Current", "vintage": "Current_Current",
+                         "layers": "Counties", "format": "json"}).encode()
+    request = Request("https://geocoding.geo.census.gov/geocoder/geographies/address",
+                      data=payload, headers={"Content-Type": "application/x-www-form-urlencoded",
+                                            "User-Agent": "WSBCO-CRM-Geocoding/1.0"})
+    try:
+        with urlopen(request, timeout=12) as response:
+            result = json.load(response)
+        if "result" not in result or result.get("errors"):
+            return {"status": "retry", "reason": "service_error"}
+        matches = result["result"].get("addressMatches") or []
+        if len(matches) != 1:
+            return {"status": "review", "reason": "ambiguous" if matches else "no_match"}
+        candidate = matches[0]
+        attr, coordinates = candidate.get("addressComponents") or {}, candidate.get("coordinates") or {}
+        lat, lon = coordinates.get("y"), coordinates.get("x")
+        counties = (candidate.get("geographies") or {}).get("Counties") or []
+        number = re.match(r"\s*(\d+(?:-\d+)?)\b", fields["address"])
+        matched_number = re.match(r"\s*(\d+(?:-\d+)?)\b", candidate.get("matchedAddress", ""))
+        if (type(lat) not in (int, float) or type(lon) not in (int, float)
+                or not math.isfinite(lat) or not math.isfinite(lon)
+                or not -90 <= lat <= 90 or not -180 <= lon <= 180 or (lat == 0 and lon == 0)
+                or (fields["state"] and state_code(attr.get("state")) != state_code(fields["state"]))
+                or (fields["zip_code"] and zip5(attr.get("zip")) != zip5(fields["zip_code"]))
+                or (not fields["zip_code"] and fields["city"].casefold() != str(attr.get("city") or "").casefold())
+                or not number or not matched_number or number[1] != matched_number[1]
+                or len(counties) != 1 or not counties[0].get("NAME")
+                or not candidate.get("tigerLine", {}).get("tigerLineId")):
+            return {"status": "review", "reason": "uncertain_match"}
+        return {"status": "matched", "reason": "", "lat": float(lat), "lon": float(lon),
+                "score": None, "match_type": "CensusStreetAddress",
+                "county": str(counties[0]["NAME"])[:100],
+                "source": "U.S. Census Geocoder — Public_AR_Current / Current_Current"}
+    except Exception:
         return {"status": "retry", "reason": "service_error"}
 
 
@@ -200,7 +247,7 @@ def process_next(engine, lookup=None, now=None):
                 (lead_id,address_hash,source,checked_at,precision) VALUES (:id,:hash,:source,:checked,:precision)
                 ON CONFLICT(lead_id) DO UPDATE SET address_hash=excluded.address_hash,
                 source=excluded.source,checked_at=excluded.checked_at,precision=excluded.precision'''),
-                {"id": job_id, "hash": fingerprint, "source": "Esri World Geocoding Service",
+                {"id": job_id, "hash": fingerprint, "source": result.get("source", "Esri World Geocoding Service"),
                  "checked": datetime.now(timezone.utc).isoformat(), "precision": precision})
         db.commit()
     log.info("Contact geocoding job completed: %s", result["status"])
@@ -242,7 +289,7 @@ class GeocodingWorker:
         if os.getenv("ARCGIS_API_KEY", "").strip():
             log.info("Automatic contact geocoding worker started; Esri is configured")
         else:
-            log.warning("Automatic contact geocoding is waiting for Esri configuration")
+            log.info("Automatic contact geocoding worker started; using U.S. Census geocoder")
 
     def run(self):
         while not self.stop_event.is_set():
