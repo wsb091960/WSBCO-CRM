@@ -7,13 +7,14 @@ const script=fs.readFileSync(path.join(__dirname,'../app/static/js/turning65_map
 const tick=async()=>{for(let i=0;i<8;i++)await new Promise(r=>setImmediate(r));};
 function node(){return {textContent:'',value:'light',children:[],events:{},attrs:{},disabled:false,
  append(...children){this.children.push(...children);},addEventListener(k,f){this.events[k]=f;},setAttribute(k,v){this.attrs[k]=v;}};}
-function run({layer='population',leaflet=true,mismatch=false,reject=false,territory=false}={}){
+function run({layer='population',leaflet=true,mismatch=false,reject=false,territory=false,overlay,measure='count',missingIncome=false}={}){
  const nodes=new Map();for(const id of ['t65-esri-map','t65-map-status','t65-basemap','t65-fit-state','t65-fit-county','t65-map-config'])nodes.set(id,node());
  const counties=[{id:'48029',name:'Bexar',value:21564,share:1,in_scope:true,url:'/turning65?state=TX&county=48029'},
   {id:'48201',name:'Harris',value:40000,share:.9,in_scope:false,url:'/turning65?state=TX&county=48201'}];
  const config={state:'TX',selected:'48029',layer,metric_label:'Residents age 64',measure:'count',
   features_url:'/ma-map/counties.geojson?state=TX',thresholds:[500,2000,10000,20000],counties,
   points:[{name:'<img src=x onerror=alert(1)>',turns65:'2027-01-01',lat:29.4,lon:-98.5,url:'/leads/1'}],point_total:1};
+ if(overlay){config.overlay=overlay;config.measure=measure;config.palette=['a','b','c','d','e'];config.thresholds=[50000,65000,80000,100000];config.bubble_scale=measure==='share'?5:100000;counties[0].income=missingIncome?null:72500;counties[0].shade_value=counties[0].income;}
  if(territory){config.outside_label='Outside selected territory filters';counties[0].details=['21,564 residents age 64','3 CRM contacts · 1 recently worked','<img src=x>'];}
  nodes.get('t65-map-config').textContent=JSON.stringify(config);
  const features=counties.map(c=>({properties:{id:c.id}}));if(mismatch)features.pop();
@@ -25,7 +26,7 @@ function run({layer='population',leaflet=true,mismatch=false,reject=false,territ
     setStyle(style){outlines.forEach(l=>l.style=style(l.feature));},resetStyle(l){l.style=options.style(l.feature);}};
    for(const f of data.features){const element=node();const l={feature:f,events:{},style:options.style(f),
     bindTooltip(t){this.tooltip=t;},on(k,fn){this.events[k]=fn;},getElement(){return element;},
-    setStyle(s){this.style={...this.style,...s};},bringToFront(){},getBounds(){return [];},openTooltip(){},closeTooltip(){}};
+    setStyle(s){this.style={...this.style,...s};},bringToFront(){},getBounds(){return {getCenter:()=>[29.4,-98.5]};},openTooltip(){},closeTooltip(){}};
     options.onEachFeature(f,l);outlines.push(l);}
    return group;
   },circleMarker(point,style){const m={point,style,bindPopup(p){this.popup=p;return this;},addTo(){markers.push(this);return this;}};return m;}};
@@ -91,4 +92,25 @@ test('filter changes clear incompatible plans and custom dates stay explicit',()
  insurer.events.change();assert.equal(plan.value,'');assert.equal(county.value,'');
  birthday.value='custom';birthday.events.change();assert.equal(dates.hidden,false);
  birthday.value='12';birthday.events.change();assert.equal(dates.hidden,true);
+});
+
+test('income colors and missing data use income independently from the age count',async()=>{
+ const r=run({overlay:'income'});await tick();
+ assert.equal(r.outlines[0].style.fillColor,'c');
+ assert.match(r.outlines[0].tooltip.children[1].textContent, /\$72,500/);
+ assert.equal(r.markers.length,0);
+ const missing=run({overlay:'income',missingIncome:true});await tick();
+ assert.equal(missing.outlines[0].style.fillColor,'#a5b3bc');
+ assert.match(missing.outlines[0].tooltip.children[1].textContent,/unavailable/);
+});
+test('both overlays shade income and size noninteractive county circles by chosen age measure',async()=>{
+ for(const measure of ['count','share']){
+  const r=run({overlay:'both',measure});await tick();
+  assert.equal(r.outlines[0].style.fillColor,'c');
+  assert.equal(r.markers.length,1); // excluded counties have no age bubble
+  assert.equal(r.markers[0].style.interactive,false); // underlying county remains clickable
+  const value=measure==='share'?1:21564,scale=measure==='share'?5:100000;
+  assert.equal(r.markers[0].style.radius,32*Math.sqrt(value/scale));
+  r.outlines[0].events.click();assert.equal(r.navigation.length,1);
+ }
 });

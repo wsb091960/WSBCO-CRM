@@ -16,7 +16,7 @@
     return;
   }
   const map = L.map(root, {scrollWheelZoom: false}).setView([39, -98], 4);
-  const palette = ['#f4e7d5', '#edc393', '#e69b5d', '#cf6342', '#9b342d'];
+  const palette = config.palette || ['#f4e7d5', '#edc393', '#e69b5d', '#cf6342', '#9b342d'];
   const meta = new Map(config.counties.map(c => [c.id, c]));
   const format = new Intl.NumberFormat('en-US');
   let outlines, selectedLayer, active, tileFailed = false;
@@ -35,11 +35,11 @@
   active = layers.light.addTo(map);
   const style = feature => {
     const c = meta.get(feature.properties.id);
-    const value = config.measure === 'share' ? c.share : c.value;
+    const value = config.overlay === 'income' || config.overlay === 'both' ? c.shade_value : config.measure === 'share' ? c.share : c.value;
     const bucket = config.thresholds.filter(threshold => value >= threshold).length;
     return {color: c.id === config.selected ? '#153d50' : basemap.value === 'satellite' ? '#ffffff' : '#647b86',
       weight: c.id === config.selected ? 3 : .8,
-      fillColor: !c.in_scope ? '#d3dce1' : c.value === null ? '#a5b3bc' : palette[bucket],
+      fillColor: !c.in_scope ? '#d3dce1' : value === null ? '#a5b3bc' : palette[bucket],
       fillOpacity: !c.in_scope ? .4 : .82};
   };
   basemap.addEventListener('change', () => {
@@ -57,12 +57,14 @@
       if (data.type !== 'FeatureCollection' || data.features.length !== meta.size ||
           new Set(data.features.map(f => f.properties.id)).size !== meta.size ||
           data.features.some(f => !meta.has(f.properties.id))) throw Error('County boundary mismatch');
+      const bubbles = [];
       outlines = L.geoJSON(data, {style, onEachFeature(feature, layer) {
         const c = meta.get(feature.properties.id);
         const box = document.createElement('div');
         const title = document.createElement('strong'); title.textContent = c.name + ' County';
         const value = document.createElement('div');
-        value.textContent = !c.in_scope ? (config.outside_label || 'Outside selected plan service area') :
+        value.textContent = !c.in_scope ? (config.outside_label || 'Outside selected plan service area') : config.overlay === 'income' ?
+          (c.income === null ? 'Income data unavailable' : '$' + format.format(c.income) + ' median household income · 2024') :
           c.value === null ? 'Population data unavailable' :
             (config.measure === 'share' ? c.share.toFixed(2) + '% of residents' : format.format(c.value)) + ' · ' + config.metric_label;
         box.append(title, value);
@@ -75,6 +77,16 @@
         layer.on('mouseover', () => layer.setStyle({weight: 3}));
         layer.on('mouseout', () => outlines.resetStyle(layer));
         if (c.in_scope) layer.on('click', () => window.location.assign(c.url));
+        if (config.overlay === 'both' && c.in_scope) {
+          const ageValue = config.measure === 'share' ? c.share : c.value;
+          if (Number.isFinite(ageValue) && ageValue > 0) {
+            const bubble = L.circleMarker(layer.getBounds().getCenter(), {
+              radius: 32 * Math.sqrt(ageValue / config.bubble_scale), color: '#063e42', weight: 1.5,
+              fillColor: '#15b9b1', fillOpacity: .65, interactive: false
+            });
+            bubbles.push(bubble);
+          }
+        }
         layer.on('add', () => {
           const path = layer.getElement();
           if (!path || !c.in_scope) return;
@@ -88,6 +100,7 @@
       }}).addTo(map);
       map.fitBounds(outlines.getBounds(), {padding: [15, 15]});
       if (selectedLayer) selectedLayer.bringToFront();
+      bubbles.forEach(bubble => bubble.addTo(map));
       if (config.layer === 'contacts') {
         for (const point of config.points) {
           const popup = document.createElement('div');

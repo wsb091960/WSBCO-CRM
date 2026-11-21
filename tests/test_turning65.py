@@ -18,6 +18,7 @@ from app.golf_integration import GolfProfile
 from app.models import Lead
 from app.services import turning65 as service
 from app.turning65 import router, safe_csv
+from app.services import county_income
 
 
 @pytest.fixture
@@ -35,6 +36,96 @@ def setup(monkeypatch):
     with TestClient(app) as client:
         yield client, sessions, app
     engine.dispose()
+
+
+@pytest.mark.parametrize('state,count', [('OR',36),('CA',58),('WV',55),('TX',254)])
+def test_income_coverage_preserves_counties_and_reports_confidence_bounds(setup, state, count):
+    client, _, _ = setup
+    response = client.get('/turning65', params={'state':state, 'overlay':'income'})
+    assert response.status_code == 200
+    c = response.context
+    assert len(c['scoped']) == count
+    assert c['income']['income_year'] == 2024 and c['population']['reference_date'] == '2025-07-01'
+    assert len(c['income']['source_sha256']) == 64
+    for row in c['scoped']:
+        assert 0 < row['income_low'] <= row['income'] <= row['income_high']
+        assert row['shade_value'] == row['income']
+    values = [row['income'] for row in c['ranked']]
+    assert values == sorted(values, reverse=True)
+    assert 'all households' in response.text and '2024 dollars' in response.text
+    assert c['map_config']['points'] == []
+
+
+@pytest.mark.parametrize('age,measure', [('64','count'),('64','share'),('65plus','count'),('65plus','share')])
+def test_both_overlays_keep_age_and_income_separate_and_retain_selection(setup, age, measure):
+    client, _, _ = setup
+    response = client.get('/turning65', params={'state':'TX','county':'48029', 'overlay':'both',
+        'age':age, 'measure':measure, 'carrier':'Clover Health', 'map_view':'outline'})
+    assert response.status_code == 200
+    c = response.context
+    assert len(c['scoped']) == 7
+    selected = c['selected']
+    assert selected['value'] == selected['age64' if age == '64' else 'age65plus']
+    assert selected['shade_value'] == selected['income']
+    assert selected['bubble_radius'] > 0
+    # Circle area scales with the chosen age count/share; income does not affect circle size.
+    smaller, larger = sorted(c['scoped'], key=lambda r:r['bubble_radius'])[::6]
+    key = 'share' if measure == 'share' else 'value'
+    assert (larger['bubble_radius']/smaller['bubble_radius'])**2 == pytest.approx(larger[key]/smaller[key])
+    for url in [c['outline_url'],c['esri_url'],c['csv_url'],c['contacts_url'],*c['state_links'].values()]:
+        assert 'overlay=both' in url
+    assert 'county=48029' in c['overlay_links']['income']
+    assert 't65-age-bubble' in response.text and '90% confidence range' in response.text
+    assert 'Income &amp; Age Layers' in response.text
+
+
+def test_income_csv_is_county_based_and_does_not_sum_medians(setup):
+    client, _, _ = setup
+    response = client.get('/turning65/export.csv?state=OR&overlay=both')
+    rows = list(csv.DictReader(io.StringIO(response.text)))
+    assert len(rows) == 36
+    assert all(row['Income year']=='2024' and row['Income dollars year']=='2024' for row in rows)
+    assert all(row['Selected overlay']=='both' for row in rows)
+    assert all(row['Income source'].startswith('https://www2.census.gov/') for row in rows)
+    assert all(int(row['Median household income']) > 0 for row in rows)
+    assert not any('email' in key.lower() or 'phone' in key.lower() for key in rows[0])
+
+
+def test_income_no_data_is_distinct_and_contacts_do_not_use_income_shading(setup, monkeypatch):
+    client, _, _ = setup
+    original = county_income.income('OR')
+    data = {**original, 'counties': {k:dict(v) for k,v in original['counties'].items()}}
+    data['counties']['41019'] = dict.fromkeys(('income','income_low','income_high'))
+    monkeypatch.setattr(county_income, 'income', lambda _:data)
+    response = client.get('/turning65?county=41019&overlay=income&map_view=outline')
+    assert response.status_code == 200 and response.context['selected']['bucket'] is None
+    assert '--t65-fill:#a5b3bc' in response.text and 'Unavailable' in response.text
+    assert response.context['ranked'][-1]['id'] == '41019'
+    contacts = client.get('/turning65?layer=contacts&overlay=both')
+    assert contacts.context['map_config']['overlay']=='age'
+    assert contacts.context['map_config']['thresholds']==[1,5,20,100]
+    assert 'County data overlays' not in contacts.text
+
+
+def test_invalid_overlay_rejected_on_map_contacts_and_export(setup):
+    client, _, _ = setup
+    for path in ('/turning65','/turning65/contacts','/turning65/export.csv'):
+        assert client.get(path+'?overlay=invalid').status_code==422
+
+
+def test_income_snapshot_failure_is_explicit(tmp_path, monkeypatch):
+    monkeypatch.setattr(county_income, 'DATA_DIR', tmp_path)
+    county_income.income.cache_clear()
+    try:
+        with pytest.raises(Exception) as exc:
+            county_income.income('OR')
+        assert exc.value.status_code==503
+        (tmp_path/'or_2024.json').write_text('{}')
+        with pytest.raises(Exception) as exc:
+            county_income.income('OR')
+        assert exc.value.status_code==503
+    finally:
+        county_income.income.cache_clear()
 
 
 @pytest.mark.parametrize('state,count,total', [('OR',36,51489),('CA',58,450325),('WV',55,24012),('TX',254,332178)])
