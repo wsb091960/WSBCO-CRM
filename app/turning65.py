@@ -2,6 +2,7 @@
 import csv
 from dataclasses import asdict, dataclass
 import io
+import re
 from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
@@ -12,6 +13,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.ma_county_map import load_geometry
 from app.services import turning65 as service
+from app.services import county_income
 
 router = APIRouter(prefix='/turning65', tags=['Turning 65 targeting'])
 templates = Jinja2Templates(directory='app/templates')
@@ -32,22 +34,24 @@ class Filters:
     date_from: str
     date_to: str
     map_view: str
+    overlay: str = 'age'
 
 
 def filters(state: str = Query('OR', max_length=2), year: int = 2027,
             county: str = Query('', max_length=5), carrier: str = Query('', max_length=200),
             plan_id: str = Query('', max_length=40), stars: str = 'all',
             layer: str = 'population', age: str = '64', measure: str = 'count',
-            window: str = '6', date_from: str = '', date_to: str = '', map_view: str = 'esri'):
+            window: str = '6', date_from: str = '', date_to: str = '', map_view: str = 'esri',
+            overlay: str = 'age'):
     state = state.upper()
     choices = [(state, service.STATES), (year, {2026, 2027}), (stars, {'all', '4', '4.5', '5'}),
                (layer, {'population', 'contacts'}), (age, {'64', '65plus'}),
                (measure, {'count', 'share'}), (window, {'6', '12', 'custom', 'age64'}),
-               (map_view, {'esri', 'outline'})]
+               (map_view, {'esri', 'outline'}), (overlay, {'age', 'income', 'both'})]
     if any(value not in allowed for value, allowed in choices):
         raise HTTPException(422, 'Choose a supported state, plan year and targeting filters.')
     return Filters(state, year, county, carrier, plan_id, stars, layer, age, measure,
-                   window, date_from, date_to, map_view)
+                   window, date_from, date_to, map_view, overlay)
 
 
 def link(f, path='/turning65', **changes):
@@ -61,6 +65,8 @@ def view_model(f, db):
     if f.county and f.county not in known:
         raise HTTPException(422, 'Choose a county in the selected state.')
     data = service.population(f.state)
+    income_data = county_income.income(f.state)
+    overlay = f.overlay if f.layer == 'population' else 'age'
     area = service.service_area(f.state, f.year, f.carrier, f.plan_id, f.stars)
     # A changed insurer/year can remove the previously selected county.
     selected = f.county if f.county in area['ids'] else ''
@@ -75,13 +81,15 @@ def view_model(f, db):
         stats = targeting['counties'][county_id]
         value = (numbers['age64'] if f.age == '64' else numbers['age65plus']) if f.layer == 'population' else stats['matching']
         share = value / numbers['population'] * 100 if numbers['population'] else 0
-        rows.append({**source, **numbers, **stats, 'in_scope': county_id in area['ids'],
+        rows.append({**source, **numbers, **stats, **income_data['counties'][county_id], 'in_scope': county_id in area['ids'],
                      'value': value, 'share': share, 'url': link(f, county=county_id),
                      'contacts_url': link(f, path='/turning65/contacts', county=county_id),
                      'plans_url': '/ma-map?' + urlencode({'state': f.state, 'year': f.year, 'county': county_id,
                                                         'carrier': f.carrier})})
     scoped = [c for c in rows if c['in_scope']]
     ranked = sorted(scoped, key=lambda c: (-(c['share'] if f.measure == 'share' and f.layer == 'population' else c['value']), c['name']))
+    if overlay == 'income':
+        ranked = sorted(scoped, key=lambda c: (c['income'] is None, -(c['income'] or 0), c['name']))
     selected_county = next((c for c in scoped if c['id'] == selected), None)
     totals = {key: sum(c[key] for c in scoped) for key in ('population', 'age64', 'age65plus', 'matching', 'contacts')}
     selected_matches = [c for c in targeting['matches'] if not selected or c['county_id'] == selected]
@@ -90,7 +98,7 @@ def view_model(f, db):
                   if f.layer == 'population' else 'Matching CRM contacts',
                   'measure': f.measure if f.layer == 'population' else 'count',
                   'features_url': '/ma-map/counties.geojson?' + urlencode({'state': f.state}),
-                  'counties': [{k: c[k] for k in ('id', 'name', 'value', 'share', 'in_scope', 'url')} for c in rows],
+                  'counties': [],
                   'points': targeting['points'][:5000] if f.layer == 'contacts' else [],
                   'point_total': len(targeting['points']) if f.layer == 'contacts' else 0}
     threshold = ([500, 2000, 10000, 20000] if f.age == '64' else [2000, 10000, 50000, 100000])
@@ -101,15 +109,32 @@ def view_model(f, db):
         labels = ['<0.8%', '0.8–1.09%', '1.1–1.39%', '1.4–1.69%', '1.7%+'] if f.age == '64' else ['<10%', '10–14.9%', '15–19.9%', '20–24.9%', '25%+']
     if f.layer == 'contacts':
         threshold, labels = [1, 5, 20, 100], ['0', '1–4', '5–19', '20–99', '100+']
+    map_config['overlay'] = overlay
+    map_config['bubble_scale'] = (5 if f.age == '64' else 50) if f.measure == 'share' else (100000 if f.age == '64' else 1000000)
+    if overlay in {'income', 'both'}:
+        threshold, labels = county_income.THRESHOLDS, county_income.LEGEND
+        map_config['palette'] = county_income.PALETTE
     for county in rows:
         number = county['share'] if map_config['measure'] == 'share' else county['value']
-        county['bucket'] = sum(number >= t for t in threshold)
+        county['shade_value'] = county['income'] if overlay in {'income', 'both'} else number
+        county['bucket'] = sum(county['shade_value'] >= t for t in threshold) if county['shade_value'] is not None else None
+        county['fill'] = (county_income.PALETTE[county['bucket']] if county['bucket'] is not None else '#a5b3bc') if overlay in {'income', 'both'} else ''
+        county['bubble_radius'] = 32 * (number / map_config['bubble_scale']) ** .5 if overlay == 'both' else 0
+        if overlay == 'both':
+            coords = re.findall(r'[ML]([\d.]+),([\d.]+)', county['path'])
+            county['cx'] = (min(float(p[0]) for p in coords) + max(float(p[0]) for p in coords)) / 2
+            county['cy'] = (min(float(p[1]) for p in coords) + max(float(p[1]) for p in coords)) / 2
+        income_text = 'Median household income unavailable' if county['income'] is None else f"Median household income: ${county['income']:,} (2024); 90% range ${county['income_low']:,}–${county['income_high']:,}"
+        county['details'] = [income_text, 'Population snapshot: July 1, 2025']
+        map_config['counties'].append({k: county[k] for k in ('id', 'name', 'value', 'share', 'in_scope', 'url', 'income', 'shade_value', 'details')})
     map_config['thresholds'] = threshold
+    overlay_links = {mode: link(f, overlay=mode, layer='population') for mode in ('age', 'income', 'both')}
     return {'f': f, 'states': service.STATES, 'state_name': service.STATES[f.state],
             'geometry': geometry, 'population': data, 'area': area, 'counties': rows,
             'scoped': scoped, 'ranked': ranked, 'selected': selected_county,
             'totals': totals, 'targeting': targeting, 'matches': selected_matches,
             'map_config': map_config, 'legend': labels, 'notice': notice,
+            'income': income_data, 'overlay': overlay, 'overlay_links': overlay_links,
             'state_links': {s: link(f, state=s, county='', carrier='', plan_id='', stars='all') for s in service.STATES},
             'outline_url': link(f, county=selected, map_view='outline'),
             'esri_url': link(f, county=selected, map_view='esri'),
@@ -161,13 +186,20 @@ def export_territory(f: Filters = Depends(filters), db: Session = Depends(get_db
                      'Residents exactly age 64', 'Age 64 percent', 'Residents age 65+', 'Age 65+ percent',
                      'Existing Medicare contacts', 'Matching CRM birthdays', 'Birthday window', 'CRM as-of date',
                      'Plan year', 'Insurer filter', 'Plan filter', 'Minimum star filter', 'Census source',
-                     'Census SHA256', 'CMS source date'])
+                     'Census SHA256', 'CMS source date', 'Median household income', 'Income 90% lower bound',
+                     'Income 90% upper bound', 'Income year', 'Income dollars year', 'Income source',
+                     'Income source SHA256', 'Selected overlay'])
     for row in context['ranked']:
         writer.writerow([safe_csv(v) for v in [f.state, row['id'], row['name'], context['population']['reference_date'],
             row['population'], row['age64'], round(row['age64'] / row['population'] * 100, 4) if row['population'] else 0,
             row['age65plus'], round(row['age65plus'] / row['population'] * 100, 4) if row['population'] else 0,
             row['contacts'], row['matching'], context['targeting']['window_label'], context['targeting']['today'],
             f.year, f.carrier, f.plan_id, f.stars, context['population']['source_url'],
-            context['population']['source_sha256'], context['area']['catalog']['source_updated']]])
+            context['population']['source_sha256'], context['area']['catalog']['source_updated'],
+            row['income'] if row['income'] is not None else 'Unavailable',
+            row['income_low'] if row['income_low'] is not None else 'Unavailable',
+            row['income_high'] if row['income_high'] is not None else 'Unavailable',
+            context['income']['income_year'], context['income']['dollars_year'], context['income']['source_url'],
+            context['income']['source_sha256'], context['overlay']]])
     return Response(output.getvalue(), media_type='text/csv', headers={
         'Content-Disposition': f'attachment; filename="turning65_{f.state}_territory.csv"', 'Cache-Control': 'no-store'})

@@ -1,0 +1,288 @@
+{
+  "state": "WV",
+  "income_year": 2024,
+  "dollars_year": 2024,
+  "source_label": "U.S. Census Bureau, SAIPE 2024",
+  "source_release": "January 2026",
+  "source_url": "https://www2.census.gov/programs-surveys/saipe/datasets/2024/2024-state-and-county/est24all.txt",
+  "source_layout": "https://www2.census.gov/programs-surveys/saipe/technical-documentation/file-layouts/state-county/2024-estimate-layout.txt",
+  "source_sha256": "f49df1828732ae06c2700d939fd77ced0d1a15ccc23621c67cc9c48680d344dc",
+  "built_at": "2026-11-21T00:23:35.891468+00:00",
+  "counties": {
+    "54001": {
+      "income": 52771,
+      "income_low": 46702,
+      "income_high": 58840
+    },
+    "54003": {
+      "income": 82567,
+      "income_low": 77129,
+      "income_high": 88005
+    },
+    "54005": {
+      "income": 52928,
+      "income_low": 47881,
+      "income_high": 57975
+    },
+    "54007": {
+      "income": 53011,
+      "income_low": 47327,
+      "income_high": 58695
+    },
+    "54009": {
+      "income": 60780,
+      "income_low": 54611,
+      "income_high": 66949
+    },
+    "54011": {
+      "income": 57512,
+      "income_low": 52814,
+      "income_high": 62210
+    },
+    "54013": {
+      "income": 47867,
+      "income_low": 42169,
+      "income_high": 53565
+    },
+    "54015": {
+      "income": 48528,
+      "income_low": 42855,
+      "income_high": 54201
+    },
+    "54017": {
+      "income": 59779,
+      "income_low": 53076,
+      "income_high": 66482
+    },
+    "54019": {
+      "income": 47998,
+      "income_low": 44339,
+      "income_high": 51657
+    },
+    "54021": {
+      "income": 48225,
+      "income_low": 42631,
+      "income_high": 53819
+    },
+    "54023": {
+      "income": 56277,
+      "income_low": 49894,
+      "income_high": 62660
+    },
+    "54025": {
+      "income": 55405,
+      "income_low": 50425,
+      "income_high": 60385
+    },
+    "54027": {
+      "income": 63929,
+      "income_low": 57262,
+      "income_high": 70596
+    },
+    "54029": {
+      "income": 61526,
+      "income_low": 55528,
+      "income_high": 67524
+    },
+    "54031": {
+      "income": 60209,
+      "income_low": 53636,
+      "income_high": 66782
+    },
+    "54033": {
+      "income": 63576,
+      "income_low": 58462,
+      "income_high": 68690
+    },
+    "54035": {
+      "income": 63024,
+      "income_low": 56276,
+      "income_high": 69772
+    },
+    "54037": {
+      "income": 92550,
+      "income_low": 86133,
+      "income_high": 98967
+    },
+    "54039": {
+      "income": 62137,
+      "income_low": 58346,
+      "income_high": 65928
+    },
+    "54041": {
+      "income": 57454,
+      "income_low": 51696,
+      "income_high": 63212
+    },
+    "54043": {
+      "income": 48285,
+      "income_low": 42632,
+      "income_high": 53938
+    },
+    "54045": {
+      "income": 48120,
+      "income_low": 42975,
+      "income_high": 53265
+    },
+    "54047": {
+      "income": 35721,
+      "income_low": 32021,
+      "income_high": 39421
+    },
+    "54049": {
+      "income": 61504,
+      "income_low": 56924,
+      "income_high": 66084
+    },
+    "54051": {
+      "income": 58419,
+      "income_low": 52986,
+      "income_high": 63852
+    },
+    "54053": {
+      "income": 56080,
+      "income_low": 49649,
+      "income_high": 62511
+    },
+    "54055": {
+      "income": 54317,
+      "income_low": 49969,
+      "income_high": 58665
+    },
+    "54057": {
+      "income": 63375,
+      "income_low": 57073,
+      "income_high": 69677
+    },
+    "54059": {
+      "income": 43289,
+      "income_low": 38256,
+      "income_high": 48322
+    },
+    "54061": {
+      "income": 67259,
+      "income_low": 62392,
+      "income_high": 72126
+    },
+    "54063": {
+      "income": 56789,
+      "income_low": 50214,
+      "income_high": 63364
+    },
+    "54065": {
+      "income": 67722,
+      "income_low": 60779,
+      "income_high": 74665
+    },
+    "54067": {
+      "income": 53678,
+      "income_low": 48799,
+      "income_high": 58557
+    },
+    "54069": {
+      "income": 56892,
+      "income_low": 51183,
+      "income_high": 62601
+    },
+    "54071": {
+      "income": 63245,
+      "income_low": 58515,
+      "income_high": 67975
+    },
+    "54073": {
+      "income": 63468,
+      "income_low": 55908,
+      "income_high": 71028
+    },
+    "54075": {
+      "income": 52248,
+      "income_low": 46646,
+      "income_high": 57850
+    },
+    "54077": {
+      "income": 63370,
+      "income_low": 57774,
+      "income_high": 68966
+    },
+    "54079": {
+      "income": 80834,
+      "income_low": 73172,
+      "income_high": 88496
+    },
+    "54081": {
+      "income": 55834,
+      "income_low": 50401,
+      "income_high": 61267
+    },
+    "54083": {
+      "income": 51338,
+      "income_low": 46407,
+      "income_high": 56269
+    },
+    "54085": {
+      "income": 58610,
+      "income_low": 51734,
+      "income_high": 65486
+    },
+    "54087": {
+      "income": 49728,
+      "income_low": 43888,
+      "income_high": 55568
+    },
+    "54089": {
+      "income": 45580,
+      "income_low": 40164,
+      "income_high": 50996
+    },
+    "54091": {
+      "income": 61452,
+      "income_low": 54327,
+      "income_high": 68577
+    },
+    "54093": {
+      "income": 56204,
+      "income_low": 50883,
+      "income_high": 61525
+    },
+    "54095": {
+      "income": 65585,
+      "income_low": 57842,
+      "income_high": 73328
+    },
+    "54097": {
+      "income": 56994,
+      "income_low": 52920,
+      "income_high": 61068
+    },
+    "54099": {
+      "income": 61452,
+      "income_low": 57419,
+      "income_high": 65485
+    },
+    "54101": {
+      "income": 41687,
+      "income_low": 36928,
+      "income_high": 46446
+    },
+    "54103": {
+      "income": 58389,
+      "income_low": 52483,
+      "income_high": 64295
+    },
+    "54105": {
+      "income": 55031,
+      "income_low": 48799,
+      "income_high": 61263
+    },
+    "54107": {
+      "income": 59516,
+      "income_low": 54051,
+      "income_high": 64981
+    },
+    "54109": {
+      "income": 48086,
+      "income_low": 42628,
+      "income_high": 53544
+    }
+  }
+}
