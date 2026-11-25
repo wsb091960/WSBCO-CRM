@@ -12,6 +12,7 @@ import re
 import secrets
 from typing import Literal
 from zoneinfo import ZoneInfo
+from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse, Response
@@ -26,6 +27,11 @@ from app.database import Base, get_db
 router = APIRouter()
 templates = Jinja2Templates(directory='app/templates')
 GIS_URL = 'https://wsbco-san-antonio-senior-outreach.williamsburton.chatgpt.site'
+TERRITORIES = {
+    'sa-clover': {'label': 'San Antonio Outreach', 'description': 'San Antonio senior-center and nutrition-site outreach.'},
+    'wv-peak': {'label': 'Peak Health WV Outreach', 'description': 'West Virginia senior-center, nutrition-site and county-provider outreach.'},
+}
+Territory = Literal['sa-clover', 'wv-peak']
 CENTER_ID = re.compile(r'^[a-z0-9][a-z0-9_-]{0,119}$')
 STATUSES = {
     'not_contacted': 'Not contacted',
@@ -58,7 +64,7 @@ class OutreachInput(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
     center_name: str = Field(min_length=1, max_length=240)
     address: str = Field(default='', max_length=500)
-    type: Literal['', 'comprehensive', 'part_time', 'partner', 'closed', 'unknown'] = ''
+    type: Literal['', 'comprehensive', 'part_time', 'partner', 'closed', 'unknown', 'senior_center', 'nutrition_site', 'county_provider'] = ''
     contact_name: str = Field(default='', max_length=160)
     contact_phone: str = Field(default='', max_length=80)
     status: Literal['not_contacted', 'contacted', 'meeting_scheduled', 'event_scheduled', 'follow_up', 'completed'] = 'not_contacted'
@@ -105,6 +111,12 @@ def serialize(row):
 
 def list_records(db):
     return [serialize(r) for r in db.scalars(select(SeniorOutreachRecord).order_by(SeniorOutreachRecord.updated_at.desc(), SeniorOutreachRecord.center_id)).all()]
+
+
+def territory_records(db, territory):
+    # Territory is an organizational view; the owner and Site service can access
+    # the complete collection. WV IDs are deliberately namespaced with wv-.
+    return [row for row in list_records(db) if row['center_id'].startswith('wv-') == (territory == 'wv-peak')]
 
 
 async def parse_record(request):
@@ -169,21 +181,24 @@ async def outreach_save(center_id: str, request: Request, db: Session = Depends(
 
 
 @router.get('/senior-outreach')
-def dashboard(request: Request, db: Session = Depends(get_db)):
-    rows = list_records(db)
+def dashboard(request: Request, territory: Territory = 'sa-clover', db: Session = Depends(get_db)):
+    rows = territory_records(db, territory)
     today = datetime.now(timezone.utc).astimezone(ZoneInfo('America/Los_Angeles')).date().isoformat()
     counts = {key: sum(r['status'] == key for r in rows) for key in STATUSES}
     due = sum(bool(r['next_follow_up']) and r['next_follow_up'] <= today and r['status'] != 'completed' for r in rows)
     return templates.TemplateResponse(request=request, name='senior_outreach.html', context={
-        'rows': rows, 'statuses': STATUSES, 'counts': counts, 'due': due, 'today': today, 'gis_url': GIS_URL,
+        'rows': rows, 'statuses': STATUSES, 'counts': counts, 'due': due, 'today': today,
+        'gis_url': GIS_URL + '/?' + urlencode({'territory': territory}),
+        'territory': territory, 'territories': TERRITORIES, 'territory_info': TERRITORIES[territory],
+        'export_url': '/senior-outreach/export.csv?' + urlencode({'territory': territory}),
     }, headers={'Cache-Control': 'no-store'})
 
 
 @router.get('/senior-outreach/export.csv')
-def export_records(db: Session = Depends(get_db)):
+def export_records(territory: Territory = 'sa-clover', db: Session = Depends(get_db)):
     columns = [c.name for c in SeniorOutreachRecord.__table__.columns]
     output = io.StringIO(); writer = csv.DictWriter(output, fieldnames=columns); writer.writeheader()
-    for row in list_records(db):
+    for row in territory_records(db, territory):
         # Spreadsheet formulas must not execute when a saved note is exported.
         writer.writerow({k: "'" + str(v) if isinstance(v, str) and v.lstrip().startswith(('=', '+', '-', '@')) else v for k, v in row.items()})
-    return Response(output.getvalue(), media_type='text/csv', headers={'Content-Disposition': 'attachment; filename="senior-center-outreach.csv"', 'Cache-Control': 'no-store'})
+    return Response(output.getvalue(), media_type='text/csv', headers={'Content-Disposition': f'attachment; filename="{territory}-senior-center-outreach.csv"', 'Cache-Control': 'no-store'})

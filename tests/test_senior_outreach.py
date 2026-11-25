@@ -133,3 +133,48 @@ def test_csv_export_requires_owner_and_neutralizes_formulas(setup):
     response = client.get('/senior-outreach/export.csv')
     assert response.status_code == 200 and "'=HYPERLINK" in response.text
     assert response.headers['cache-control'] == 'no-store'
+
+
+@pytest.mark.parametrize('center_type', ['senior_center', 'nutrition_site', 'county_provider'])
+def test_wv_center_types_can_be_saved_without_changing_service_contract(setup, center_type):
+    client, _ = setup
+    data = payload(); data.update(center_name='WV County Senior Services', type=center_type)
+    response = service(client, 'PUT', '/wv-example-center', data)
+    assert response.status_code == 200 and response.json()['type'] == center_type
+    assert service(client, 'GET').json()['records'][0]['center_id'] == 'wv-example-center'
+
+
+def test_territory_dashboard_counts_rows_links_and_export_are_scoped(setup):
+    client, factory = setup
+    sa = payload(); sa.update(center_name='San Antonio test center', status='completed', notes='SA_ONLY_NOTE')
+    wv = payload(); wv.update(center_name='West Virginia test center', status='follow_up', next_follow_up='2020-01-01', type='senior_center', notes='WV_ONLY_NOTE')
+    assert service(client, 'PUT', '/sa-example', sa).status_code == 200
+    assert service(client, 'PUT', '/wv-example', wv).status_code == 200
+    sign_in(client, factory)
+    sa_view = client.get('/senior-outreach')
+    assert sa_view.status_code == 200
+    assert sa_view.context['territory'] == 'sa-clover'
+    assert [row['center_id'] for row in sa_view.context['rows']] == ['sa-example']
+    assert sa_view.context['counts']['completed'] == 1 and sa_view.context['counts']['follow_up'] == 0
+    assert sa_view.context['due'] == 0
+    assert 'SA_ONLY_NOTE' in sa_view.text and 'WV_ONLY_NOTE' not in sa_view.text
+    assert '?territory=sa-clover&amp;center=sa-example' in sa_view.text
+    wv_view = client.get('/senior-outreach?territory=wv-peak')
+    assert wv_view.status_code == 200
+    assert [row['center_id'] for row in wv_view.context['rows']] == ['wv-example']
+    assert wv_view.context['counts']['follow_up'] == 1 and wv_view.context['counts']['completed'] == 0
+    assert wv_view.context['due'] == 1
+    assert 'WV_ONLY_NOTE' in wv_view.text and 'SA_ONLY_NOTE' not in wv_view.text
+    assert GIS_URL + '/?territory=wv-peak' in wv_view.text
+    assert '?territory=wv-peak&amp;center=wv-example' in wv_view.text
+    sa_csv = client.get('/senior-outreach/export.csv').text
+    wv_csv = client.get('/senior-outreach/export.csv?territory=wv-peak').text
+    assert 'SA_ONLY_NOTE' in sa_csv and 'WV_ONLY_NOTE' not in sa_csv
+    assert 'WV_ONLY_NOTE' in wv_csv and 'SA_ONLY_NOTE' not in wv_csv
+    assert len(service(client, 'GET').json()['records']) == 2  # Shared API stays unfiltered.
+    assert client.get('/senior-outreach?territory=invalid').status_code == 422
+    assert client.get('/senior-outreach/export.csv?territory=invalid').status_code == 422
+    for template in ['app/templates/layouts/sidebar.html','app/templates/base_v2.html']:
+        source = Path(template).read_text()
+        assert 'territory=wv-peak' in source and 'Peak Health WV Outreach' in source
+        assert 'territory=sa-clover' in source and 'San Antonio Outreach' in source
