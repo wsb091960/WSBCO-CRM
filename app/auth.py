@@ -91,6 +91,11 @@ def digest(value):
 
 
 def service_endpoint(path, method):
+    # This isolated collection validates its own dedicated service token.
+    if (path == '/api/senior-outreach/service/records' and method == 'GET') or (
+            re.fullmatch(r'/api/senior-outreach/service/records/[a-z0-9][a-z0-9_-]{0,119}', path)
+            and method in {'GET', 'PUT'}):
+        return True
     if path in {'/', '/login', '/auth/google/start', '/health'} and method in {'GET', 'HEAD'}:
         return True
     if path == '/auth/google/complete' and method == 'POST':

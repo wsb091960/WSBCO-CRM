@@ -1,3 +1,4 @@
+from app.senior_outreach import router as senior_outreach_router
 from app.golf_integration import router as golf_integration_router
 from app.address_cleanup import router as address_cleanup_router
 from app.gis_map import router as gis_router
@@ -43,6 +44,7 @@ app.include_router(plan_compare_v36_router)
 app.include_router(ma_county_map_router)
 app.include_router(turning65_router)
 app.include_router(territories_router)
+app.include_router(senior_outreach_router)
 
 
 @app.on_event("startup")
