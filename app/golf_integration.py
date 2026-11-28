@@ -79,6 +79,25 @@ def require_key(value: str | None, expected_env: str):
         raise HTTPException(status_code=403, detail="Integration authentication required")
 
 
+def _video_intake_result(db: Session, lead_id: int, already_saved: bool):
+    """Retry student sync on repeated delivery; preserve the committed inquiry."""
+    profile = db.query(GolfProfile).filter_by(lead_id=lead_id).first()
+    result = {"crm_contact_id": lead_id, "golf_stage": "Inquiry", "already_saved": already_saved}
+    if not profile or profile.program not in {
+        "Video lesson — Full swing analysis", "Video lesson — Short game", "Video lesson — Putting"
+    }:
+        return result
+    if os.getenv("GOLF_VIDEO_AUTO_SYNC", "").strip() != "1":
+        return {**result, "video_sync": "disabled"}
+    try:
+        linked = _convert_to_student(lead_id, db)
+        return {**result, "golf_stage": "Active student", "video_sync": "linked",
+                "golf_student_id": linked["golf_student_id"]}
+    except HTTPException as exc:
+        db.rollback()
+        return {**result, "video_sync": "review_required" if exc.status_code == 409 else "pending"}
+
+
 @router.post("/inquiries", status_code=201)
 def create_inquiry(payload: Inquiry, x_golf_form_key: str | None = Header(default=None),
                    db: Session = Depends(get_db)):
@@ -86,7 +105,7 @@ def create_inquiry(payload: Inquiry, x_golf_form_key: str | None = Header(defaul
     require_key(x_golf_form_key, "GOLF_FORM_WEBHOOK_KEY")
     previous = db.get(GolfInquiryReceipt, payload.submission_id)
     if previous:
-        return {"crm_contact_id": previous.lead_id, "golf_stage": "Inquiry", "already_saved": True}
+        return _video_intake_result(db, previous.lead_id, True)
     notes = "\n".join([
         "Golf lesson inquiry — Reedsport Golf Course",
         "Program: " + payload.program,
@@ -109,8 +128,8 @@ def create_inquiry(payload: Inquiry, x_golf_form_key: str | None = Header(defaul
         previous = db.get(GolfInquiryReceipt, payload.submission_id)
         if not previous:
             raise
-        return {"crm_contact_id": previous.lead_id, "golf_stage": "Inquiry", "already_saved": True}
-    return {"crm_contact_id": lead.id, "golf_stage": "Inquiry", "already_saved": False}
+        return _video_intake_result(db, previous.lead_id, True)
+    return _video_intake_result(db, lead.id, False)
 
 
 @router.get("/contacts")
