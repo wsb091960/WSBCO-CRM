@@ -57,13 +57,16 @@ function relayGolfResponse_(response) {
       answers[item.getItem().getTitle()] = String(item.getResponse() || '').trim();
     });
     const nameParts = (answers['Your name'] || '').split(/\s+/);
+    const lessonType = answers['Lesson type'] || '';
+    const videoPrograms = {'Full swing analysis':'Video lesson — Full swing analysis','Short game':'Video lesson — Short game','Putting':'Video lesson — Putting'};
+    const program = Object.prototype.hasOwnProperty.call(videoPrograms, lessonType) ? videoPrograms[lessonType] : 'Individual lesson';
     const payload = {
       submission_id: 'google-form:' + FormApp.getActiveForm().getId() + ':' + response.getId(),
       first_name: nameParts.shift() || '',
       last_name: nameParts.join(' '),
       phone: answers['Phone number'] || '',
       email: answers['Email address (optional)'] || '',
-      program: 'Individual lesson',
+      program: program,
       goal: answers['What would you like help with?'] || '',
       experience: answers['Golf experience'] || '',
       preferred_contact: (answers['Preferred way to contact you'] || '').replace(/ \(.*\)$/, '')
@@ -93,6 +96,7 @@ function relayGolfResponse_(response) {
       'Name: ' + (payload.first_name + ' ' + payload.last_name).trim(),
       'Phone: ' + payload.phone,
       'Email: ' + (payload.email || 'Not provided'),
+      'Program: ' + payload.program,
       'Experience: ' + (payload.experience || 'Not provided'),
       'Preferred contact: ' + (payload.preferred_contact || 'Not provided'),
       'Golf goals: ' + (payload.goal || 'Not provided'), '',
